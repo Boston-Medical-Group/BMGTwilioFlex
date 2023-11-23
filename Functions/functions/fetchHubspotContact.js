@@ -42,7 +42,7 @@ const fetchByDeal = async (deal_id, context) => {
   }
 }
 
-exports.handler = FunctionTokenValidator(async function (  _, event, callback) {
+exports.handler = FunctionTokenValidator(async function (  context, event, callback) {
   const {
     crmid,
     deal_id
@@ -51,9 +51,9 @@ exports.handler = FunctionTokenValidator(async function (  _, event, callback) {
   try {
     let data;
     if (crmid) {
-      data = await fetchByContact(crmid, _);
+      data = await fetchByContact(crmid, context);
     } else if (deal_id) {
-      data = await fetchByDeal(deal_id, _);
+      data = await fetchByDeal(deal_id, context);
     } else {
       throw new Error('CONTACT ID (crmid) o DEAL ID Inválidos');
     }
