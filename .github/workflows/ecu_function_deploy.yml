@@ -1,15 +1,15 @@
-name: Twilio Functions - DEVELOP
+name: Twilio Functions - ECUADOR
 on:
   push:
     branches:
-      - dev
+      - main
     paths:
-      - 'Functions/**/*'
-      - '.github/workflows/*_function_deploy.yml'
+      - 'CHANGELOG.md'
+      - 'CHANGELOG_ECU.md'
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: Flex-DEVenv
+    environment: flex-ecu
     steps:
       - name: Preparing Repository
         uses: actions/checkout@v4
