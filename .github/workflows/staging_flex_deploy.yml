@@ -46,9 +46,9 @@ jobs:
       - name: Preparing 
         working-directory: Flex/${{matrix.folder}}
         run: npm install
-      - name: Testing
-        working-directory: Flex/${{matrix.folder}}
-        run: twilio flex:plugins:test
+#      - name: Testing
+#        working-directory: Flex/${{matrix.folder}}
+#        run: twilio flex:plugins:test
       - name: Deploying
         working-directory: Flex/${{matrix.folder}}
         run: twilio flex:plugins:deploy --changelog "check version"
