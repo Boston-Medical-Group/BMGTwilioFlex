@@ -29,7 +29,7 @@ exports.handler = FunctionTokenValidator(async function (_,  event,  callback) {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`
+        'Authorization': `Bearer ${_.HUBSPOT_TOKEN}`
       },
       body: JSON.stringify({
         properties: {

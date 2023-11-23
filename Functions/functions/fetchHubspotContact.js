@@ -1,12 +1,12 @@
 const FunctionTokenValidator = require('twilio-flex-token-validator').functionValidator;
 const fetch = require("node-fetch");
 
-const fetchByContact = async (crmid) => {
+const fetchByContact = async (crmid, context) => {
   const request = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${crmid}/?properties=email,firstname,lastname,phone,hs_object_id,reservar_cita`, {
     method: "GET",
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`
+      'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
     }
   });
 
@@ -17,12 +17,12 @@ const fetchByContact = async (crmid) => {
   return await request.json();
 }
 
-const fetchByDeal = async (deal_id) => {
+const fetchByDeal = async (deal_id, context) => {
   const request = await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${deal_id}/?associations=contacts`, {
     method: "GET",
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`
+      'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
     }
   });
 
@@ -51,9 +51,9 @@ exports.handler = FunctionTokenValidator(async function (  _, event, callback) {
   try {
     let data;
     if (crmid) {
-      data = await fetchByContact(crmid);
+      data = await fetchByContact(crmid, _);
     } else if (deal_id) {
-      data = await fetchByDeal(deal_id);
+      data = await fetchByDeal(deal_id, _);
     } else {
       throw new Error('CONTACT ID (crmid) o DEAL ID Inválidos');
     }

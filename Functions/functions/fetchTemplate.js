@@ -35,7 +35,7 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
         method: "GET",
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`
+          'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
         }
       });
 
