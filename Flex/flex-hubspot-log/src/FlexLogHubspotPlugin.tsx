@@ -64,7 +64,7 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
   }
 
   const token = manager.store.getState().flex.session.ssoTokenPayload.token;
-  const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/call`, {
+  const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/logCall`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json'
@@ -95,7 +95,7 @@ const LogHubspotMessage = async (task: ITask, manager: Flex.Manager) => {
   }
 
   const token = manager.store.getState().flex.session.ssoTokenPayload.token;
-  const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/message`, {
+  const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/logMessage`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json'

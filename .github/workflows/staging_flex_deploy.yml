@@ -1,0 +1,59 @@
+name: Twilio Flex Plugins - DEVELOP
+on:
+  pull_request:
+    branches:
+      - staging
+    types: [closed] 
+    paths:
+      - 'Flex/**/*'
+
+jobs:
+  prepare: # Job that list subdirectories inside flex
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    environment: Flex-DEVenv
+    outputs:
+      dir: ${{ steps.set-dirs.outputs.dir }} # generate output name folders by using inner step output
+    steps:
+      - uses: actions/checkout@v4
+      - id: set-dirs # Give it an id to handle to get step outputs in the outputs key above
+        run: |
+          echo "dir=$(curl -s  -H "Authorization: token ${{secrets.GITHUB_TOKEN}}" https://api.github.com/repos/${{github.repository}}/pulls/${{github.event.pull_request.number}}/files | jq -r '.[]  .filename' | cut -d "/" -f 1,2 | sed '/^Flex/!d'  | cut -d "/" -f 2 | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+
+  buildandrelease:
+    needs: prepare
+    if:  ${{ needs.prepare.outputs.dir != '[]' && needs.prepare.outputs.dir != '' }} 
+    runs-on: ubuntu-latest
+    environment: Flex-DEVenv
+    strategy:
+      matrix:
+        folder: ${{fromJson(needs.prepare.outputs.dir)}}
+    env:
+      TWILIO_ACCOUNT_SID: ${{secrets.ACCOUNT_SID}} 
+      TWILIO_API_KEY: ${{secrets.TWILIO_API_KEY}}
+      TWILIO_API_SECRET: ${{secrets.TWILIO_API_SECRET}}
+      FLEX_APP_HUBSPOT_CRMID: ${{secrets.FLEX_APP_HUBSPOT_CRMID}}
+      FLEX_APP_TWILIO_SERVERLESS_DOMAIN: ${{vars.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}}
+      FLEX_APP_CALENDAR_URL_FIELD: ${{vars.FLEX_APP_CALENDAR_URL_FIELD}}
+    steps:
+      - name: RepositoryPrep
+        uses: actions/checkout@v4
+      - name: NodeJSPrep
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: GlobalPackages
+        run: npm install twilio-cli -g 
+      - run: twilio plugins:install @twilio-labs/plugin-flex 
+      - name: Preparing 
+        working-directory: Flex/${{matrix.folder}}
+        run: npm install
+#      - name: Testing
+#        working-directory: Flex/${{matrix.folder}}
+#        run: twilio flex:plugins:test
+      - name: Deploying
+        working-directory: Flex/${{matrix.folder}}
+        run: twilio flex:plugins:deploy --changelog "check version"
+      - name: Releasing
+        working-directory: Flex/${{  matrix.folder }}
+        run: twilio flex:plugins:release --plugin ${{  matrix.folder }}@$(node -p -e "require('./package.json').version")

@@ -78,19 +78,16 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
       ]
     });
 
-    console.log(hubspotBody);
-
     const request = await fetch(`https://api.hubapi.com/crm/v3/objects/communications`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`
+        'Authorization': `Bearer ${_.HUBSPOT_TOKEN}`
       },
       body: hubspotBody
     });
 
     if (!request.ok) {
-      console.log(request)
       throw new Error('Error while retrieving data from hubspot');
     }
 

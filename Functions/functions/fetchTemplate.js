@@ -2,7 +2,7 @@ const FunctionTokenValidator = require('twilio-flex-token-validator').functionVa
 const TokenValidator = require('twilio-flex-token-validator').validator;
 const fetch = require("node-fetch");
 
-export const handler = FunctionTokenValidator(async function (context, event, callback) {
+exports.handler = FunctionTokenValidator(async function (context, event, callback) {
   /**
    * @typedef {{hubspot_id: string, Token: string, country?: string}} event
    * @property {string} hubspot_id - El ID de HubSpot
@@ -18,7 +18,8 @@ export const handler = FunctionTokenValidator(async function (context, event, ca
   try {
 
     let defaultCountry = 'EC';
-    if (event.hasOwnProperty('country')) {
+    const validCountries = ['EC','CA','ES','MX','CO','AR','PE','DE'];
+    if (event.hasOwnProperty('country') && validCountries.includes(event.country)) {
       defaultCountry = event.country;
     }
 
@@ -30,12 +31,12 @@ export const handler = FunctionTokenValidator(async function (context, event, ca
     const client = context.getTwilioClient();
 
     let template;
-    if (hubspot_id) {
+    if (hubspot_id && templateRaw?.length > 0) {
       const request = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspot_id}`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`
+          'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
         }
       });
 

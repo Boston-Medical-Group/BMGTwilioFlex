@@ -1,12 +1,12 @@
 const FunctionTokenValidator = require('twilio-flex-token-validator').functionValidator;
 const fetch = require("node-fetch");
 
-const fetchByContact = async (crmid) => {
+const fetchByContact = async (crmid, context) => {
   const request = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${crmid}/?properties=email,firstname,lastname,phone,hs_object_id,reservar_cita`, {
     method: "GET",
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`
+      'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
     }
   });
 
@@ -17,12 +17,12 @@ const fetchByContact = async (crmid) => {
   return await request.json();
 }
 
-const fetchByDeal = async (deal_id) => {
+const fetchByDeal = async (deal_id, context) => {
   const request = await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${deal_id}/?associations=contacts`, {
     method: "GET",
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.HUBSPOT_TOKEN}`
+      'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
     }
   });
 
@@ -31,19 +31,15 @@ const fetchByDeal = async (deal_id) => {
   }
 
   const deal = await request.json();
-  console.log('found deal', deal);
   if (deal.associations?.contacts?.results?.length > 0) {
     const contactId = deal.associations.contacts.results[0].id;
-    console.log('found contact', contactId);
-    return await fetchByContact(contactId);
+    return await fetchByContact(contactId, context);
   } else {
-    console.log('Conact not found in deal associations');
     throw new Error('Error while retrieving data from hubspot');
   }
 }
 
-// @ts-ignore
-export const handler = FunctionTokenValidator(async function (  _, event, callback) {
+exports.handler = FunctionTokenValidator(async function (  context, event, callback) {
   const {
     crmid,
     deal_id
@@ -52,9 +48,9 @@ export const handler = FunctionTokenValidator(async function (  _, event, callba
   try {
     let data;
     if (crmid) {
-      data = await fetchByContact(crmid);
+      data = await fetchByContact(crmid, context);
     } else if (deal_id) {
-      data = await fetchByDeal(deal_id);
+      data = await fetchByDeal(deal_id, context);
     } else {
       throw new Error('CONTACT ID (crmid) o DEAL ID Inválidos');
     }
