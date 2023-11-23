@@ -2,8 +2,7 @@ name: Twilio Flex Plugins - ECUADOR
 on:
   push:
     branches:
-      - master
-
+      - main
     paths:
       - 'CHANGELOG.md'
       - 'CHANGELOG_ECU.md'
