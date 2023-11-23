@@ -5,6 +5,7 @@ on:
       - dev
     paths:
       - 'Functions/**/*'
+      - '.github/workflows/*_function_deploy.yml'
 jobs:
   build:
     runs-on: ubuntu-latest
