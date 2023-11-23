@@ -75,7 +75,7 @@ const InteractionCard = ({manager}) => {
         .catch(() => setError("Error while fetching data from Hubspot"));
     } else if (dealId) {
       getDataByDealId({ deal_id: dealId })
-        .then(data => setContact(data))
+        .then(data => setContact(data.properties))
         .catch(() => setError("Error while fetching data from Hubspot"));
     }
   }, [contactId, dealId])
