@@ -30,7 +30,7 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
     const client = context.getTwilioClient();
 
     let template;
-    if (hubspot_id) {
+    if (hubspot_id && templateRaw?.length > 0) {
       const request = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspot_id}`, {
         method: "GET",
         headers: {
