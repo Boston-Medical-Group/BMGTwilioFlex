@@ -43,13 +43,6 @@ jobs:
           TWILIO_ACCOUNT_SID: ${{secrets.ACCOUNT_SID}} 
           TWILIO_API_KEY: ${{secrets.TWILIO_API_KEY}}
           TWILIO_API_SECRET: ${{secrets.TWILIO_API_SECRET}}
-          HUBSPOT_TOKEN: ${{secrets.HUBSPOT_TOKEN}}
-          INBOUND_SMS_STUDIO_FLOW: ${{secrets.INBOUND_SMS_STUDIO_FLOW}}
-          TASK_ROUTER_WORKSPACE_SID: ${{secrets.TASK_ROUTER_WORKSPACE_SID}}
-          TASK_ROUTER_WORKFLOW_SID: ${{secrets.TASK_ROUTER_WORKFLOW_SID}}
-          TASK_ROUTER_QUEUE_SID: ${{secrets.TASK_ROUTER_QUEUE_SID}}
-          TWILIO_PHONE_NUMBER: ${{secrets.TWILIO_PHONE_NUMBER}}
-          TWILIO_WA_PHONE_NUMBER: ${{secrets.TWILIO_WA_PHONE_NUMBER}}
         run: twilio serverless:deploy --environment=dev --force -n bmg-elexial-cc-stack --override-existing-project
 
   
