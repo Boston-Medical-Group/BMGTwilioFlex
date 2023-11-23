@@ -31,7 +31,7 @@ jobs:
       - name: Installing NodeJS and NPM
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
       - name: Installing Packages 
         working-directory: Functions
         run: npm install twilio-cli -g;twilio plugins:install @twilio-labs/plugin-serverless;npm install
