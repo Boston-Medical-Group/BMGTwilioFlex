@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: Functions/package-lock.json
       - name: Installing Packages 
         working-directory: Functions
         run: npm install twilio-cli -g;twilio plugins:install @twilio-labs/plugin-serverless;npm install

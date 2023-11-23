@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: Functions/package-lock.json
       - name: Installing Packages 
         working-directory: Functions
         run: npm install twilio-cli -g;twilio plugins:install @twilio-labs/plugin-serverless;npm install
@@ -33,7 +34,7 @@ jobs:
           TASK_ROUTER_QUEUE_SID: ${{secrets.TASK_ROUTER_QUEUE_SID}}
           TWILIO_PHONE_NUMBER: ${{secrets.TWILIO_PHONE_NUMBER}}
           TWILIO_WA_PHONE_NUMBER: ${{secrets.TWILIO_WA_PHONE_NUMBER}}
-        run: twilio serverless:deploy --environment=dev --force -n bmg-elexial-cc-stack --override-existing-project --env .env.example
+        run: twilio serverless:deploy --env .env.example --environment=dev --force -n bmg-elexial-cc-stack --override-existing-project
 
   
        
