@@ -89,7 +89,7 @@ const sendOutboundMessage = async (client, To, From, Body, KnownAgentRoutingFlag
     return { success: true, channelSid: channel.sid };
   };
 
-export const handler = FunctionTokenValidator(async function (context, event, callback) {
+exports.handler = FunctionTokenValidator(async function (context, event, callback) {
   const {
     To,
     Body,

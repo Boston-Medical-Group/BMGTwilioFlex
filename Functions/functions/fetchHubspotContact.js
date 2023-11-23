@@ -42,8 +42,7 @@ const fetchByDeal = async (deal_id) => {
   }
 }
 
-// @ts-ignore
-export const handler = FunctionTokenValidator(async function (  _, event, callback) {
+exports.handler = FunctionTokenValidator(async function (  _, event, callback) {
   const {
     crmid,
     deal_id

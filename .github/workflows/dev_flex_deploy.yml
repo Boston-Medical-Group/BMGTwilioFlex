@@ -4,6 +4,9 @@ on:
     branches:
       - dev
 
+    paths:
+      - 'Flex/**/*'
+
 jobs:
   prepare: # Job that list subdirectories inside flex
     runs-on: ubuntu-latest
