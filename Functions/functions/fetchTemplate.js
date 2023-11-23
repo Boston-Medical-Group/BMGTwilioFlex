@@ -18,7 +18,8 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
   try {
 
     let defaultCountry = 'EC';
-    if (event.hasOwnProperty('country')) {
+    const validCountries = ['EC','CA','ES','MX','CO','AR','PE','DE'];
+    if (event.hasOwnProperty('country') && validCountries.includes(event.country)) {
       defaultCountry = event.country;
     }
 
