@@ -31,13 +31,10 @@ const fetchByDeal = async (deal_id, context) => {
   }
 
   const deal = await request.json();
-  console.log('found deal', deal);
   if (deal.associations?.contacts?.results?.length > 0) {
     const contactId = deal.associations.contacts.results[0].id;
-    console.log('found contact', contactId);
-    return await fetchByContact(contactId);
+    return await fetchByContact(contactId, context);
   } else {
-    console.log('Conact not found in deal associations');
     throw new Error('Error while retrieving data from hubspot');
   }
 }
