@@ -149,7 +149,7 @@ const InteractionCard = ({manager}) => {
             <Button variant="primary" title={actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call"} disabled={actionDisabled} onClick={() => initiateCallHandler(contact)}><FaPhoneAlt /> Call</Button>
               <Button variant="primary" title={actionDisabled ? "To send a SMS, please change your status from 'Offline'" : "Send a SMS"} disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
               <Button variant="primary" title={actionDisabled ? "To send a WhatsApp, please change your status from 'Offline'" : "Send a WhatsApp"} disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
-              {calendar(contact) && <Button variant="primary" title={actionDisabled ? "To send a WhatsApp, please change your status from 'Offline'" : "Send a WhatsApp"} disabled={actionDisabled} onClick={() => sendCalendarHandler(contact)}><FaCalendar /> Cita</Button>}
+              {calendar(contact) && <Button variant="primary" title="Schedule a new appointment" onClick={() => sendCalendarHandler(contact)}><FaCalendar /> Cita</Button>}
           </Stack>
           </Card>
         </Box>
