@@ -7,7 +7,8 @@ exports.handler = function (context, event, callback) {
         firstname: '',
         lastname: '',
         fullname: '',
-        lifecyclestage: 'lead'
+        lifecyclestage: 'lead',
+        leadorpatient: 'lead'
     };
     let from = event.from;
 
@@ -31,6 +32,9 @@ exports.handler = function (context, event, callback) {
                 result.lastname = `${contact.properties.lastname.value}`;
                 result.fullname = `${contact.properties.firstname.value ?? ''} ${contact.properties.lastname.value ?? ''}`;
                 result.lifecyclestage = `${contact.properties?.lifecyclestage?.value ?? 'lead'}`;
+                if ((result.lifecyclestage != 'lead') && (result.lifecyclestage != 'marketingqualifiedlead') && (result.lifecyclestage != 'opportunity')) {
+                    result.leadorpatient = 'patient';
+                }
                 if (result.fullname.trim() == '') {
                     result.fullname = 'Customer'
                 }
