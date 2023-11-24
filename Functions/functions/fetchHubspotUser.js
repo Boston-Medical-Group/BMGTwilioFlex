@@ -8,7 +8,7 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
   } = event;
 
   try {
-    const request = await fetch(`https://api.hubapi.com/settings/v3/users/${email}?idProperty=EMAIL`, {
+    const request = await fetch(`https://api.hubapi.com/crm/v3/owners/?email=${email}&limit=1`, {
       method: "GET",
       headers: {
         'Content-Type': 'application/json',

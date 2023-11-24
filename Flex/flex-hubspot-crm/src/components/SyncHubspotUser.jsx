@@ -16,13 +16,22 @@ const SyncHubspotUser = ({ manager }) => {
     }, [])
 
     const sync = async () => {
-        if (!manager.workerClient.attributes.hasOwnProperty('hubspot_id')) {
+        if (!manager.workerClient.attributes.hasOwnProperty('hubspot_id') || !manager.workerClient.attributes.hasOwnProperty('hubspot_owner_id')) {
             getHubspotUserByEmail({ email: manager.workerClient.attributes.email })
-                .then(async (user) => {
-                    if (user && user.id) {
-                        manager.workerClient.attributes.hubspot_id = user.id;
-                        console.log(manager.workerClient.attributes);
-                        await manager.workerClient.setAttributes(manager.workerClient.attributes);
+                .then(async (users) => {
+                    if (users?.results && users.results[0]) {
+                        const user = users.results[0];
+                        if (user) {
+                            if (user.userId) {
+                                manager.workerClient.attributes.hubspot_id = user.userId;
+                            }
+                            if (user.id) {
+                                manager.workerClient.attributes.hubspot_owner_id = user.id;
+                            }
+                            
+                            console.log(manager.workerClient.attributes);
+                            await manager.workerClient.setAttributes(manager.workerClient.attributes);
+                        }
                     }
                 })
                 .catch(() => console.log("Error while Syncing Hubspot User"));

@@ -18,7 +18,7 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
     "CONNECTED": "f240bbac-87c9-4f6e-bf70-924b57d47db7"
   }
 
-  const ownerId = manager.workerClient?.attributes?.hubspot_id ?? null;
+  const ownerId = manager.workerClient?.attributes?.hubspot_owner_id ?? null;
 
   const direction = task.attributes.direction.toUpperCase();
   let params : any = {}
@@ -85,7 +85,7 @@ const LogHubspotMessage = async (task: ITask, manager: Flex.Manager) => {
     return;
   }
   
-  const ownerId = manager.workerClient?.attributes?.hubspot_id ?? null;
+  const ownerId = manager.workerClient?.attributes?.hubspot_owner_id ?? null;
 
   const params = {
     conversationSid: task.attributes.conversationSid,
