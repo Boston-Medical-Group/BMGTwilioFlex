@@ -44,7 +44,8 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
     hs_communication_channel_type,
     hs_communication_logged_from,
     hs_communication_body,
-    hs_timestamp
+    hs_timestamp,
+    hubspot_owner_id
   } = event
 
   try {
@@ -61,7 +62,8 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
         hs_communication_channel_type,
         hs_communication_logged_from,
         hs_communication_body: logBody,
-        hs_timestamp
+        hs_timestamp,
+        hubspot_owner_id
       },
       associations: [
         {

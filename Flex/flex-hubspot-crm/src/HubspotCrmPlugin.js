@@ -1,5 +1,6 @@
 import React from 'react';
 import { FlexPlugin } from '@twilio/flex-plugin';
+import SyncHubspotUser from './components/SyncHubspotUser';
 
 const PLUGIN_NAME = 'HubspotCrmPlugin';
 
@@ -15,6 +16,9 @@ export default class HubspotCrmPlugin extends FlexPlugin {
    * @param flex { typeof import('@twilio/flex-ui') }
    */
   async init(flex, manager) {
+
+    flex.AgentDesktopView.Panel1.Content.add(<SyncHubspotUser key="HubspotCrmPlugin-component-SyncHubspotUser" manager={manager} />)
+
     //If there is a task and the task has a crm ID, screenpop customer record. Otherwise show the list of contacts
     flex.CRMContainer.defaultProps.uriCallback = (task) => {
       if (task && task.attributes.crmid)
