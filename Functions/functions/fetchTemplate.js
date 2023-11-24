@@ -3,13 +3,6 @@ const TokenValidator = require('twilio-flex-token-validator').validator;
 const fetch = require("node-fetch");
 
 exports.handler = FunctionTokenValidator(async function (context, event, callback) {
-  /**
-   * @typedef {{hubspot_id: string, Token: string, country?: string}} event
-   * @property {string} hubspot_id - El ID de HubSpot
-   * @property {string} Token - El token de autenticación
-  */
-  
-  /** @type {event} */
   const {
     hubspot_id,
     Token

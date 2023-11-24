@@ -8,7 +8,6 @@ const PLUGIN_NAME = 'FlexLogHubspotPlugin';
 const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
   // if task.attributes.hubspot_contact_id is not available end this callback
   //const { postCallLog } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
-  console.log('JRUMEAU sending', task.attributes);
 
   const mapOutcome : { [key: string]: string } = {
     "NO_ANSWER": "73a0d17f-1163-4015-bdd5-ec830791da20",
@@ -18,6 +17,8 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
     "LEFT_VOICEMAIL": "b2cf5968-551e-4856-9783-52b3da59a7d0",
     "CONNECTED": "f240bbac-87c9-4f6e-bf70-924b57d47db7"
   }
+
+  const ownerId = manager.workerClient?.attributes?.hubspot_id ?? null;
 
   const direction = task.attributes.direction.toUpperCase();
   let params : any = {}
@@ -39,7 +40,7 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
       hs_call_recording_url: task.attributes.conversations?.segment_link ?? null,
       hs_call_status: task.status == 'completed' ? 'COMPLETED' : 'CALLING_CRM_USER',
       //hs_call_title: ''
-      //hubspot_owner_id: task.attributes.hubspot_contact_id ?? null,
+      hubspot_owner_id: ownerId,
     }
   } else if (direction === 'OUTBOUND') {
     params = {
@@ -59,7 +60,7 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
       hs_call_recording_url: task.attributes.conversations?.segment_link ?? null,
       hs_call_status: task.status == 'completed' ? 'COMPLETED' : 'CALLING_CRM_USER',
       //hs_call_title: ''
-      //hubspot_owner_id: task.attributes.hubspot_contact_id ?? null,
+      hubspot_owner_id: ownerId,
     }
   }
 
@@ -84,6 +85,8 @@ const LogHubspotMessage = async (task: ITask, manager: Flex.Manager) => {
     return;
   }
   
+  const ownerId = manager.workerClient?.attributes?.hubspot_id ?? null;
+
   const params = {
     conversationSid: task.attributes.conversationSid,
     hubspot_contact_id: task.attributes.hubspot_contact_id ?? null,
@@ -92,6 +95,7 @@ const LogHubspotMessage = async (task: ITask, manager: Flex.Manager) => {
     hs_communication_body: `${task.attributes.conversations?.outcome} - "${task.attributes.conversations?.content}"
     - Duración: ${task.age} segundos`,
     hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
+    hubspot_owner_id: ownerId,
   }
 
   const token = manager.store.getState().flex.session.ssoTokenPayload.token;
