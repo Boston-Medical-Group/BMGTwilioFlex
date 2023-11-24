@@ -17,7 +17,7 @@ exports.handler = FunctionTokenValidator(async function (_,  event,  callback) {
     hs_call_to_number,
     hs_call_recording_url,
     hs_call_status,
-    //hubspot_owner_id
+    hubspot_owner_id
   } = event
 
   try {
@@ -42,7 +42,8 @@ exports.handler = FunctionTokenValidator(async function (_,  event,  callback) {
           hs_call_to_number,
           hs_call_recording_url,
           hs_call_status,
-          hs_call_disposition
+          hs_call_disposition,
+          hubspot_owner_id
         },
         associations: [
           {
