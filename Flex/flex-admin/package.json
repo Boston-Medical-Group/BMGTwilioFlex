@@ -2,6 +2,7 @@
   "name": "flex-admin",
   "version": "0.2.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "postinstall": "flex-plugin pre-script-check"
   },
@@ -15,7 +16,9 @@
   "devDependencies": {
     "@twilio-paste/core": "^17.0.0",
     "@twilio/flex-ui": "2.4.1",
+    "@types/axios": "^0.14.0",
     "@types/uuid": "^8.3.4",
+    "axios": "^0.27.2",
     "downshift": "^6.1.12",
     "libphonenumber-js": "^1.10.14",
     "moment-timezone": "^0.5.38",
