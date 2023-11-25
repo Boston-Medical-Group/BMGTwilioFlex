@@ -2,7 +2,6 @@
   "name": "flex-admin",
   "version": "0.2.1",
   "private": true,
-  "type": "module",
   "scripts": {
     "postinstall": "flex-plugin pre-script-check"
   },
