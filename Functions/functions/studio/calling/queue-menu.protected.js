@@ -160,7 +160,7 @@ exports.handler = async function (context, event, callback) {
                         waitTts = `menos de ${ewt + 1} minutos...`;
                 }
 
-                waitMsg += `Eñ tiempo estimado de espera es de ${waitTts} ....`;
+                waitMsg += `El tiempo estimado de espera es de ${waitTts} ....`;
             }
 
             //  Logic for Position in Queue
