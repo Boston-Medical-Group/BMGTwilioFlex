@@ -1,6 +1,6 @@
 {
   "name": "bmg-cc-twilio-functions",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,6 +16,8 @@
   "devDependencies": {
     "@types/node-fetch": "^2.6.9",
     "copyfiles": "^2.2.0",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "nodemon": "^2.0.20",
     "twilio-run": "^3.5.3",
     "wrap-ansi": "^9.0.0"

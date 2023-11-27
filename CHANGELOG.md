@@ -2,6 +2,7 @@
 
 ## 27/11/2023
 * Agrega funciones de Admin y plugin Admin
+* Agrega funciones de calling
 
 ## 24/11/2023
 * Agrega identificación de agente en Flex y en log de Llamadas/Chat
