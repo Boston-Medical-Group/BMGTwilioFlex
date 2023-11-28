@@ -7,6 +7,7 @@
 * Corrige path de funciones en directorios
 * Corrige url de assets
 * Agrega traducciones
+* Ajuste en logs
 
 ## 27/11/2023
 * Agrega funciones de Admin y plugin Admin

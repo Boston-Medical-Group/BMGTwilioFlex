@@ -58,7 +58,7 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
     logBody += '<br /><br />';
     logBody += await getHtmlMessage(_.getTwilioClient(), conversationSid);
 
-    let hubspotBody = {
+    let toHubspot = {
       properties: {
         hs_communication_channel_type,
         hs_communication_logged_from,
@@ -94,7 +94,7 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${_.HUBSPOT_TOKEN}`
       },
-      body: JSON.stringify(hubspotBody)
+      body: JSON.stringify(toHubspot)
     });
 
     if (!request.ok) {
