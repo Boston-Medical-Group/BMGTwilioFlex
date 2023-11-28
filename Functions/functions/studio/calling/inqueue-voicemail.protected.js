@@ -109,7 +109,7 @@ exports.handler = async function (context, event, callback) {
 
         case 'main':
             //  Main logic for Recording the voicemail
-            twiml.say(sayOptions, 'Please leave a message at the tone.  Press the star key when finished.');
+            twiml.say(sayOptions, 'Por favor deje un mensaje despues del tono. Presione asterisco al finalizar.');
             twiml.record({
                 action: `${domain}/studio/calling/inqueue-voicemail?mode=success&CallSid=${CallSid}`,
                 transcribeCallback: `${domain}/studio/calling/inqueue-voicemail?mode=submitVoicemail&CallSid=${CallSid}`,
@@ -119,13 +119,13 @@ exports.handler = async function (context, event, callback) {
                 timeout: 10,
                 finishOnKey: '*',
             });
-            twiml.say(sayOptions, 'I did not capture your recording');
+            twiml.say(sayOptions, 'Lo siento, no logramos capturar su grabación');
             return callback(null, twiml);
             break;
 
         //  End the voicemail interaction - hang up call
         case 'success':
-            twiml.say(sayOptions, 'Your voicemail has been successfully received... goodbye');
+            twiml.say(sayOptions, 'Su mensaje de voz ha sido recibido... hasta pronto');
             twiml.hangup();
             return callback(null, twiml);
             break;

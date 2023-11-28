@@ -95,9 +95,9 @@ exports.handler = async function (context, event, callback) {
         //  present main menu options
         case 'main':
             // main menu
-            message = `You have requested a callback at ${formatPhoneNumber(PhoneNumberFrom)}...`;
-            message += 'If this is correct, press 1...';
-            message += 'Press 2 to be called at different number';
+            message = `Ha solicitado que lo llamemos al número ${formatPhoneNumber(PhoneNumberFrom)}...`;
+            message += 'Si esto es correcto, presione 1...';
+            message += 'Presione 2 si desea que lo llamemos a un número diferente';
 
             queries = {
                 mode: 'mainProcess',
@@ -136,8 +136,8 @@ exports.handler = async function (context, event, callback) {
                     break;
                 //  new number
                 case '2':
-                    message = 'Using your keypad, enter in your phone number...';
-                    message += 'Press the pound sign when you are done...';
+                    message = 'Use su teclado para ingresar su número de teléfono...';
+                    message += 'Presione numeral al finalizar...';
 
                     queries = {
                         mode: 'newNumber',
@@ -178,7 +178,7 @@ exports.handler = async function (context, event, callback) {
                     if (taskSid) {
                         queries.taskSid = taskSid;
                     }
-                    twiml.say(sayOptions, 'I did not understand your selection.');
+                    twiml.say(sayOptions, 'No he entendido su seleccion.');
                     twiml.redirect(urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries));
                     return callback(null, twiml);
                     break;
@@ -190,10 +190,10 @@ exports.handler = async function (context, event, callback) {
             const NewPhoneNumber = event.Digits;
             // TODO: Handle country code in new number
 
-            message = `You entered ${formatPhoneNumber(NewPhoneNumber)} ...`;
-            message += 'Press 1 if this is correct...';
-            message += 'Press 2 to re-enter your number';
-            message += 'Press the star key to return to the main menu';
+            message = `Ha ingresado el número ${formatPhoneNumber(NewPhoneNumber)} ...`;
+            message += 'Presione 1 si es correcto...';
+            message += 'Presione 2 para ingresar el número nuevamente';
+            message += 'Presione asterisco para regresar al menu principal';
 
             queries = {
                 mode: 'mainProcess',
@@ -238,9 +238,9 @@ exports.handler = async function (context, event, callback) {
             await createCallbackTask(client, CallbackNumber, taskInfo, ringBackUrl);
 
             //  hangup the call
-            twiml.say(sayOptions, 'Your callback request has been delivered...');
-            twiml.say(sayOptions, 'An available care specialist will reach out to contact you...');
-            twiml.say(sayOptions, 'Thank you for your call.');
+            twiml.say(sayOptions, 'Su solicitud ha sido recibida...');
+            twiml.say(sayOptions, 'Un agente disponible lo contactará a la brevedad...');
+            twiml.say(sayOptions, 'Gracias por llamar.');
             twiml.hangup();
             return callback(null, twiml);
             break;
