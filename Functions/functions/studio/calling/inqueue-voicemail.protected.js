@@ -24,10 +24,9 @@
  *
  *Last Updated: 03/27/2020
  */
-
-const helpersPath = Runtime.getFunctions().helpers.path;
+const helpersPath = Runtime.getFunctions()['studio/calling/helpers'].path;
 const { getTask, cancelTask, getTime, handleError } = require(helpersPath);
-const optionsPath = Runtime.getFunctions().options.path;
+const optionsPath = Runtime.getFunctions()['studio/calling/options'].path;
 const options = require(optionsPath);
 
 // create the voicemail task
