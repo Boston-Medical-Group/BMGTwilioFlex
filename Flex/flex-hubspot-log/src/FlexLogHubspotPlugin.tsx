@@ -26,6 +26,7 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
     params = {
       //hs_object_id: task.attributes.hubspot_contact_id ?? null,
       hs_call_callee_object_id: task.attributes.hubspot_contact_id ?? null,
+      hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
       // convert task.dateCreated Date Object to UTC time and to timestamp
       hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
       // @todo custom disposition codes
@@ -46,6 +47,7 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
     params = {
       //hs_object_id: task.attributes.hubspot_contact_id ?? null,
       hs_call_callee_object_id: task.attributes.hubspot_contact_id ?? null,
+      hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
       // convert task.dateCreated Date Object to UTC time and to timestamp
       hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
       // @todo custom disposition codes
@@ -90,6 +92,7 @@ const LogHubspotMessage = async (task: ITask, manager: Flex.Manager) => {
   const params = {
     conversationSid: task.attributes.conversationSid,
     hubspot_contact_id: task.attributes.hubspot_contact_id ?? null,
+    hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
     hs_communication_channel_type: task.attributes.channelType == 'whatsapp' ? 'WHATS_APP' : 'SMS',
     hs_communication_logged_from: 'CRM',
     hs_communication_body: `${task.attributes.conversations?.outcome} - "${task.attributes.conversations?.content}"

@@ -95,7 +95,8 @@ const InteractionCard = ({manager}) => {
       destination: data.phone,
       taskAttributes: {
         name: `${data.firstname || ''} ${data.lastname || ''}`.trim(),
-        hubspot_contact_id: data.hs_object_id
+        hubspot_contact_id: data.hs_object_id,
+        hubspot_deal_id: dealId ?? null
       }
     });
   }, []);
@@ -137,8 +138,8 @@ const InteractionCard = ({manager}) => {
   return (
     <Theme.Provider theme="default">
       <>
-        <SendSmsModal selectedContact={selectedSmsContact} manager={manager} handleClose={handleCloseModel} />
-        <SendWAModal selectedContact={selectedWAContact} manager={manager} handleClose={handleCloseModel} />
+        <SendSmsModal selectedContact={selectedSmsContact} dealId={dealId} manager={manager} handleClose={handleCloseModel} />
+        <SendWAModal selectedContact={selectedWAContact} dealId={dealId} manager={manager} handleClose={handleCloseModel} />
         <Box paddingTop="space60">
         <Card>
           <Heading as="h2" variant="heading20">Interactuar con {fullName(contact)}</Heading>
