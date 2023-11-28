@@ -1,5 +1,5 @@
 module.exports = {
-    sayOptions: { voice: 'Polly.Conchita', language: 'es-ES' },
+    sayOptions: { voice: 'Google.es-US-Neural2-A', language: 'es-ES' },
     holdMusicUrl: '/guitar_music.mp3',
     // Enable Estimated Waiting Time in voice prompt
     getEwt: true,
@@ -16,5 +16,5 @@ module.exports = {
     // Agent audible alert sound file for callback call
     CallbackAlertTone: '/alertTone.mp3',
     // Timezone configuration
-    TimeZone: 'America/Los_Angeles',
+    TimeZone: 'America/Bogota',
 };
