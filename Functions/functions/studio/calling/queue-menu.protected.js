@@ -140,7 +140,7 @@ exports.handler = async function (context, event, callback) {
             if (getEwt && taskInfo.status === 'success') {
                 const workflowStats = await getWorkflowCummStats(
                     client,
-                    context.TWILIO_WORKSPACE_SID,
+                    context.TASK_ROUTER_WORKSPACE_SID,
                     taskInfo.workflowSid,
                     statPeriod,
                 );
@@ -203,7 +203,7 @@ exports.handler = async function (context, event, callback) {
                 message = 'Las siguientes opciones están disponibles...';
                 message += 'Presione 1 para mantenerse en espera...';
                 message += 'Presione 2 y lo llamaremos en cuanto un agente se encuentre disponible...';
-                message += 'Presione asterisco para escuhar esta lista de opciones nuevamente...';
+                message += 'Presione asterisco para escuchar esta lista de opciones nuevamente...';
 
                 gather = twiml.gather({
                     input: 'dtmf',
