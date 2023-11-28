@@ -40,30 +40,34 @@ const InteractionCard = ({manager}) => {
     }
   }, [afterSetActivityListener])
 
-  async function receiveMessage(event) {
-    // Invoke the Flex Outbound Call Action
-    const { data } = event;
-    if (data.from === 'FLEX_SCRIPT') {
-      console.log('LOCALDEV', event);
-      if (data.actionType === 'gotoInteraction') {
-        //window.removeEventListener('message', receiveMessage);
-        if (data.hasOwnProperty('contact_id')) {
-          setContactId(data.contact_id);
-        } else if (data.hasOwnProperty('deal_id')) {
-          setDealId(data.deal_id);
+  
+
+  useEffect(() => {
+    async function receiveMessage(event) {
+      // Invoke the Flex Outbound Call Action
+      const { data } = event;
+      if (data.from === 'FLEX_SCRIPT') {
+        console.log('LOCALDEV', event);
+        if (data.actionType === 'gotoInteraction') {
+          //window.removeEventListener('message', receiveMessage);
+          if (data.hasOwnProperty('contact_id')) {
+            setContactId(data.contact_id);
+            setDealId(null);
+          } else if (data.hasOwnProperty('deal_id')) {
+            setContactId(null);
+            setDealId(data.deal_id);
+          }
         }
       }
     }
-  }
 
-  useEffect(() => {
     window.addEventListener("message", receiveMessage, false);
   }, [])
 
   useEffect(() => {
     setContact({});
-    setContactId(null);
-    setDealId(null);
+    //setContactId(null);
+    //setDealId(null);
 
     if (!contactId && !dealId) {
       return;
@@ -95,7 +99,8 @@ const InteractionCard = ({manager}) => {
       destination: data.phone,
       taskAttributes: {
         name: `${data.firstname || ''} ${data.lastname || ''}`.trim(),
-        hubspot_contact_id: data.hs_object_id
+        hubspot_contact_id: data.hs_object_id,
+        hubspot_deal_id: dealId ?? null
       }
     });
   }, []);
@@ -134,11 +139,13 @@ const InteractionCard = ({manager}) => {
     return null;
   }
 
+  console.log('DEALID', dealId);
+
   return (
     <Theme.Provider theme="default">
       <>
-        <SendSmsModal selectedContact={selectedSmsContact} manager={manager} handleClose={handleCloseModel} />
-        <SendWAModal selectedContact={selectedWAContact} manager={manager} handleClose={handleCloseModel} />
+        <SendSmsModal selectedContact={selectedSmsContact} dealId={dealId} manager={manager} handleClose={handleCloseModel} />
+        <SendWAModal selectedContact={selectedWAContact} dealId={dealId} manager={manager} handleClose={handleCloseModel} />
         <Box paddingTop="space60">
         <Card>
           <Heading as="h2" variant="heading20">Interactuar con {fullName(contact)}</Heading>

@@ -26,12 +26,12 @@ function getTask(context, sid) {
     let fetchTask;
 
     if (sid.startsWith('CA')) {
-        fetchTask = client.taskrouter.workspaces(context.TWILIO_WORKSPACE_SID).tasks.list({
+        fetchTask = client.taskrouter.workspaces(context.TASK_ROUTER_WORKSPACE_SID).tasks.list({
             evaluateTaskAttributes: `call_sid='${sid}'`,
             limit: 20,
         });
     } else {
-        fetchTask = client.taskrouter.workspaces(context.TWILIO_WORKSPACE_SID).tasks(sid).fetch();
+        fetchTask = client.taskrouter.workspaces(context.TASK_ROUTER_WORKSPACE_SID).tasks(sid).fetch();
     }
 
     return fetchTask

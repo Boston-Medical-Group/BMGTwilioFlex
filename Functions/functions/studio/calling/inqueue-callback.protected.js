@@ -232,7 +232,7 @@ exports.handler = async function (context, event, callback) {
             const taskInfo = await getTask(context, taskSid || CallSid);
 
             // Cancel current Task
-            await cancelTask(client, context.TWILIO_WORKSPACE_SID, taskInfo.taskSid);
+            await cancelTask(client, context.TASK_ROUTER_WORKSPACE_SID, taskInfo.taskSid);
             // Create the callback task
             const ringBackUrl = CallbackAlertTone.startsWith('https://') ? CallbackAlertTone : domain + CallbackAlertTone;
             await createCallbackTask(client, CallbackNumber, taskInfo, ringBackUrl);

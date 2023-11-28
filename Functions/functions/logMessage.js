@@ -41,6 +41,7 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
   const {
     conversationSid,
     hubspot_contact_id,
+    hubspot_deal_id,
     hs_communication_channel_type,
     hs_communication_logged_from,
     hs_communication_body,
@@ -57,7 +58,7 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
     logBody += '<br /><br />';
     logBody += await getHtmlMessage(_.getTwilioClient(), conversationSid);
 
-    let hubspotBody = JSON.stringify({
+    let toHubspot = {
       properties: {
         hs_communication_channel_type,
         hs_communication_logged_from,
@@ -78,7 +79,14 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
           ]
         }
       ]
-    });
+    };
+
+    if (hubspot_deal_id !== undefined && hubspot_deal_id !== null) {
+      toHubspot.associations[0].types.push({
+        associationCategory: "HUBSPOT_DEFINED",
+        associationTypeId: 85
+      })
+    }
 
     const request = await fetch(`https://api.hubapi.com/crm/v3/objects/communications`, {
       method: "POST",
@@ -86,7 +94,7 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${_.HUBSPOT_TOKEN}`
       },
-      body: hubspotBody
+      body: JSON.stringify(toHubspot)
     });
 
     if (!request.ok) {

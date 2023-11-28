@@ -55,7 +55,7 @@ exports.handler = JWEValidator(async function (context, event, callback) {
 
         // update task attributes
         await client.taskrouter
-            .workspaces(context.TWILIO_WORKSPACE_SID)
+            .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
             .tasks(taskSid)
             .update({
                 attributes: JSON.stringify(attr),
@@ -80,7 +80,7 @@ exports.handler = JWEValidator(async function (context, event, callback) {
 
             function getTask(taskSid) {
                 return client.taskrouter
-                    .workspaces(context.TWILIO_WORKSPACE_SID)
+                    .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
                     .tasks(taskSid)
                     .fetch()
                     .then((task) => {
@@ -103,7 +103,7 @@ exports.handler = JWEValidator(async function (context, event, callback) {
 
                 //    update task attributes
                 return client.taskrouter
-                    .workspaces(context.TWILIO_WORKSPACE_SID)
+                    .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
                     .tasks(taskSid)
                     .update({
                         attributes: JSON.stringify(attr),
@@ -157,7 +157,7 @@ exports.handler = JWEValidator(async function (context, event, callback) {
             //  handler to create new task
             function newTask(workflowSid, attr) {
                 return client.taskrouter
-                    .workspaces(context.TWILIO_WORKSPACE_SID)
+                    .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
                     .tasks.create({
                         taskChannel: attr.taskType,
                         priority: 50,
@@ -174,7 +174,7 @@ exports.handler = JWEValidator(async function (context, event, callback) {
             //  handler to update the existing task
             function completeTask(taskSid) {
                 return client.taskrouter
-                    .workspaces(context.TWILIO_WORKSPACE_SID)
+                    .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
                     .tasks(taskSid)
                     .update({
                         assignmentStatus: 'completed',

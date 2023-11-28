@@ -102,7 +102,7 @@ exports.handler = async function (context, event, callback) {
             }
 
             //  Cancel (update) the task given taskSid
-            await cancelTask(client, context.TWILIO_WORKSPACE_SID, taskSid);
+            await cancelTask(client, context.TASK_ROUTER_WORKSPACE_SID, taskSid);
 
             return callback(null, '');
             break;

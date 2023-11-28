@@ -79,7 +79,7 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
-  const sendOutboundMessage = useCallback(async ({ To, customerName, Body, WorkerFriendlyName, KnownAgentRoutingFlag, OpenChatFlag, hubspot_contact_id }) => {
+  const sendOutboundMessage = useCallback(async ({ To, customerName, Body, WorkerFriendlyName, KnownAgentRoutingFlag, OpenChatFlag, hubspot_contact_id, hubspot_deal_id }) => {
 
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/sendOutboundMessage`, {
       method: "POST",
@@ -94,6 +94,7 @@ const useApi = ({ token }) => {
         KnownAgentRoutingFlag,
         OpenChatFlag,
         hubspot_contact_id,
+        hubspot_deal_id,
         Token: token
       })
     });
