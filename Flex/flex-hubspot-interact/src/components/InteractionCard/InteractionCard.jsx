@@ -40,30 +40,33 @@ const InteractionCard = ({manager}) => {
     }
   }, [afterSetActivityListener])
 
-  async function receiveMessage(event) {
-    // Invoke the Flex Outbound Call Action
-    const { data } = event;
-    if (data.from === 'FLEX_SCRIPT') {
-      console.log('LOCALDEV', event);
-      if (data.actionType === 'gotoInteraction') {
-        //window.removeEventListener('message', receiveMessage);
-        if (data.hasOwnProperty('contact_id')) {
-          setContactId(data.contact_id);
-        } else if (data.hasOwnProperty('deal_id')) {
-          setDealId(data.deal_id);
+  
+
+  useEffect(() => {
+    async function receiveMessage(event) {
+      // Invoke the Flex Outbound Call Action
+      const { data } = event;
+      if (data.from === 'FLEX_SCRIPT') {
+        console.log('LOCALDEV', event);
+        if (data.actionType === 'gotoInteraction') {
+          //window.removeEventListener('message', receiveMessage);
+          if (data.hasOwnProperty('contact_id')) {
+            setContactId(data.contact_id);
+          } else if (data.hasOwnProperty('deal_id')) {
+            console.log(data.deal_id);
+            setDealId(data.deal_id);
+          }
         }
       }
     }
-  }
 
-  useEffect(() => {
     window.addEventListener("message", receiveMessage, false);
   }, [])
 
   useEffect(() => {
     setContact({});
-    setContactId(null);
-    setDealId(null);
+    //setContactId(null);
+    //setDealId(null);
 
     if (!contactId && !dealId) {
       return;
@@ -134,6 +137,8 @@ const InteractionCard = ({manager}) => {
   if (!contact.hasOwnProperty('hs_object_id')) {
     return null;
   }
+
+  console.log('DEALID', dealId);
 
   return (
     <Theme.Provider theme="default">
