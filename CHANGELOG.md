@@ -3,6 +3,7 @@
 ## 28/11/2023
 * Actualiza dependencias de funciones calling (momentjs)
 * Actualiza URL Servicio Manager de Flex
+* Corrige paths de funciones serverless
 
 ## 27/11/2023
 * Agrega funciones de Admin y plugin Admin
