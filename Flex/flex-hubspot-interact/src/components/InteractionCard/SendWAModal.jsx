@@ -12,7 +12,7 @@ import useApi from '../../hooks/useApi';
 
 const MODAL_ID = "smsOutboundModal";
 
-const SendWAModal = ({ selectedContact, handleClose, manager }) => {
+const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
 
   const { sendOutboundMessage, getTemplate } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
   const [templateList, setTemplateList] = useState([]);
@@ -80,7 +80,8 @@ const SendWAModal = ({ selectedContact, handleClose, manager }) => {
         WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
         KnownAgentRoutingFlag: false,
         OpenChatFlag: true,
-        hubspot_contact_id: selectedContact.hs_object_id
+        hubspot_contact_id: selectedContact.hs_object_id,
+        hubspot_deal_id: dealId ?? null
       })
         .then(() => setMessageSent(true))
         .catch(() => setError("Error while sending the SMS"))

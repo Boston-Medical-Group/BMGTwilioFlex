@@ -1,7 +1,7 @@
 const FunctionTokenValidator = require('twilio-flex-token-validator').functionValidator;
 const TokenValidator = require('twilio-flex-token-validator').validator;
 
-const openAChatTask = async (client, To, customerName, From, Body, WorkerConversationIdentity, channel, hubspot_contact_id, routingProperties) => {
+const openAChatTask = async (client, To, customerName, From, Body, WorkerConversationIdentity, channel, hubspot_contact_id, hubspot_deal_id, routingProperties) => {
 
     const interaction = await client.flexApi.v1.interaction.create({
       channel: {
@@ -21,6 +21,7 @@ const openAChatTask = async (client, To, customerName, From, Body, WorkerConvers
           attributes: {
             name: customerName,
             hubspot_contact_id: hubspot_contact_id,
+            hubspot_deal_id,
             from: To,
             direction: "outbound",
             customerName: customerName,
@@ -95,6 +96,7 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
     Body,
     customerName,
     hubspot_contact_id,
+    hubspot_deal_id,
     WorkerFriendlyName,
     Token
   } = event;
@@ -136,6 +138,7 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
         identity,
         channel,
         hubspot_contact_id,
+        hubspot_deal_id,
         {
           workspace_sid: context.TASK_ROUTER_WORKSPACE_SID,
           workflow_sid: context.TASK_ROUTER_WORKFLOW_SID,
