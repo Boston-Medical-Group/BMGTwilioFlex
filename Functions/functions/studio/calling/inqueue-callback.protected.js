@@ -110,10 +110,10 @@ exports.handler = async function (context, event, callback) {
             const gatherConfirmation = twiml.gather({
                 input: 'dtmf',
                 timeout: '2',
-                action: urlBuilder(`${domain}/inqueue-callback`, queries),
+                action: urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries),
             });
             gatherConfirmation.say(sayOptions, message);
-            twiml.redirect(`${domain}/queue-menu?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`);
+            twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`);
             return callback(null, twiml);
             break;
 
@@ -131,7 +131,7 @@ exports.handler = async function (context, event, callback) {
                     if (taskSid) {
                         queries.taskSid = taskSid;
                     }
-                    twiml.redirect(urlBuilder(`${domain}/inqueue-callback`, queries));
+                    twiml.redirect(urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries));
                     return callback(null, twiml);
                     break;
                 //  new number
@@ -151,12 +151,12 @@ exports.handler = async function (context, event, callback) {
                         input: 'dtmf',
                         timeout: '10',
                         finishOnKey: '#',
-                        action: urlBuilder(`${domain}/inqueue-callback`, queries),
+                        action: urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries),
                     });
                     GatherNewNumber.say(sayOptions, message);
 
                     queries.mode = 'main';
-                    twiml.redirect(urlBuilder(`${domain}/inqueue-callback`, queries));
+                    twiml.redirect(urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries));
                     return callback(null, twiml);
                     break;
                 case '*':
@@ -168,7 +168,7 @@ exports.handler = async function (context, event, callback) {
                     if (taskSid) {
                         queries.taskSid = taskSid;
                     }
-                    twiml.redirect(urlBuilder(`${domain}/inqueue-callback`, queries));
+                    twiml.redirect(urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries));
                     return callback(null, twiml);
                     break;
                 default:
@@ -179,7 +179,7 @@ exports.handler = async function (context, event, callback) {
                         queries.taskSid = taskSid;
                     }
                     twiml.say(sayOptions, 'I did not understand your selection.');
-                    twiml.redirect(urlBuilder(`${domain}/inqueue-callback`, queries));
+                    twiml.redirect(urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries));
                     return callback(null, twiml);
                     break;
             }
@@ -207,12 +207,12 @@ exports.handler = async function (context, event, callback) {
                 input: 'dtmf',
                 timeout: '5',
                 finishOnKey: '#',
-                action: urlBuilder(`${domain}/inqueue-callback`, queries),
+                action: urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries),
             });
             GatherConfirmNewNumber.say(sayOptions, message);
 
             queries.mode = 'main';
-            twiml.redirect(urlBuilder(`${domain}/inqueue-callback`, queries));
+            twiml.redirect(urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries));
             return callback(null, twiml);
             break;
 

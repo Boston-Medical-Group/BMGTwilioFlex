@@ -93,7 +93,7 @@ exports.handler = async function (context, event, callback) {
             }
 
             // Redirect Call to Voicemail main menu
-            const redirectUrl = `${domain}/inqueue-voicemail?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`;
+            const redirectUrl = `${domain}/studio/calling/inqueue-voicemail?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`;
             try {
                 await client.calls(CallSid).update({ method: 'POST', url: redirectUrl });
             } catch (error) {
@@ -111,8 +111,8 @@ exports.handler = async function (context, event, callback) {
             //  Main logic for Recording the voicemail
             twiml.say(sayOptions, 'Please leave a message at the tone.  Press the star key when finished.');
             twiml.record({
-                action: `${domain}/inqueue-voicemail?mode=success&CallSid=${CallSid}`,
-                transcribeCallback: `${domain}/inqueue-voicemail?mode=submitVoicemail&CallSid=${CallSid}`,
+                action: `${domain}/studio/calling/inqueue-voicemail?mode=success&CallSid=${CallSid}`,
+                transcribeCallback: `${domain}/studio/calling/inqueue-voicemail?mode=submitVoicemail&CallSid=${CallSid}`,
                 method: 'GET',
                 playBeep: 'true',
                 transcribe: true,
