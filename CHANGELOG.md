@@ -1,5 +1,8 @@
 # Changelog
 
+## 28/11/2023
+* Actualiza dependencias de funciones calling (momentjs)
+
 ## 27/11/2023
 * Agrega funciones de Admin y plugin Admin
 * Agrega funciones de calling
