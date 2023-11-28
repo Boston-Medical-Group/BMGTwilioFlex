@@ -60,7 +60,8 @@ export default class HubspotInteractPlugin extends FlexPlugin {
             destination: contact.phone ?? data.phone,
             taskAttributes: {
               name: `${contact.firstname || ''} ${contact.lastname || ''}`.trim(),
-              hubspot_contact_id: contact.hs_object_id
+              hubspot_contact_id: contact.hs_object_id,
+              
             }
           });
         } else if (data.actionType === 'gotoCustomer') {

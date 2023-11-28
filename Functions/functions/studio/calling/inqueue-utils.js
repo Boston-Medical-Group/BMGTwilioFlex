@@ -22,7 +22,7 @@
 const axios = require('axios');
 const JWEValidator = require('twilio-flex-token-validator').functionValidator;
 
-const helpersPath = Runtime.getFunctions().helpers.path;
+const helpersPath = Runtime.getFunctions()['studio/calling/helpers'].path;
 const { handleError } = require(helpersPath);
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
