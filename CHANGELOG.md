@@ -8,6 +8,7 @@
 * Corrige url de assets
 * Agrega traducciones
 * Ajuste en logs
+* Correccion en condicion
 
 ## 27/11/2023
 * Agrega funciones de Admin y plugin Admin
