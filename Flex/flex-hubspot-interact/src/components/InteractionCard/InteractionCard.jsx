@@ -52,8 +52,9 @@ const InteractionCard = ({manager}) => {
           //window.removeEventListener('message', receiveMessage);
           if (data.hasOwnProperty('contact_id')) {
             setContactId(data.contact_id);
+            setDealId(null);
           } else if (data.hasOwnProperty('deal_id')) {
-            console.log(data.deal_id);
+            setContactId(null);
             setDealId(data.deal_id);
           }
         }
