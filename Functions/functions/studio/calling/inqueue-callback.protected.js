@@ -26,9 +26,9 @@
  *Last Updated: 07/05/2021
  */
 
-const helpersPath = Runtime.getFunctions().helpers.path;
+const helpersPath = Runtime.getFunctions()['studio/calling/helpers'].path;
 const { getTask, handleError, getTime, cancelTask, urlBuilder } = require(helpersPath);
-const optionsPath = Runtime.getFunctions().options.path;
+const optionsPath = Runtime.getFunctions()['studio/calling/options'].path;
 const options = require(optionsPath);
 
 // Create the callback task

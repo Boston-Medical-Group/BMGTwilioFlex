@@ -25,9 +25,9 @@
 const axios = require('axios');
 const moment = require('moment');
 
-const helpersPath = Runtime.getFunctions().helpers.path;
+const helpersPath = Runtime.getFunctions()['studio/calling/helpers'].path;
 const { getTask, handleError } = require(helpersPath);
-const optionsPath = Runtime.getFunctions().options.path;
+const optionsPath = Runtime.getFunctions()['studio/calling/options'].path;
 const options = require(optionsPath);
 
 //  retrieve workflow cummulative statistics for Estimated wait time
