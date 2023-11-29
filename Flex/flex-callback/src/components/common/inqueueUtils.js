@@ -2,7 +2,7 @@ import * as Flex from '@twilio/flex-ui';
 
 import { buildUrl, http } from '../../helpers';
 
-const url = buildUrl('/inqueue-utils');
+const url = buildUrl('/studio/calling/inqueue-utils');
 
 export const callButtonAccessibility = async (task, type, state) => {
   const { taskSid, attributes } = task;
