@@ -14,7 +14,7 @@ const fetchUserRoles = () => {
   
  export const hasAdminRights = () => {
     const userRoles = fetchUserRoles();
-    return userRoles.indexOf('admin') >= 0;
+    return userRoles.indexOf('admin') >= 0 || userRoles.indexOf('supervisor') >= 0;
   };
   
 
