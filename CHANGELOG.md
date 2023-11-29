@@ -2,6 +2,8 @@
 
 ## 29/11/2023
 * Nuevos deploys
+* Reescribe callback
+* Corrige log
 
 ## 28/11/2023
 * Actualiza dependencias de funciones calling (momentjs)
