@@ -184,14 +184,15 @@ exports.handler = async function (context, event, callback) {
 
             if (event.skipGreeting !== 'true') {
                 let initGreeting = waitMsg + posQueueMsg;
-                initGreeting += '...Por favor espere mientras encontramos un agente disponible...';
+                initGreeting += 'Nuestros asesores te atenderán pronto, aguarde un momento.';
                 twiml.say(sayOptions, initGreeting);
             }
-            message = 'Para escuchar una lista de opciones mientras espera, presione 1 en cualquier momento.';
+            message = 'Si prefiere, marque 1 y le devolveremos la llamada lo antes posible.';
             gather = twiml.gather({
                 input: 'dtmf',
                 timeout: '2',
-                action: `${domain}/studio/calling/queue-menu?mode=mainProcess${taskSid ? `&taskSid=${taskSid}` : ''}`,
+//                action: `${domain}/studio/calling/queue-menu?mode=mainProcess${taskSid ? `&taskSid=${taskSid}` : ''}`,
+                action: `${domain}/studio/calling/queue-menu?mode=menuProcess${taskSid ? `&taskSid=${taskSid}` : ''}`,
             });
             gather.say(sayOptions, message);
             gather.play(domain + holdMusicUrl);
@@ -200,14 +201,15 @@ exports.handler = async function (context, event, callback) {
             break;
         case 'mainProcess':
             if (event.Digits === '1') {
-                message = 'Las siguientes opciones están disponibles...';
-                message += 'Presione 1 para mantenerse en espera...';
-                message += 'Presione 2 y lo llamaremos en cuanto un agente se encuentre disponible...';
-                message += 'Presione asterisco para escuchar esta lista de opciones nuevamente...';
+                // message = 'Las siguientes opciones están disponibles...';
+                // message += 'Presione 1 para mantenerse en espera...';
+                // message += 'Presione 2 y lo llamaremos en cuanto un agente se encuentre disponible...';
+                // message += 'Presione asterisco para escuchar esta lista de opciones nuevamente...';
+                message = 'Marque 1 y le devolveremos la llamada lo antes posible.';
 
                 gather = twiml.gather({
                     input: 'dtmf',
-                    timeout: '1',
+                    timeout: '2',
                     action: `${domain}/studio/calling/queue-menu?mode=menuProcess${taskSid ? `&taskSid=${taskSid}` : ''}`,
                 });
                 gather.say(sayOptions, message);
@@ -215,23 +217,24 @@ exports.handler = async function (context, event, callback) {
                 twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`);
                 return callback(null, twiml);
             }
-            twiml.say(sayOptions, 'Lo siento. No entendí la opción seleccionada.');
+            twiml.say(sayOptions, 'Esa opción no está disponible.');
             twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main&skipGreeting=true${taskSid ? `&taskSid=${taskSid}` : ''}`);
             return callback(null, twiml);
             break;
         case 'menuProcess':
             switch (event.Digits) {
                 //  stay in queue
-                case '1':
+                // case '1':
                     /*
                      *   stay in queue
                      * twiml.say(sayOptions, 'Please wait for the next available agent');
                      */
-                    twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main&skipGreeting=true${taskSid ? `&taskSid=${taskSid}` : ''}`);
-                    return callback(null, twiml);
-                    break;
+                    // twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main&skipGreeting=true${taskSid ? `&taskSid=${taskSid}` : ''}`);
+                    // return callback(null, twiml);
+                    // break;
                 //  request a callback
-                case '2':
+                // case '2':
+                case '1':
                     twiml.redirect(`${domain}/studio/calling/inqueue-callback?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`);
                     return callback(null, twiml);
                     break;
@@ -244,7 +247,7 @@ exports.handler = async function (context, event, callback) {
 
                 //  listen to menu again
                 default:
-                    twiml.say(sayOptions, 'Lo siento. No entendí la opción seleccionada.');
+                    twiml.say(sayOptions, 'Esa opción no está disponible.');
                     twiml.redirect(`${domain}/studio/calling/queue-menu?mode=mainProcess&Digits=1${taskSid ? `&taskSid=${taskSid}` : ''}`);
                     return callback(null, twiml);
                     break;
