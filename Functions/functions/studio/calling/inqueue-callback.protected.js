@@ -34,14 +34,16 @@ const options = require(optionsPath);
 
 // Create the callback task
 async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
+    const time = getTime(options.TimeZone);
+    const taskAttributes = JSON.parse(taskInfo.data.attributes);
+
     const timeout = taskInfo.timeout || 86400;
-    const priority = taskInfo.priority || 0;
+    const priority = taskInfo.priority || options.CallbackTaskPriority;
     const attempts = 1;
     const taskChannel = 'voice';
-    const utcDateTimeReceived = taskInfo.dateCreated.getUTCDate()
-        ? taskInfo.dateCreated.getUTCDate()
-        : new Date();
     const conversation_id = taskInfo.sid;
+
+    const workflowSid = taskInfo.workflowSid || process.env.TWILIO_FLEX_CALLBACK_WORKFLOW_SID;
     
     console.log('NumbertoCall', phoneNumber);
     const attributes = {
@@ -50,16 +52,16 @@ async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
         flow_execution_sid: undefined,
         message: null,
         callBackData: {
-            numberToCall: phoneNumber,
-            numberToCallFrom,
+            numberToCall: phoneNumber || taskAttributes.caller,
+            numberToCallFrom: taskAttributes.called,
             attempts,
-            mainTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            utcDateTimeReceived: utcDateTimeReceived || new Date(),
-            RecordingSid,
-            RecordingUrl,
-            TranscriptionSid,
-            TranscriptionText,
-            isDeleted: isDeleted || false,
+            mainTimeZone: options.TimeZone,
+            utcDateTimeReceived: time,
+            RecordingSid: null,
+            RecordingUrl: null,
+            TranscriptionSid: null,
+            TranscriptionText: null,
+            isDeleted: false,
         },
         direction: 'inbound',
         conversations: {
@@ -253,7 +255,7 @@ exports.handler = async function (context, event, callback) {
             //await cancelTask(client, context.TASK_ROUTER_WORKSPACE_SID, taskInfo.taskSid);
             // Create the callback task
             const ringBackUrl = CallbackAlertTone.startsWith('https://') ? CallbackAlertTone : domain + CallbackAlertTone;
-            await createCallbackTask(client, CallbackNumber, taskInfo.data, ringBackUrl);
+            await createCallbackTask(client, CallbackNumber, taskInfo, ringBackUrl);
 
             //  hangup the call
             twiml.say(sayOptions, 'Su solicitud ha sido recibida...');
