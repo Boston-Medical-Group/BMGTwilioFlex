@@ -33,7 +33,7 @@ const optionsPath = Runtime.getFunctions()['studio/calling/options'].path;
 const options = require(optionsPath);
 
 // Create the callback task
-async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
+async function createCallbackTask(context, phoneNumber, taskInfo, ringback) {
     const time = getTime(options.TimeZone);
     const taskAttributes = JSON.parse(taskInfo.data.attributes);
 
@@ -255,7 +255,7 @@ exports.handler = async function (context, event, callback) {
             //await cancelTask(client, context.TASK_ROUTER_WORKSPACE_SID, taskInfo.taskSid);
             // Create the callback task
             const ringBackUrl = CallbackAlertTone.startsWith('https://') ? CallbackAlertTone : domain + CallbackAlertTone;
-            await createCallbackTask(client, CallbackNumber, taskInfo, ringBackUrl);
+            await createCallbackTask(context, CallbackNumber, taskInfo, ringBackUrl);
 
             //  hangup the call
             twiml.say(sayOptions, 'Su solicitud ha sido recibida...');
