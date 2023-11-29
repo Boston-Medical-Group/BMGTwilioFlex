@@ -34,7 +34,7 @@ exports.createTask = async function createTask(parameters) {
   try {
     const task = await taskRouterClient.createTask(config);
 
-    return {
+    const result = {
       success: task.success,
       taskSid: task.task.sid,
       task: {
@@ -43,7 +43,11 @@ exports.createTask = async function createTask(parameters) {
       },
       status: task.status,
     };
+    console.log('CRATETASKSUCCESS', result);
+
+    return result;
   } catch (error) {
+    console.log('CRATETASKERROR', error);
     return { success: false, status: error.status, message: error.message };
   }
 };
