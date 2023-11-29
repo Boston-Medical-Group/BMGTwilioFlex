@@ -51,8 +51,7 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
       // convert task.dateCreated Date Object to UTC time and to timestamp
       hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
       // @todo custom disposition codes
-      hs_call_body: `${task.attributes.conversations?.outcome} - "${task.attributes.conversations?.content}"
-            - DISPOSITION: ${task.attributes.conversations?.outcome}`,
+      hs_call_body: `NOTA: "${task.attributes.conversations?.content}"`,
       hs_call_callee_object_type_id: '0-1',
       hs_call_direction: task.attributes.direction?.toUpperCase(),
       hs_call_disposition: mapOutcome[task.attributes.conversations?.outcome],
@@ -95,7 +94,7 @@ const LogHubspotMessage = async (task: ITask, manager: Flex.Manager) => {
     hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
     hs_communication_channel_type: task.attributes.channelType == 'whatsapp' ? 'WHATS_APP' : 'SMS',
     hs_communication_logged_from: 'CRM',
-    hs_communication_body: `${task.attributes.conversations?.outcome} - "${task.attributes.conversations?.content}"
+    hs_communication_body: `NOTA: "${task.attributes.conversations?.content}"
     - Duración: ${task.age} segundos`,
     hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
     hubspot_owner_id: ownerId,
