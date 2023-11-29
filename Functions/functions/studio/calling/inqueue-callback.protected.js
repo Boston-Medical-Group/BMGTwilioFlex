@@ -43,6 +43,7 @@ async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
         : new Date();
     const conversation_id = taskInfo.sid;
     
+    console.log('NumbertoCall', phoneNumber);
     const attributes = {
         taskType: 'callback',
         name: `Callback (${numberToCall})`,
