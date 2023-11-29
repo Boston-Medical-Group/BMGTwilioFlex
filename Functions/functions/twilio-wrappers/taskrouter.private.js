@@ -33,10 +33,10 @@ exports.createTask = async function createTask(parameters) {
 
   try {
     const task = await taskRouterClient.createTask(config);
-
+    console.log('CRATETASKSUCCESS1', task);
     const result = {
       success: task.success,
-      taskSid: task.task.sid,
+      taskSid: task.taskSid,
       task: {
         ...task.task,
         attributes: JSON.parse(task.task.attributes),
