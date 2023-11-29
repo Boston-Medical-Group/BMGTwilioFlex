@@ -19,7 +19,7 @@ exports.createTask = async function createTask(parameters) {
     attempts: attempts || 3,
     workflowSid,
     taskChannel,
-    attributes,
+    attributes: JSON.stringify(attributes),
     priority,
     timeout,
     workspaceSid: context.TWILIO_FLEX_WORKSPACE_SID,
