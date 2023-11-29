@@ -48,7 +48,7 @@ async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
         taskType: 'callback',
         name: `Callback (${phoneNumber})`,
         flow_execution_sid: undefined,
-        message: message || null,
+        message: null,
         callBackData: {
             numberToCall: phoneNumber,
             numberToCallFrom,
