@@ -12,9 +12,9 @@ const request = async (path, manager, params) =>{
         }
     };
 
-    const { REACT_APP_SERVICE_BASE_URL } = process.env;
-    console.log('REQUEST BASE URL: ', REACT_APP_SERVICE_BASE_URL, ' PATH:', path);
-    return await fetch(`${REACT_APP_SERVICE_BASE_URL}/${path}`, options).then(d=>d.json()).catch(e=>{return {statusCode:"500"}})
+    const { FLEX_APP_TWILIO_SERVERLESS_DOMAIN } = process.env;
+    console.log('REQUEST BASE URL: ', FLEX_APP_TWILIO_SERVERLESS_DOMAIN, ' PATH:', path);
+    return await fetch(`${FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/${path}`, options).then(d=>d.json()).catch(e=>{return {statusCode:"500"}})
     return (await resp.json())
 }
 
