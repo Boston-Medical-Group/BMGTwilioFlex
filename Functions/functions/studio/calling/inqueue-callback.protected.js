@@ -26,6 +26,7 @@
  *Last Updated: 07/05/2021
  */
 
+const TaskOperations = require(Runtime.getFunctions()['twilio-wrappers/taskrouter'].path);
 const helpersPath = Runtime.getFunctions()['studio/calling/helpers'].path;
 const { getTask, handleError, getTime, cancelTask, urlBuilder } = require(helpersPath);
 const optionsPath = Runtime.getFunctions()['studio/calling/options'].path;
@@ -33,31 +34,50 @@ const options = require(optionsPath);
 
 // Create the callback task
 async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
-    const time = getTime(options.TimeZone);
-    const taskAttributes = JSON.parse(taskInfo.data.attributes);
-
-    const newTaskAttributes = {
+    const timeout = taskInfo.timeout || 86400;
+    const priority = taskInfo.priority || 0;
+    const attempts = 1;
+    const taskChannel = 'voice';
+    const utcDateTimeReceived = taskInfo.dateCreated.getUTCDate()
+        ? taskInfo.dateCreated.getUTCDate()
+        : new Date();
+    const conversation_id = taskInfo.sid;
+    
+    const attributes = {
         taskType: 'callback',
-        ringback,
-        to: phoneNumber || taskAttributes.caller,
+        name: `Callback (${numberToCall})`,
+        flow_execution_sid: flexFlowSid,
+        message: message || null,
+        callBackData: {
+            numberToCall: phoneNumber,
+            numberToCallFrom,
+            attempts,
+            mainTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            utcDateTimeReceived: utcDateTimeReceived || new Date(),
+            RecordingSid,
+            RecordingUrl,
+            TranscriptionSid,
+            TranscriptionText,
+            isDeleted: isDeleted || false,
+        },
         direction: 'inbound',
-        name: `Callback: ${phoneNumber || taskAttributes.caller}`,
-        from: taskAttributes.called,
-        callTime: time,
-        queueTargetName: taskInfo.taskQueueName,
-        queueTargetSid: taskInfo.taskQueueSid,
-        workflowTargetSid: taskInfo.workflowSid,
-        // eslint-disable-next-line camelcase
-        ui_plugin: { cbCallButtonAccessibility: false },
-        placeCallRetry: 1,
+        conversations: {
+            conversation_id,
+        },
     };
+
+    // use assigned values or use defaults
+    const workflowSid = taskInfo.workflowSid || process.env.TWILIO_FLEX_CALLBACK_WORKFLOW_SID;
+    
     try {
-        await client.taskrouter.workspaces(taskInfo.workspaceSid).tasks.create({
-            attributes: JSON.stringify(newTaskAttributes),
-            type: 'callback',
-            taskChannel: 'callback',
-            priority: options.CallbackTaskPriority,
-            workflowSid: taskInfo.workflowSid,
+        return await TaskOperations.createTask({
+            context,
+            workflowSid,
+            taskChannel,
+            attributes,
+            priority,
+            timeout,
+            attempts: 0,
         });
     } catch (error) {
         console.log('createCallBackTask error');
@@ -232,10 +252,10 @@ exports.handler = async function (context, event, callback) {
             const taskInfo = await getTask(context, taskSid || CallSid);
 
             // Cancel current Task
-            await cancelTask(client, context.TASK_ROUTER_WORKSPACE_SID, taskInfo.taskSid);
+            //await cancelTask(client, context.TASK_ROUTER_WORKSPACE_SID, taskInfo.taskSid);
             // Create the callback task
             const ringBackUrl = CallbackAlertTone.startsWith('https://') ? CallbackAlertTone : domain + CallbackAlertTone;
-            await createCallbackTask(client, CallbackNumber, taskInfo, ringBackUrl);
+            await createCallbackTask(client, CallbackNumber, taskInfo.data, ringBackUrl);
 
             //  hangup the call
             twiml.say(sayOptions, 'Su solicitud ha sido recibida...');
