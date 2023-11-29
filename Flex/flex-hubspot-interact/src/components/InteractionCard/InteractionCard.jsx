@@ -47,7 +47,7 @@ const InteractionCard = ({manager}) => {
       // Invoke the Flex Outbound Call Action
       const { data } = event;
       if (data.from === 'FLEX_SCRIPT') {
-        console.log('LOCALDEV', event);
+        //console.log('LOCALDEV', event);
         if (data.actionType === 'gotoInteraction') {
           //window.removeEventListener('message', receiveMessage);
           if (data.hasOwnProperty('contact_id')) {

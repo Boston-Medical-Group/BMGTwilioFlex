@@ -82,7 +82,7 @@ const LogHubspotCall = async (task : ITask, manager : Flex.Manager) => {
 }
 
 const LogHubspotMessage = async (task: ITask, manager: Flex.Manager) => {
-  console.log('JRUMEAU sending', task.attributes);
+  //console.log('JRUMEAU sending', task.attributes);
   if (!task.attributes.hubspot_contact_id) { 
     return;
   }
