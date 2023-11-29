@@ -63,6 +63,8 @@ async function createCallbackTask(context, phoneNumber, taskInfo, ringback) {
             TranscriptionText: null,
             isDeleted: false,
         },
+        crmid: taskAttributes.crmid,
+        hubspot_id: taskAttributes.hubspot_id,
         direction: 'inbound',
         conversations: {
             conversation_id,
