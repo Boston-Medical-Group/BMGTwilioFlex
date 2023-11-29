@@ -18,7 +18,7 @@ exports.createTask = async function createTask(parameters) {
 
   const client = context.getTwilioClient();
   const taskRouterClient = new TaskRouterUtils(client, {
-    flexWorkSpaceSid,
+    flexWorkSpaceSid: context.TASK_ROUTER_WORKSPACE_SID,
     accountSid: context.ACCOUNT_SID,
     authToken: context.AUTH_TOKEN,
     region
@@ -33,7 +33,7 @@ exports.createTask = async function createTask(parameters) {
       timeout,
       workflowSid
     });
-    
+
     console.log('CRATETASKSUCCESS1', task);
     const result = {
       success: task.success,
