@@ -46,7 +46,7 @@ async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
     console.log('NumbertoCall', phoneNumber);
     const attributes = {
         taskType: 'callback',
-        name: `Callback (${numberToCall})`,
+        name: `Callback (${phoneNumber})`,
         flow_execution_sid: flexFlowSid,
         message: message || null,
         callBackData: {
