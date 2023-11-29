@@ -1,0 +1,31 @@
+{
+  "name": "flex-callback",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "flex-plugin pre-script-check",
+    "lint": "eslint --ext js src/ serverless/functions",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "dependencies": {
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-moment": "^1.1",
+    "url-join": "^4.0.1",
+    "@twilio-paste/icons": "^9.3.1",
+    "@twilio/flex-plugin-scripts": "6.2.3"
+  },
+  "devDependencies": {
+    "@twilio-labs/serverless-api": "^5.2.1",
+    "eslint": "^7.30.0",
+    "eslint-config-twilio": "^1.35.1",
+    "husky": "^7.0.1",
+    "ora": "^5.4.1",
+    "twilio": "^3.67.0",
+    "react-test-renderer": "17.0.2",
+    "@twilio-paste/core": "^17.0.0",
+    "@twilio/flex-ui": "2.4.1"
+  }
+}

@@ -1,10 +1,10 @@
 module.exports = {
     sayOptions: { voice: 'Google.es-US-Neural2-A', language: 'es-ES' },
-    holdMusicUrl: '/guitar_music.mp3',
+    holdMusicUrl: '/audio_bmg.mp3',
     // Enable Estimated Waiting Time in voice prompt
     getEwt: true,
     //  Time interval (minutes) for Estimated Waiting Time stats
-    statPeriod: 5,
+    statPeriod: 2,
     // Enable Queue Position in voice prompt
     getQueuePosition: true,
     // Priority for the Task generatared by the VoiceMail
