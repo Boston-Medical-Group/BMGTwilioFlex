@@ -1,8 +1,8 @@
 import { VERSION } from '@twilio/flex-ui';
 import * as FlexPlugin from '@twilio/flex-plugin';
-import PhoneCallbackIcon from '@material-ui/icons/PhoneCallback';
 import React from 'react';
-import VoicemailIcon from '@material-ui/icons/Voicemail';
+import { VoicemailIcon } from "@twilio-paste/icons/esm/VoicemailIcon";
+import { CallIncomingIcon } from "@twilio-paste/icons/esm/CallIncomingIcon";
 
 import { logger } from './helpers';
 import reducers, { namespace } from './states';
@@ -46,9 +46,9 @@ export default class InQueueMessagingPlugin extends FlexPlugin {
     CallbackChannel.templates.TaskCanvasHeader.title = (task) => `${task.queueName}: ${task.attributes.name}`;
     CallbackChannel.templates.IncomingTaskCanvas.firstLine = (task) => task.queueName;
     // Lead Channel Icon
-    CallbackChannel.icons.active = <PhoneCallbackIcon key="active-callback-icon" />;
-    CallbackChannel.icons.list = <PhoneCallbackIcon key="list-callback-icon" />;
-    CallbackChannel.icons.main = <PhoneCallbackIcon key="main-callback-icon" />;
+    CallbackChannel.icons.active = <CallIncomingIcon key="active-callback-icon" />;
+    CallbackChannel.icons.list = <CallIncomingIcon key="list-callback-icon" />;
+    CallbackChannel.icons.main = <CallIncomingIcon key="main-callback-icon" />;
     // Register Lead Channel
     flex.TaskChannels.register(CallbackChannel);
 

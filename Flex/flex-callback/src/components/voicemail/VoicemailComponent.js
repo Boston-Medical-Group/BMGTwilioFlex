@@ -2,10 +2,10 @@ import React from 'react';
 import * as Flex from '@twilio/flex-ui';
 import moment from 'moment';
 import 'moment-timezone';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
-import Icon from '@material-ui/core/Icon';
+import { Button } from '@twilio-paste/core/dist/button';
+import { TextArea } from '@twilio-paste/core/textarea';
+import { Tooltip } from '@twilio-paste/core/tooltip';
+import { InformationIcon } from '@twilio-paste/icons/esm/InformationIcon';
 
 import styles from './VoicemailStyles';
 import { inqueueUtils } from '../common';
@@ -80,18 +80,10 @@ export default class VoicemailComponent extends React.Component {
         </div>
         <div style={styles.transcriptWrapper}>
           <h4 style={styles.h4Title}>Voicemail Transcript</h4>
-          <TextField
+          <TextArea
             id="outlined-multiline-static"
-            multiline
             rows="4"
-            fullWidth
-            InputProps={{
-              style: {
-                fontSize: '9pt',
-              },
-            }}
             value={transcriptText}
-            variant="outlined"
           />
         </div>
         <h4 style={styles.itemBold}>Voicemail Details</h4>
@@ -112,10 +104,8 @@ export default class VoicemailComponent extends React.Component {
             <div style={styles.itemWrapper}>
               <label style={styles.item}>
                 Received: &nbsp;
-                <Tooltip title="System call reception time" placement="right" arrow="true">
-                  <Icon color="primary" fontSize="small" style={styles.info}>
-                    info
-                  </Icon>
+                <Tooltip text="System call reception time" placement="right">
+                  <InformationIcon decorative={false} title="Open Tooltip" display="block" />
                 </Tooltip>
               </label>
 
@@ -127,10 +117,8 @@ export default class VoicemailComponent extends React.Component {
               <div style={styles.itemWrapper}>
                 <div>
                   <label style={styles.item}>Localized:&nbsp;</label>
-                  <Tooltip title="Call time localized to agent" placement="right" arrow="true">
-                    <Icon color="primary" fontSize="small" style={styles.info}>
-                      info
-                    </Icon>
+                  <Tooltip text="Call time localized to agent" placement="right">
+                    <InformationIcon decorative={false} title="Open Tooltip" display="block" />
                   </Tooltip>
                   <label style={styles.itemDetail}>{localTimeShort}</label>
                 </div>
@@ -141,8 +129,7 @@ export default class VoicemailComponent extends React.Component {
         </ul>
         <Button
           style={styles.cbButton}
-          variant="contained"
-          color="primary"
+          variant="primary"
           onClick={async () => this.startCall()}
           disabled={attributes.ui_plugin.vmCallButtonAccessibility}
         >
@@ -152,8 +139,7 @@ export default class VoicemailComponent extends React.Component {
         <p style={styles.textCenter}>Not answering? Requeue to retry later.</p>
         <Button
           style={styles.cbButton}
-          variant="outlined"
-          color="primary"
+          variant="secondary"
           onClick={async () => this.startTransfer()}
           disabled={count >= 3}
         >
@@ -162,8 +148,7 @@ export default class VoicemailComponent extends React.Component {
         <p style={styles.textAlert}>Upon successful contact, delete the recording resources.</p>
         <Button
           style={styles.cbButton}
-          variant="contained"
-          color="secondary"
+          variant="destructive"
           onClick={async () => this.deleteResources()}
           disabled={attributes.ui_plugin.vmRecordButtonAccessibility}
         >

@@ -2,9 +2,9 @@ import React from 'react';
 import * as Flex from '@twilio/flex-ui';
 import moment from 'moment';
 import 'moment-timezone';
-import Button from '@material-ui/core/Button';
-import Tooltip from '@material-ui/core/Tooltip';
-import Icon from '@material-ui/core/Icon';
+import { Button } from '@twilio-paste/core/button';
+import { Tooltip } from '@twilio-paste/core/tooltip';
+import { InformationIcon } from '@twilio-paste/icons/esm/InformationIcon';
 
 import styles from './CallbackStyles';
 import { inqueueUtils } from '../common';
@@ -82,10 +82,8 @@ export default class CallbackComponent extends React.Component {
             <div style={styles.itemWrapper}>
               <label style={styles.item}>
                 Received: &nbsp;
-                <Tooltip title="System call reception time" placement="right" arrow="true">
-                  <Icon color="primary" fontSize="small" style={styles.info}>
-                    info
-                  </Icon>
+                <Tooltip text="System call reception time" placement="right">
+                    <InformationIcon decorative={false} title="Open Tooltip" display="block" />
                 </Tooltip>
               </label>
 
@@ -97,10 +95,8 @@ export default class CallbackComponent extends React.Component {
               <div style={styles.itemWrapper}>
                 <div>
                   <label style={styles.item}>Localized:&nbsp;</label>
-                  <Tooltip title="Call time localized to agent" placement="right" arrow="true">
-                    <Icon color="primary" fontSize="small" style={styles.info}>
-                      info
-                    </Icon>
+                  <Tooltip text="Call time localized to agent" placement="right">
+                    <InformationIcon decorative={false} title="Open Tooltip" display="block" />
                   </Tooltip>
                   <label style={styles.itemDetail}>{localTimeShort}</label>
                 </div>
@@ -111,8 +107,7 @@ export default class CallbackComponent extends React.Component {
         </ul>
         <Button
           style={styles.cbButton}
-          variant="contained"
-          color="primary"
+          variant="primary"
           onClick={async () => this.startCall()}
           disabled={attributes.ui_plugin.cbCallButtonAccessibility}
         >
@@ -121,8 +116,7 @@ export default class CallbackComponent extends React.Component {
         <p style={styles.textCenter}>Not answering? Requeue to try later.</p>
         <Button
           style={styles.cbButton}
-          variant="outlined"
-          color="primary"
+          variant="secondary"
           onClick={async () => this.startTransfer()}
           disabled={count >= 3}
         >
