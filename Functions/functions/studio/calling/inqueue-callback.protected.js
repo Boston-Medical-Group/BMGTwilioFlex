@@ -47,7 +47,7 @@ async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
     const attributes = {
         taskType: 'callback',
         name: `Callback (${phoneNumber})`,
-        flow_execution_sid: flexFlowSid,
+        flow_execution_sid: undefined,
         message: message || null,
         callBackData: {
             numberToCall: phoneNumber,
@@ -66,9 +66,6 @@ async function createCallbackTask(client, phoneNumber, taskInfo, ringback) {
             conversation_id,
         },
     };
-
-    // use assigned values or use defaults
-    const workflowSid = taskInfo.workflowSid || process.env.TWILIO_FLEX_CALLBACK_WORKFLOW_SID;
     
     try {
         return await TaskOperations.createTask({
