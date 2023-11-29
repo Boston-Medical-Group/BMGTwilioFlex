@@ -1,5 +1,8 @@
 # Changelog
 
+## 29/11/2023
+* Nuevos deploys
+
 ## 28/11/2023
 * Actualiza dependencias de funciones calling (momentjs)
 * Actualiza URL Servicio Manager de Flex
