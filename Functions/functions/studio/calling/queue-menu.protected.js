@@ -26,9 +26,14 @@ const axios = require('axios');
 const moment = require('moment');
 
 const helpersPath = Runtime.getFunctions()['studio/calling/helpers'].path;
-const { getTask, handleError } = require(helpersPath);
+const { getTask, handleError, urlBuilder } = require(helpersPath);
 const optionsPath = Runtime.getFunctions()['studio/calling/options'].path;
+/**
+ * @type {{sayOptions: {voice: string, language: string}, holdMusicUrl: string, statPeriod: number, getEwt: boolean, getQueuePosition: boolean}}
+ */
 const options = require(optionsPath);
+
+const i18n = require(Runtime.getFunctions()['helpers/i18n'].path);
 
 //  retrieve workflow cummulative statistics for Estimated wait time
 async function getWorkflowCummStats(client, workspaceSid, workflowSid, statPeriod) {
@@ -105,9 +110,14 @@ exports.handler = async function (context, event, callback) {
     const client = context.getTwilioClient();
     const domain = `https://${context.DOMAIN_NAME}`;
     const twiml = new Twilio.twiml.VoiceResponse();
+    const language = event.language || options.sayOptions.language || 'es'; // Default es es-EC solamente porque es el primer idioma que trabajamos
+    const voice = event.voice || options.sayOptions.voice;
+    const _ = i18n.init(language);
 
     // Retrieve options
     const { sayOptions, holdMusicUrl, statPeriod, getEwt, getQueuePosition } = options;
+    sayOptions.language = language;
+    sayOptions.voice = voice;
 
     // Retrieve event arguments
     const CallSid = event.CallSid || '';
@@ -121,6 +131,13 @@ exports.handler = async function (context, event, callback) {
     let waitMsg = '';
     let posQueueMsg = '';
     let gather;
+
+    let queries;
+    queries = {
+        language,
+        voice,
+        mode: 'main'
+    }
 
     /*
      *  ==========================
@@ -151,16 +168,16 @@ exports.handler = async function (context, event, callback) {
                 let waitTts = '';
                 switch (ewt) {
                     case 0:
-                        waitTts = 'menos de un minuto...';
+                        waitTts = _.t('queue_menu:least_than_a_minute');
                         break;
                     case 4:
-                        waitTts = 'mas de 4 minutos...';
+                        waitTts = _.t('queue_menu:more_than_x_minutes', { minutes: 4 });
                         break;
                     default:
-                        waitTts = `menos de ${ewt + 1} minutos...`;
+                        waitTts = _.t('queue_menu:less_than_x_minutes', { minutes: ewt + 1 });
                 }
 
-                waitMsg += `El tiempo estimado de espera es de ${waitTts} ....`;
+                waitMsg += _.t('queue_menu:estimated_wait_time', { wait: waitTts });
             }
 
             //  Logic for Position in Queue
@@ -168,60 +185,77 @@ exports.handler = async function (context, event, callback) {
                 const taskPositionInfo = await getTaskPositionInQueue(client, taskInfo);
                 switch (taskPositionInfo.position) {
                     case 0:
-                        posQueueMsg = 'Su llamada es la siguiente en la cola.... ';
+                        posQueueMsg = _.t('queue_menu:your_call_is_next_in_queue');
                         break;
                     case 1:
-                        posQueueMsg = 'Hay solo una llamada antes de usted....';
+                        posQueueMsg = _.t('queue_menu:just_one_call_before_you');
                         break;
                     case -1:
-                        posQueueMsg = 'Has mas de 20 llamadas antes de usted...';
+                        posQueueMsg = _.t('queue_menu:more_than_x_calls_before_you', { calls: 20 });
                         break;
                     default:
-                        posQueueMsg = `Hay ${taskPositionInfo.position} llamadas antes de usted...`;
+                        posQueueMsg = _.t('queue_menu:x_calls_before_you', { calls: taskPositionInfo.position });
                         break;
                 }
             }
 
             if (event.skipGreeting !== 'true') {
                 let initGreeting = waitMsg + posQueueMsg;
-                initGreeting += 'Nuestros asesores te atenderán pronto, aguarde un momento.';
+                initGreeting += _.t('queue_menu:wait_for_an_agent');
                 twiml.say(sayOptions, initGreeting);
             }
-            message = 'Si prefiere, marque 1 y le devolveremos la llamada lo antes posible.';
+            message = _.t('queue_menu:press_one_and_callback_option', { option: 1 });
+
+            if (taskSid) {
+                queries.taskSid = taskSid;
+            }
+            queries.mode = 'menuProcess';
             gather = twiml.gather({
                 input: 'dtmf',
                 timeout: '2',
-//                action: `${domain}/studio/calling/queue-menu?mode=mainProcess${taskSid ? `&taskSid=${taskSid}` : ''}`,
-                action: `${domain}/studio/calling/queue-menu?mode=menuProcess${taskSid ? `&taskSid=${taskSid}` : ''}`,
+                action: urlBuilder(`${domain}/studio/calling/queue-menu`, queries),
             });
             gather.say(sayOptions, message);
             gather.play(domain + holdMusicUrl);
-            twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`);
+            queries.mode = 'main';
+            twiml.redirect(urlBuilder(`${domain}/studio/calling/queue-menu`, queries));
             return callback(null, twiml);
             break;
         case 'mainProcess':
+            if (taskSid) {
+                queries.taskSid = taskSid
+            }
+
             if (event.Digits === '1') {
                 // message = 'Las siguientes opciones están disponibles...';
                 // message += 'Presione 1 para mantenerse en espera...';
                 // message += 'Presione 2 y lo llamaremos en cuanto un agente se encuentre disponible...';
                 // message += 'Presione asterisco para escuchar esta lista de opciones nuevamente...';
-                message = 'Marque 1 y le devolveremos la llamada lo antes posible.';
+                message = _.t('queue_menu:press_one_and_callback', {option: 1});
 
+                queries.mode = 'menuProcess';
                 gather = twiml.gather({
                     input: 'dtmf',
                     timeout: '2',
-                    action: `${domain}/studio/calling/queue-menu?mode=menuProcess${taskSid ? `&taskSid=${taskSid}` : ''}`,
+                    action: urlBuilder(`${domain}/studio/calling/queue-menu`, queries),
                 });
                 gather.say(sayOptions, message);
                 gather.play(domain + holdMusicUrl);
-                twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`);
+                queries.mode = 'main';
+                twiml.redirect(urlBuilder(`${domain}/studio/calling/queue-menu`, queries));
                 return callback(null, twiml);
             }
-            twiml.say(sayOptions, 'Esa opción no está disponible.');
-            twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main&skipGreeting=true${taskSid ? `&taskSid=${taskSid}` : ''}`);
+            twiml.say(sayOptions, _.t('queue_menu:invalid_option'));
+
+            queries.skipGreeting = 'true';
+            twiml.redirect(urlBuilder(`${domain}/studio/calling/queue-menu`, queries));
             return callback(null, twiml);
             break;
         case 'menuProcess':
+            if (taskSid) {
+                queries.taskSid = taskSid
+            }
+
             switch (event.Digits) {
                 //  stay in queue
                 // case '1':
@@ -235,20 +269,24 @@ exports.handler = async function (context, event, callback) {
                 //  request a callback
                 // case '2':
                 case '1':
-                    twiml.redirect(`${domain}/studio/calling/inqueue-callback?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`);
+                    twiml.redirect(urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries));
                     return callback(null, twiml);
                     break;
 
                 // listen options menu again
                 case '*':
-                    twiml.redirect(`${domain}/studio/calling/queue-menu?mode=mainProcess&Digits=1${taskSid ? `&taskSid=${taskSid}` : ''}`);
+                    queries.mode = 'mainProcess';
+                    queries.Digits = '1';
+                    twiml.redirect(urlBuilder(`${domain}/studio/calling/queue-menu`, queries));
                     return callback(null, twiml);
                     break;
 
                 //  listen to menu again
                 default:
-                    twiml.say(sayOptions, 'Esa opción no está disponible.');
-                    twiml.redirect(`${domain}/studio/calling/queue-menu?mode=mainProcess&Digits=1${taskSid ? `&taskSid=${taskSid}` : ''}`);
+                    twiml.say(sayOptions, _.t('queue_menu:invalid_option'));
+                    queries.mode = 'mainProcess';
+                    queries.Digits = '1';
+                    twiml.redirect(urlBuilder(`${domain}/studio/calling/queue-menu`, queries));
                     return callback(null, twiml);
                     break;
             }

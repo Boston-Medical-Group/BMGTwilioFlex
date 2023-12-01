@@ -34,7 +34,6 @@ exports.createTask = async function createTask(parameters) {
       workflowSid
     });
 
-    console.log('CRATETASKSUCCESS1', task);
     const result = {
       success: task.success,
       taskSid: task.taskSid,
@@ -44,11 +43,9 @@ exports.createTask = async function createTask(parameters) {
       },
       status: task.status,
     };
-    console.log('CRATETASKSUCCESS', result);
 
     return result;
   } catch (error) {
-    console.log('CRATETASKERROR', error);
     return { success: false, status: error.status, message: error.message };
   }
 };
