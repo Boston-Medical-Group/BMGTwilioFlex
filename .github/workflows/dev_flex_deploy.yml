@@ -3,9 +3,11 @@ on:
   push:
     branches:
       - dev
+      - feature/**
 
     paths:
       - 'Flex/**/*'
+      - '.github/workflows/dev_flex_deploy.yml'
 
 jobs:
   prepare: # Job that list subdirectories inside flex
