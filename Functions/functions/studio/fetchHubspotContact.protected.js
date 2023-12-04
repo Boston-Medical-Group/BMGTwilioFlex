@@ -21,7 +21,6 @@ exports.handler = function (context, event, callback) {
         headers: { Authorization: `Bearer ` + context.HUBSPOT_TOKEN, 'content-type': 'application/x-www-form-urlencoded;charset=utf-8' }
     })
         .then(function (response) {
-            console.log('FOUND CONTACTS', response.data.contacts.length);
             if (response.data.contacts.length > 0) {
 
                 // handle success - first record found is going to be used for screen pop

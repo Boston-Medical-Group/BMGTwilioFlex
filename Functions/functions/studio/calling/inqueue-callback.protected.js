@@ -32,10 +32,13 @@ const { getTask, handleError, getTime, cancelTask, urlBuilder } = require(helper
 const optionsPath = Runtime.getFunctions()['studio/calling/options'].path;
 const options = require(optionsPath);
 
+const i18n = require(Runtime.getFunctions()['helpers/i18n'].path);
+
 // Create the callback task
 async function createCallbackTask(context, phoneNumber, taskInfo, ringback) {
-    const time = getTime(options.TimeZone);
     const taskAttributes = JSON.parse(taskInfo.data.attributes);
+    const timezone = taskAttributes.timezone ?? options.TimeZone
+    const time = getTime(timezone);
 
     const timeout = taskInfo.timeout || 86400;
     const priority = taskInfo.priority || options.CallbackTaskPriority;
@@ -55,7 +58,7 @@ async function createCallbackTask(context, phoneNumber, taskInfo, ringback) {
             numberToCall: phoneNumber || taskAttributes.caller,
             numberToCallFrom: taskAttributes.called,
             attempts,
-            mainTimeZone: options.TimeZone,
+            mainTimeZone: timezone,
             utcDateTimeReceived: time,
             RecordingSid: null,
             RecordingUrl: null,
@@ -99,11 +102,16 @@ function formatPhoneNumber(phoneNumber) {
 exports.handler = async function (context, event, callback) {
     const client = context.getTwilioClient();
     const twiml = new Twilio.twiml.VoiceResponse();
+    const language = event.language || options.sayOptions.language || 'es'; // Default es es-EC solamente porque es el primer idioma que trabajamos
+    const voice = event.voice || options.sayOptions.voice;
+    const _ = i18n.init(language);
 
     const domain = `https://${context.DOMAIN_NAME}`;
 
     // Load options
     const { sayOptions, CallbackAlertTone } = options;
+    sayOptions.language = language;
+    sayOptions.voice = voice;
 
     const { mode } = event;
     const PhoneNumberFrom = event.From;
@@ -111,32 +119,37 @@ exports.handler = async function (context, event, callback) {
     const CallbackNumber = event.cbphone;
     const { taskSid } = event;
     let message = '';
-    let queries;
+    let queries = {
+        mode: 'main',
+        language,
+        voice
+    };
 
     // main logic for callback methods
     switch (mode) {
         //  present main menu options
         case 'main':
             // main menu
-            message = `Ha solicitado que lo llamemos al número ${formatPhoneNumber(PhoneNumberFrom)}...`;
-            message += 'Si esto es correcto, presione 1...';
-            message += 'Presione 2 si desea que lo llamemos a un número diferente';
+            message = _.t('callback_menu:confirm_number', { number: formatPhoneNumber(PhoneNumberFrom) });
+            message += _.t('callback_menu:press_to_confirm', {option: 1});
+            message += _.t('callback_menu:press_to_change_number', {option: 2});
 
-            queries = {
-                mode: 'mainProcess',
-                CallSid,
-                cbphone: encodeURI(PhoneNumberFrom),
-            };
+            queries.mode = 'mainProcess';
             if (taskSid) {
                 queries.taskSid = taskSid;
             }
             const gatherConfirmation = twiml.gather({
                 input: 'dtmf',
                 timeout: '2',
-                action: urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries),
+                action: urlBuilder(`${domain}/studio/calling/inqueue-callback`, {
+                    ...queries,
+                    CallSid,
+                    cbphone: encodeURI(PhoneNumberFrom),
+                }),
             });
             gatherConfirmation.say(sayOptions, message);
-            twiml.redirect(`${domain}/studio/calling/queue-menu?mode=main${taskSid ? `&taskSid=${taskSid}` : ''}`);
+            queries.mode = 'main'
+            twiml.redirect(urlBuilder(`${domain}/studio/calling/queue-menu`, queries));
             return callback(null, twiml);
             break;
 
@@ -146,11 +159,9 @@ exports.handler = async function (context, event, callback) {
                 //  existing number
                 case '1':
                     // redirect to submitCalBack
-                    queries = {
-                        mode: 'submitCallback',
-                        CallSid,
-                        cbphone: encodeURI(CallbackNumber),
-                    };
+                    queries.mode = 'submitCallback';
+                    queries.CallSid = CallSid;
+                    queries.cbphone = encodeURI(CallbackNumber);
                     if (taskSid) {
                         queries.taskSid = taskSid;
                     }
@@ -159,14 +170,12 @@ exports.handler = async function (context, event, callback) {
                     break;
                 //  new number
                 case '2':
-                    message = 'Use su teclado para ingresar su número de teléfono...';
-                    message += 'Presione numeral al finalizar...';
+                    message = _.t('callback_menu:use_keypad_to_change_number');
+                    message += _.t('callback_menu:press_to_end');
 
-                    queries = {
-                        mode: 'newNumber',
-                        CallSid,
-                        cbphone: encodeURI(CallbackNumber),
-                    };
+                    queries.mode = 'newNumber';
+                    queries.CallSid = CallSid;
+                    queries.cbphone = encodeURI(CallbackNumber);
                     if (taskSid) {
                         queries.taskSid = taskSid;
                     }
@@ -183,11 +192,8 @@ exports.handler = async function (context, event, callback) {
                     return callback(null, twiml);
                     break;
                 case '*':
-                    queries = {
-                        mode: 'main',
-                        skipGreeting: true,
-                        CallSid,
-                    };
+                    queries.CallSid = CallSid;
+                    queries.skipGreeting = true;
                     if (taskSid) {
                         queries.taskSid = taskSid;
                     }
@@ -195,13 +201,10 @@ exports.handler = async function (context, event, callback) {
                     return callback(null, twiml);
                     break;
                 default:
-                    queries = {
-                        mode: 'main',
-                    };
                     if (taskSid) {
                         queries.taskSid = taskSid;
                     }
-                    twiml.say(sayOptions, 'No he entendido su seleccion.');
+                    twiml.say(sayOptions, _.t('callback_menu:invalid_option'));
                     twiml.redirect(urlBuilder(`${domain}/studio/calling/inqueue-callback`, queries));
                     return callback(null, twiml);
                     break;
@@ -213,16 +216,14 @@ exports.handler = async function (context, event, callback) {
             const NewPhoneNumber = event.Digits;
             // TODO: Handle country code in new number
 
-            message = `Ha ingresado el número ${formatPhoneNumber(NewPhoneNumber)} ...`;
-            message += 'Presione 1 si es correcto...';
-            message += 'Presione 2 para ingresar el número nuevamente';
-            message += 'Presione asterisco para regresar al menu principal';
+            message = _.t('callback_menu:confirm_new_number', {number: formatPhoneNumber(NewPhoneNumber)});
+            message += _.t('callback_menu:press_to_confirm_new_number', { option: 1 });
+            message += _.t('callback_menu:press_to_change_new_number', { option: 2 });
+            message += _.t('callback_menu:press_to_home');
 
-            queries = {
-                mode: 'mainProcess',
-                CallSid,
-                cbphone: encodeURI(NewPhoneNumber),
-            };
+            queries.mode = 'mainProcess';
+            queries.CallSid = CallSid;
+            queries.cbphone = encodeURI(NewPhoneNumber);
             if (taskSid) {
                 queries.taskSid = taskSid;
             }
@@ -261,9 +262,9 @@ exports.handler = async function (context, event, callback) {
             await createCallbackTask(context, CallbackNumber, taskInfo, ringBackUrl);
 
             //  hangup the call
-            twiml.say(sayOptions, 'Su solicitud ha sido recibida...');
-            twiml.say(sayOptions, 'Un agente disponible lo contactará a la brevedad...');
-            twiml.say(sayOptions, 'Gracias por llamar.');
+            twiml.say(sayOptions, _.t('callback_menu:request_received'));
+            twiml.say(sayOptions, _.t('callback_menu:agent_will_contact_soon'));
+            twiml.say(sayOptions, _.t('callback_menu:goodbye'));
             twiml.hangup();
             return callback(null, twiml);
             break;

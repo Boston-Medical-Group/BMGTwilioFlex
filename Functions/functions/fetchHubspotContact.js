@@ -1,7 +1,7 @@
 const FunctionTokenValidator = require('twilio-flex-token-validator').functionValidator;
 const fetch = require("node-fetch");
 
-const fetchByContact = async (crmid, context) => {
+const fetchByContact = async (crmid, context, deal) => {
   const request = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${crmid}/?properties=email,firstname,lastname,phone,hs_object_id,reservar_cita`, {
     method: "GET",
     headers: {
@@ -14,7 +14,11 @@ const fetchByContact = async (crmid, context) => {
     throw new Error('Error while retrieving data from hubspot');
   }
 
-  return await request.json();
+  const contact = await request.json();
+  return {
+    ...contact,
+    deal: deal ?? null
+  }
 }
 
 const fetchByDeal = async (deal_id, context) => {
@@ -33,7 +37,7 @@ const fetchByDeal = async (deal_id, context) => {
   const deal = await request.json();
   if (deal.associations?.contacts?.results?.length > 0) {
     const contactId = deal.associations.contacts.results[0].id;
-    return await fetchByContact(contactId, context);
+    return await fetchByContact(contactId, context, deal);
   } else {
     throw new Error('Error while retrieving data from hubspot');
   }
