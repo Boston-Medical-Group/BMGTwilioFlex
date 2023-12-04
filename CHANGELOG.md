@@ -1,5 +1,11 @@
 # Changelog
 
+## 04/12/2023
+* Outcomes automaticos
+* Corrige log y agrega log de llamadas canceladas
+* Ajusta callback para usar idiomas
+* Creación de leads en su país
+
 ## 29/11/2023
 * Nuevos deploys
 * Reescribe callback
