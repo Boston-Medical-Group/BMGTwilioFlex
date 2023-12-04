@@ -19,6 +19,7 @@ const InteractionCard = ({manager}) => {
 
   const [contact, setContact] = useState({});
   const [contactId, setContactId] = useState(null);
+  const [deal, setDeal] = useState({});
   const [dealId, setDealId] = useState(null);
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [selectedSmsContact, setSelectedSmsContact] = useState();
@@ -79,7 +80,12 @@ const InteractionCard = ({manager}) => {
         .catch(() => setError("Error while fetching data from Hubspot"));
     } else if (dealId) {
       getDataByDealId({ deal_id: dealId })
-        .then(data => setContact(data.properties))
+        .then((data) => {
+          setContact(data.properties)
+          if (data.deal !== undefined && data.deal !== null) {
+            setDeal(data.deal.properties)
+          }
+        })
         .catch(() => setError("Error while fetching data from Hubspot"));
     }
   }, [contactId, dealId])
@@ -129,6 +135,11 @@ const InteractionCard = ({manager}) => {
 
     if (process.env.FLEX_APP_CALENDAR_URL_FIELD != undefined) {
       const myVar = process.env.FLEX_APP_CALENDAR_URL_FIELD;
+
+      if (deal) {
+        return deal[myVar] ?? null;
+      }
+      
       return data[myVar] ?? null;
     }
 
