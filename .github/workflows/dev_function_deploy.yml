@@ -3,9 +3,10 @@ on:
   push:
     branches:
       - dev
+      - feature/**
     paths:
       - 'Functions/**/*'
-      - '.github/workflows/*_function_deploy.yml'
+      - '.github/workflows/dev_function_deploy.yml'
 jobs:
   build:
     runs-on: ubuntu-latest

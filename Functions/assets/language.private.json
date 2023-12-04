@@ -1,0 +1,66 @@
+{
+    "es": {
+        "queue_menu": {
+            "least_than_a_minute": "menos de un minuto...",
+            "more_than_x_minutes": "mas de {{minutes}} minutos...",
+            "less_than_x_minutes": "menos de {{minutes}} minutos...",
+            "estimated_waiting_time": "El tiempo estimado de espera es de {{wait}} ...",
+            "wait_for_an_agent": "Nuestros asesores te atenderán pronto, aguarde un momento.",
+            "your_call_is_next_in_queue": "Su llamada es la siguiente en la cola...",
+            "just_one_call_before_you": "Hay solo una llamada antes de usted...",
+            "more_than_x_calls_before_you": "Hay mas de {{calls}} llamadas antes de usted...",
+            "x_calls_before_you": "Hay {{calls}} llamadas antes de usted...",
+            "press_one_and_callback_option": "Si prefiere, marque {{option}} y le devolveremos la llamada lo antes posible.",
+            "press_one_and_callback": "Marque {{option}} y le devolveremos la llamada lo antes posible.",
+            "invalid_option": "Esa opción no está disponible."
+        },
+
+        "callback_menu": {
+            "confirm_number": "Ha solicitado que lo llamemos al número {{number}} ...",
+            "press_to_confirm": "Si esto es correcto, presione {{option}} ...",
+            "press_to_change_number": "Presione {{option}} si desea que lo llamemos a un número diferente",
+            "use_keypad_to_change_number": "Use su teclado para ingresar su número de teléfono...",
+            "press_to_end": "Presione numeral al finalizar...",
+            "confirm_new_number": "Ha ingresado el número {{number}}...",
+            "press_to_confirm_new_number": "Presione {{option}} si es correcto...",
+            "press_to_change_new_number": "Presione {{option}} para ingresar el número nuevamente...",
+            "invalid_option": "No he entendido su seleccion.",
+            "press_to_home": "'Presione asterisco para regresar al menu principal",
+            "request_received": "Su solicitud ha sido recibida...",
+            "agent_will_contact_soon": "Un agente disponible lo contactará a la brevedad...",
+            "goodbye": "Gracias por llamar."
+        }
+    },
+
+    "en": {
+        "queue_menu": {
+            "least_than_a_minute": "less than a minute...",
+            "more_than_x_minutes": "more than {{minutes}} minutes...",
+            "less_than_x_minutes": "less than {{minutes}} minutes...",
+            "estimated_waiting_time": "The estimated waiting time is {{wait}} ...",
+            "wait_for_an_agent": "Our agents will assist you shortly, please wait a moment.",
+            "your_call_is_next_in_queue": "Your call is next in the queue...",
+            "just_one_call_before_you": "There is just one call ahead of you...",
+            "more_than_x_calls_before_you": "There are more than {{calls}} calls ahead of you...",
+            "x_calls_before_you": "There are {{calls}} calls ahead of you...",
+            "press_one_and_callback_option": "If you prefer, dial {{option}} and we will call you back as soon as possible.",
+            "press_one_and_callback": "Dial {{option}} and we will call you back as soon as possible.",
+            "invalid_option": "That option is not available."
+        },
+        "callback_menu": {
+            "confirm_number": "You have requested a callback to the number {{number}} ...",
+            "press_to_confirm": "If this is correct, press {{option}} ...",
+            "press_to_change_number": "Press {{option}} if you want us to call you on a different number",
+            "use_keypad_to_change_number": "Use your keypad to enter your phone number...",
+            "press_to_end": "Press pound key to end...",
+            "confirm_new_number": "You have entered the number {{number}} ...",
+            "press_to_confirm_new_number": "Press {{option}} if it is correct...",
+            "press_to_change_new_number": "Press {{option}} to enter the number again...",
+            "invalid_option": "I did not understand your selection.",
+            "press_to_home": "Press asterisk to return to the main menu",
+            "request_received": "Your request has been received...",
+            "agent_will_contact_soon": "An available agent will contact you shortly...",
+            "goodbye": "Thank you for calling."
+        }
+    }
+}
