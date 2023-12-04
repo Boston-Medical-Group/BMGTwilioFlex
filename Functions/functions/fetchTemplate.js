@@ -14,9 +14,25 @@ exports.handler = async function (context, event, callback) {
   try {
 
     let defaultCountry = 'EC';
-    const validCountries = ['EC','CA','ES','MX','CO','AR','PE','DE'];
-    if (event.hasOwnProperty('country') && validCountries.includes(event.country)) {
-      defaultCountry = event.country;
+    const validCountries = [
+      'EC', 'ECU',
+      'CA', 'CAN',
+      'ES', 'ESP',
+      'MX', 'MEX',
+      'CO', 'COL',
+      'AR', 'ARG',
+      'PE', 'PER',
+      'DE', 'DEU',
+      'AL', 'ALE'
+    ];
+
+    if (event.hasOwnProperty('country') && validCountries.includes(event.country.toUpperCase())) {
+      defaultCountry = event.country.substr(0, 2).toUpperCase();
+      if (defaultCountry === 'ME') {
+        defaultCountry = 'MX';
+      } else if (defaultCountry === 'AL' || defaultCountry === 'ALE') {
+        defaultCountry = 'DE';
+      }
     }
 
     const templatesFileName = `templates_${defaultCountry}.json`;
