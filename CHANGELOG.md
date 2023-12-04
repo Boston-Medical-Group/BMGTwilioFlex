@@ -6,6 +6,7 @@
 * Ajusta callback para usar idiomas
 * Creación de leads en su país
 * Corrige propiedades obtenidas para un deal
+* Corrige URI api call
 
 ## 29/11/2023
 * Nuevos deploys
