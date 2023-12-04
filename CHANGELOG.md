@@ -5,6 +5,7 @@
 * Corrige log y agrega log de llamadas canceladas
 * Ajusta callback para usar idiomas
 * Creación de leads en su país
+* Corrige propiedades obtenidas para un deal
 
 ## 29/11/2023
 * Nuevos deploys
