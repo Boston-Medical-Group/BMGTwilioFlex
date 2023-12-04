@@ -3,6 +3,21 @@ const axios = require("axios");
 /** Receives a phone number, queries HUBSPOT and returns the customer record.
 * If the CRM has a duplicate number, the function returns the first record (usually the oldest)
 */
+
+const countryMap = {
+  ecu: 'EC',
+  can: 'CA',
+  mex: 'MX',
+  col: 'CO',
+  arg: 'AR',
+  esp: 'ES',
+  spa: 'ES',
+  per: 'PE',
+  ale: 'DE',
+  deu: 'DE',
+  bra: 'BR',
+};
+
 exports.handler = async function (context, event, callback) {
   let result = {
     crmid: '',
@@ -29,6 +44,7 @@ exports.handler = async function (context, event, callback) {
         phone: from,
         hs_lead_status: 'NEW',
         tipo_de_lead: 'Llamada',
+        country: countryMap[context.COUNTRY]
       }
     }
   }).then(function (response) {
