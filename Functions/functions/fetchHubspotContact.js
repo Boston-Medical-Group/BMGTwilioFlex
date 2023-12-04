@@ -22,7 +22,7 @@ const fetchByContact = async (crmid, context, deal) => {
 }
 
 const fetchByDeal = async (deal_id, context) => {
-  const request = await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${deal_id}/?associations=contacts`, {
+  const request = await fetch(`https://api.hubapi.com/crm/v3/objects/deals/${deal_id}/?associations=contacts?properties=dealname,dealstage,hs_object_id,reservar_cita`, {
     method: "GET",
     headers: {
       'Content-Type': 'application/json',
