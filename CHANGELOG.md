@@ -8,6 +8,7 @@
 * Corrige propiedades obtenidas para un deal
 * Corrige URI api call
 * Crea y carga plantillas de WA desde asset para cada país
+* Corrige contexto
 
 ## 29/11/2023
 * Nuevos deploys
