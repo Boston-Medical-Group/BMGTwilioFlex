@@ -1,56 +1,79 @@
 const FunctionTokenValidator = require('twilio-flex-token-validator').functionValidator;
 const TokenValidator = require('twilio-flex-token-validator').validator;
+const { replaceTemplate } = require(Runtime.getFunctions()['helpers/template-replacer'].path);
 const fetch = require("node-fetch");
 
-exports.handler = FunctionTokenValidator(async function (context, event, callback) {
+//exports.handler = FunctionTokenValidator(async function (context, event, callback) {
+exports.handler = async function (context, event, callback) {
   const {
     hubspot_id,
+    deal_id,
     Token
   } = event;
 
   try {
 
     let defaultCountry = 'EC';
-    const validCountries = ['EC','CA','ES','MX','CO','AR','PE','DE'];
-    if (event.hasOwnProperty('country') && validCountries.includes(event.country)) {
-      defaultCountry = event.country;
+    const validCountries = [
+      'EC', 'ECU',
+      'CA', 'CAN',
+      'ES', 'ESP',
+      'MX', 'MEX',
+      'CO', 'COL',
+      'AR', 'ARG',
+      'PE', 'PER',
+      'DE', 'DEU',
+      'AL', 'ALE'
+    ];
+
+    if (event.hasOwnProperty('country') && validCountries.includes(event.country.toUpperCase())) {
+      defaultCountry = event.country.substr(0, 2).toUpperCase();
+      if (defaultCountry === 'ME') {
+        defaultCountry = 'MX';
+      } else if (defaultCountry === 'AL' || defaultCountry === 'ALE') {
+        defaultCountry = 'DE';
+      }
     }
 
-    const openTemplateFile = Runtime.getAssets()['/templates.json'].open;
-    const templateRawObject = JSON.parse(openTemplateFile());
-    /** @type {array} */
-    const templateRaw = templateRawObject[defaultCountry];
-
-    const client = context.getTwilioClient();
-
+    const templatesFileName = `templates_${defaultCountry}.json`;
     let template;
-    if (hubspot_id && templateRaw?.length > 0) {
-      const request = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspot_id}`, {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
+    try {
+      const openTemplateFile = Runtime.getAssets()[`/templates/${templatesFileName}`].open;
+      const templateRaw = JSON.parse(openTemplateFile());
+
+      const client = context.getTwilioClient();
+
+      // todo obtener datos del deal o cita (futuro?) y formatear de una manera que la plantilla entienda
+      if (hubspot_id && templateRaw?.length > 0) {
+        const request = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${hubspot_id}`, {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
+          }
+        });
+
+        if (!request.ok) {
+          throw new Error('Error while retrieving data from hubspot');
         }
-      });
 
-      if (!request.ok) {
-        throw new Error('Error while retrieving data from hubspot');
+        const contactInformation = await request.json();
+        const tokenInformation = await TokenValidator(Token, context.ACCOUNT_SID || '', context.AUTH_TOKEN || '');
+        const workerInformation = await client.conversations.v1.users(tokenInformation.identity).fetch();
+
+        template = templateRaw.map(item => {
+
+          let formattedItem = item.replace(/{{customerFirstName}}/, contactInformation.properties.firstname);
+          formattedItem = formattedItem.replace(/{{customerLastName}}/, contactInformation.properties.lastname);
+          formattedItem = formattedItem.replace(/{{agentName}}/, workerInformation.friendlyName);
+
+          return formattedItem;
+        });
+      } else {
+        template = templateRaw;
       }
-
-      const contactInformation = await request.json();
-      const tokenInformation = await TokenValidator(Token, context.ACCOUNT_SID || '', context.AUTH_TOKEN || '');
-      const workerInformation = await client.conversations.v1.users(tokenInformation.identity).fetch();
-
-      template = templateRaw.map(item => {
-
-        let formattedItem = item.replace(/{{customerFirstName}}/, contactInformation.properties.firstname);
-        formattedItem = formattedItem.replace(/{{customerLastName}}/, contactInformation.properties.lastname);
-        formattedItem = formattedItem.replace(/{{agentName}}/, workerInformation.friendlyName);
-
-        return formattedItem;
-      });
-    } else {
-      template = templateRaw;
+    } catch (err) {
+      template = [];
     }
 
     const response = new Twilio.Response();
@@ -84,4 +107,5 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
     }
 
   }
-})
+//})
+}
