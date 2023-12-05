@@ -2,6 +2,7 @@
 
 ## 05/12/2023
 * Corrige URL calendario cita desde contacto.
+* Corrige leads con deal vacio
 
 ## 04/12/2023
 * Outcomes automaticos
