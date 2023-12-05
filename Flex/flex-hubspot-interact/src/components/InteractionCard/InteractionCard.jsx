@@ -136,7 +136,7 @@ const InteractionCard = ({manager}) => {
     if (process.env.FLEX_APP_CALENDAR_URL_FIELD != undefined) {
       const myVar = process.env.FLEX_APP_CALENDAR_URL_FIELD;
 
-      if (deal && deal.trim() !== '') {
+      if (deal && deal !== '') {
         console.log('CalendarURL loaded from Deal');
         return deal[myVar] ?? null;
       }

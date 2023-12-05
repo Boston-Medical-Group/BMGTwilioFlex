@@ -1,7 +1,7 @@
 # Changelog
 
 ## 05/12/2023
-* Corrige URL calendario cita desde contacto
+* Corrige URL calendario cita desde contacto.
 
 ## 04/12/2023
 * Outcomes automaticos
