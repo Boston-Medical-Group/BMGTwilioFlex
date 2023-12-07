@@ -1,0 +1,45 @@
+name: Twilio Functions - ESPAÑA
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Functions/*'
+      - 'CHANGELOG.md'
+      - 'CHANGELOG_ESP.md'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: flex-esp
+    steps:
+      - name: Preparing Repository
+        uses: actions/checkout@v4
+      - name: Installing NodeJS and NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: Functions/package-lock.json
+      - name: Installing Packages 
+        working-directory: Functions
+        run: npm install twilio-cli -g;twilio plugins:install @twilio-labs/plugin-serverless;npm install
+      - name: Deploying Functions
+        working-directory: Functions
+        env:
+          TWILIO_ACCOUNT_SID: ${{secrets.ACCOUNT_SID}} 
+          TWILIO_API_KEY: ${{secrets.TWILIO_API_KEY}}
+          TWILIO_API_SECRET: ${{secrets.TWILIO_API_SECRET}}
+          HUBSPOT_TOKEN: ${{secrets.HUBSPOT_TOKEN}}
+          INBOUND_SMS_STUDIO_FLOW: ${{secrets.INBOUND_SMS_STUDIO_FLOW}}
+          TASK_ROUTER_WORKSPACE_SID: ${{secrets.TASK_ROUTER_WORKSPACE_SID}}
+          TASK_ROUTER_WORKFLOW_SID: ${{secrets.TASK_ROUTER_WORKFLOW_SID}}
+          TASK_ROUTER_QUEUE_SID: ${{secrets.TASK_ROUTER_QUEUE_SID}}
+          TWILIO_PHONE_NUMBER: ${{secrets.TWILIO_PHONE_NUMBER}}
+          TWILIO_WA_PHONE_NUMBER: ${{secrets.TWILIO_WA_PHONE_NUMBER}}
+          FLEXMANAGER_API_KEY: ${{secrets.FLEXMANAGER_API_KEY}}
+          FLEXMANAGER_API_URL: ${{vars.FLEXMANAGER_API_URL}}
+          COUNTRY: ${{vars.COUNTRY}}
+        run: twilio serverless:deploy --env .env.example --load-system-env --environment=dev --force -n bmg-elexial-cc-stack --override-existing-project -l=debug
+
+  
+       
