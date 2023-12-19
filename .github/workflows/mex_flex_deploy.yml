@@ -1,11 +1,9 @@
 name: Twilio Flex Plugins - MEXICO
 on:
-  push:
+  pull_request:
     branches:
       - main
-    paths:
-      - 'CHANGELOG.md'
-      - 'CHANGELOG_MEX.md'
+    types: [closed] 
 
 jobs:
   prepare: # Job that list subdirectories inside flex
@@ -17,7 +15,8 @@ jobs:
       - uses: actions/checkout@v4
       - id: set-dirs # Give it an id to handle to get step outputs in the outputs key above
         run: |
-          echo "dir=$(cd Flex;ls -d */ | sed 's/.$//'| jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          echo "dir=$(curl -s  -H "Authorization: token ${{secrets.REPO_TOKEN}}" https://api.github.com/repos/${{github.repository}}/pulls/${{github.event.pull_request.number}}/files | jq -r '.[]  .filename' | cut -d "/" -f 1,2 | sed '/^Flex/!d'  | cut -d "/" -f 2 | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+        # echo "dir=$(cd Flex;ls -d */ | sed 's/.$//'| jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
 
   buildandrelease:
     needs: prepare

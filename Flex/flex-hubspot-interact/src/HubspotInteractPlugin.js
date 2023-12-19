@@ -1,6 +1,8 @@
 import React from 'react';
 import { FlexPlugin } from '@twilio/flex-plugin';
 
+import { initializeCustomCallSids } from './initializers/initializeCustomCallSids';
+
 import InteractionCard from './components/InteractionCard/InteractionCard';
 
 const PLUGIN_NAME = 'HubspotInteractPlugin';
@@ -75,6 +77,9 @@ export default class HubspotInteractPlugin extends FlexPlugin {
       }
 
     }
+
+    // Fetch CallerID from Pools
+    initializeCustomCallSids(manager);
 
     // Add an event listener to associate the postMessage() data with the receiveMessage logic
     window.addEventListener("message", receiveMessage, false);

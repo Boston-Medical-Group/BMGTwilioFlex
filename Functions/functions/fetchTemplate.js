@@ -3,8 +3,7 @@ const TokenValidator = require('twilio-flex-token-validator').validator;
 const { replaceTemplate } = require(Runtime.getFunctions()['helpers/template-replacer'].path);
 const fetch = require("node-fetch");
 
-//exports.handler = FunctionTokenValidator(async function (context, event, callback) {
-exports.handler = async function (context, event, callback) {
+exports.handler = FunctionTokenValidator(async function (context, event, callback) {
   const {
     hubspot_id,
     deal_id,

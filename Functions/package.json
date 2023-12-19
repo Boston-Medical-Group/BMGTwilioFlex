@@ -16,7 +16,8 @@
     "moment-timezone": "^0.5.43",
     "node-fetch": "^2.6.7",
     "twilio": "^3.79.0",
-    "twilio-flex-token-validator": "^1.5.6"
+    "twilio-flex-token-validator": "^1.5.6",
+    "twilio-sync": "^3.3.3"
   },
   "devDependencies": {
     "@types/node-fetch": "^2.6.9",
