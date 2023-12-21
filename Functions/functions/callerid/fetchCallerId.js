@@ -2,16 +2,14 @@ const FunctionTokenValidator = require('twilio-flex-token-validator').functionVa
 const fetch = require("node-fetch");
 /** @type {import('../helpers/utils.private.js')} */
 const utils = require(Runtime.getFunctions()['helpers/utils'].path);
-const { storeRRCounter } = require(Runtime.getFunctions()['callerid/helpers'].path);
 
-
-//exports.handler = FunctionTokenValidator(async function (context, event, callback) {
-exports.handler = async function (context, event, callback) {
+exports.handler = FunctionTokenValidator(async function (context, event, callback) {
+//exports.handler = async function (context, event, callback) {
   const {
     Token
   } = event;
 
-  let callerId, count;
+  let callerId, count = 0;
   let queueSid = event.queueSid ?? undefined;
   try {
     const country = utils.countryToIso2(context.COUNTRY);
@@ -22,16 +20,18 @@ exports.handler = async function (context, event, callback) {
       const pool = openPools.hasOwnProperty('country') ? openPools.country : openPools.default;
 
       queueSid = pool.hasOwnProperty(queueSid) ? queueSid : pool.defaultQueue;
+      /** @type {Array<Number, string>} */
       const poolConfig = pool[queueSid];
       
-      count = Number(event.request.cookies[`${queueSid}_count`]) || 0;
-      if (count >= poolConfig.pool.length) {
+      count = await utils.getRRCounter(queueSid, context) || 0;
+      if (count >= poolConfig.length) {
         count = 0;
       }
         
-      callerId = poolConfig.pool.at(count);
+      callerId = poolConfig.at(count) || null;
 
-      count++;
+      count++
+      utils.updateRRCounter(queueSid, count, context)
     } catch (err) {
       callerId = null;
     }
@@ -68,5 +68,5 @@ exports.handler = async function (context, event, callback) {
     }
 
   }
-//})
-}
+})
+//}

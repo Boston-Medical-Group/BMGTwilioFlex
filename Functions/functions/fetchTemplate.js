@@ -12,7 +12,7 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
 
   try {
 
-    let defaultCountry = context.COUNTRY.substr(0, 2).toUpperCase();
+    let defaultCountry = context.COUNTRY === 'dev' ? 'DEV' : context.COUNTRY.substr(0, 2).toUpperCase();
 
     if (defaultCountry === 'ME') {
       defaultCountry = 'MX';

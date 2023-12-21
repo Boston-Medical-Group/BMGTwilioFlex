@@ -1,39 +1,34 @@
-export const initializeCustomCallSids = (manager) => {
+import * as Flex from "@twilio/flex-ui";
 
-    flex.Actions.replaceAction("StartOutboundCall", async (payload, original) => {
-        console.log('CALLERIDREPLACE', payload, original);
-        return new Promise(async (resolve, reject) => {
-            if (payload.callerId) {
-                resolve(payload.callerId);
-                return;
-            }
+export const initializeCustomCallSids = (flex, manager) => {
 
-            try {
-                // Obtiene el callerId desde el pool
-                const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/callerid/fetchCallerId`, {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        queueSid: payload.queueSid ?? null,
-                        Token: manager.store.getState().flex.session.ssoTokenPayload.token
-                    })
-                });
-
-                // NOT Failsafe
-                const result = await request.json();
-                console.log('CALLERIDRESULT', result);
-                resolve(result.callerId);
-            } catch (error) {
-                reject(error);
-            }
-        }).then((callerId) => {
-            console.log('CALLERIDTOUSE', callerId);
-            original({ ...payload, callerId: callerId });
-        }).catch((error) => {
-            console.log('CALLERIDDEFAULT');
+    Flex.Actions.replaceAction("StartOutboundCall", (payload, original) => {
+        if (payload.callerId) {
             original(payload);
-        });
+        } else {
+            fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/callerid/fetchCallerId`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    queueSid: payload.queueSid ?? null,
+                    Token: manager.store.getState().flex.session.ssoTokenPayload.token
+                })
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                // Obtener el número de teléfono dinámico
+                const dynamicNumber = data.callerId;
+
+                // Actualizar el destino de la llamada saliente con el número de teléfono dinámico
+                payload.callerId = dynamicNumber;
+                // Invocar la acción original con el payload actualizado
+                original(payload);
+            })
+            .catch((error) => {
+                original(payload);
+            });
+        }
     });
 }

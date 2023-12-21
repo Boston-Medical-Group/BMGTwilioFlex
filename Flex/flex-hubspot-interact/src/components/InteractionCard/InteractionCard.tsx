@@ -7,23 +7,44 @@ import { FaCalendar, FaPhoneAlt, FaSms, FaWhatsapp } from 'react-icons/fa';
 import useApi from '../../hooks/useApi';
 import SendSmsModal from './SendSmsModal';
 import SendWAModal from './SendWAModal';
+import CallCard from './CallCard';
+import { actions, AppState } from '../../states';
+import { HubspotContact } from 'Types';
+// @ts-ignore
+import { useSelector, useDispatch } from 'react-redux';
+
+
+type Props = {
+  manager: Flex.Manager
+}
+
+type Deal = {
+  [key: string]: any
+};
 
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
- *
- * @param {Flex.Manager} manager - an object representing the task manager
- * @return {JSX.Element|null} - the rendered JSX element or null if isOpen is false
  */
-const InteractionCard = ({manager}) => {
+const InteractionCard = ({manager} : Props) => {
   const { getDataByContactId, getDataByDealId } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
   const [contact, setContact] = useState({});
   const [contactId, setContactId] = useState(null);
-  const [deal, setDeal] = useState({});
+  const [deal, setDeal] = useState<Deal>({});
   const [dealId, setDealId] = useState(null);
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [selectedSmsContact, setSelectedSmsContact] = useState();
   const [selectedWAContact, setSelectedWAContact] = useState();
+  const [showCallCard, setShowCallCard] = useState(false);
+  const [calendarUrl, setCalendarUrl] = useState<string>('');
+  //const [callCard, setCallCard] = useState(false);
+
+  const callCard = useSelector(
+    (state: AppState) => {
+      return state.interactionCallCardState.interactionCallCard.callCard
+    }
+  );
+  const dispatch = useDispatch();
 
   const afterSetActivityListener = useCallback((payload) => {
     if (payload.activityAvailable) {
@@ -32,6 +53,15 @@ const InteractionCard = ({manager}) => {
       setActionDisabled(true)
     }
   }, []);
+
+  useEffect(() => {
+    if (callCard !== undefined && callCard.hasOwnProperty('data')) {
+      setContact(callCard.data);
+      setShowCallCard(true);
+    } else {
+      setShowCallCard(false);
+    }
+  }, [callCard])
 
   useEffect(() => {
     Flex.Actions.addListener("afterSetActivity", afterSetActivityListener);
@@ -44,12 +74,14 @@ const InteractionCard = ({manager}) => {
   
 
   useEffect(() => {
-    async function receiveMessage(event) {
+    async function receiveMessage(event : { data: any }) {
       // Invoke the Flex Outbound Call Action
       const { data } = event;
       if (data.from === 'FLEX_SCRIPT') {
         //console.log('LOCALDEV', event);
         if (data.actionType === 'gotoInteraction') {
+          setShowCallCard(false)
+          dispatch(actions.interactionCallCard.setCallCard({}))
           //window.removeEventListener('message', receiveMessage);
           if (data.hasOwnProperty('contact_id')) {
             setContactId(data.contact_id);
@@ -67,6 +99,7 @@ const InteractionCard = ({manager}) => {
 
   useEffect(() => {
     setContact({});
+    setCalendarUrl('');
     //setContactId(null);
     //setDealId(null);
 
@@ -76,8 +109,10 @@ const InteractionCard = ({manager}) => {
 
     if (contactId) {
       getDataByContactId({ contact_id: contactId })
-        .then(data => setContact(data.properties))
-        .catch(() => setError("Error while fetching data from Hubspot"));
+        .then(data => {
+          setContact(data.properties)
+        })
+        .catch(() => console.log("Error while fetching data from Hubspot"));
     } else if (dealId) {
       getDataByDealId({ deal_id: dealId })
         .then((data) => {
@@ -86,12 +121,16 @@ const InteractionCard = ({manager}) => {
             setDeal(data.deal.properties)
           }
         })
-        .catch(() => setError("Error while fetching data from Hubspot"));
+        .catch(() => console.log("Error while fetching data from Hubspot"));
     }
   }, [contactId, dealId])
 
+  useEffect(() => {
+    setCalendarUrl(calendar(contact))
+  }, [contact, deal])
 
-  const fullName = (contact) => {
+
+  const fullName = (contact : HubspotContact) => {
     let fullName = `${contact.firstname ?? ''} ${contact.lastname ?? ''}`;
     if (fullName.trim() == '') {
       return 'Unknown name';
@@ -101,14 +140,10 @@ const InteractionCard = ({manager}) => {
   }
 
   const initiateCallHandler = useCallback((data) => {
-    Flex.Actions.invokeAction("StartOutboundCall", {
-      destination: data.phone,
-      taskAttributes: {
-        name: `${data.firstname || ''} ${data.lastname || ''}`.trim(),
-        hubspot_contact_id: data.hs_object_id,
-        hubspot_deal_id: dealId ?? null
-      }
-    });
+    dispatch(actions.interactionCallCard.setCallCard({
+      data: data,
+      dealId: dealId ?? null
+    }))
   }, []);
 
   const sendSmsHandler = React.useCallback((data) => {
@@ -124,11 +159,11 @@ const InteractionCard = ({manager}) => {
     setSelectedWAContact(undefined);
   }, []);
 
-  const sendCalendarHandler = useCallback((data) => {
-    window.open(calendar(data), '_blank');
-  })
+  const sendCalendarHandler = useCallback(() => {
+    window.open(calendarUrl, '_blank');
+  }, [calendarUrl])
 
-  const calendar = (data) => {
+  const calendar = (data : any) => {
     if (actionDisabled) {
       return '#';
     }
@@ -136,25 +171,27 @@ const InteractionCard = ({manager}) => {
     if (process.env.FLEX_APP_CALENDAR_URL_FIELD != undefined) {
       const myVar = process.env.FLEX_APP_CALENDAR_URL_FIELD;
 
-      if (deal && deal !== '') {
+      if (deal && typeof deal === 'object') {
         if (deal.hasOwnProperty(myVar)) {
-          console.log('CalendarURL loaded from Deal');
-          return deal[myVar] ?? null;
+          return deal[myVar] ?? '';
         }
       }
       
-      console.log('CalendarURL loaded from Contact');
-      return data[myVar] ?? null;
+      return data[myVar] ?? '';
     }
 
-    return null;
+    return '';
   }
 
   if (!contact.hasOwnProperty('hs_object_id')) {
     return null;
   }
 
-  console.log('DEALID', dealId);
+  if (showCallCard) {
+    return (
+      <CallCard manager={manager} />
+    )
+  }
 
   return (
     <Theme.Provider theme="default">
@@ -167,11 +204,11 @@ const InteractionCard = ({manager}) => {
           <Paragraph>
             Seleccione el método de interacción con el contacto seleccionado.
           </Paragraph>
-          <Stack orientation="horizontal" spacing="space30" style={{ 'row-gap': '10px' }}>
+          <Stack orientation="horizontal" spacing="space30">
             <Button variant="primary" title={actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call"} disabled={actionDisabled} onClick={() => initiateCallHandler(contact)}><FaPhoneAlt /> Call</Button>
               <Button variant="primary" title={actionDisabled ? "To send a SMS, please change your status from 'Offline'" : "Send a SMS"} disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
               <Button variant="primary" title={actionDisabled ? "To send a WhatsApp, please change your status from 'Offline'" : "Send a WhatsApp"} disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
-              {calendar(contact) && <Button variant="primary" title="Schedule a new appointment" onClick={() => sendCalendarHandler(contact)}><FaCalendar /> Cita</Button>}
+              {calendarUrl !== '' && <Button variant="primary" title="Schedule a new appointment" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
           </Stack>
           </Card>
         </Box>
