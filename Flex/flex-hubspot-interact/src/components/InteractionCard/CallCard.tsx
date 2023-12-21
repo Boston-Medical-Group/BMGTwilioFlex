@@ -90,7 +90,7 @@ const CallCard = ({ manager } : Props) => {
           <Heading as="h2" variant="heading20">Llamar a {fullName(callCard?.data as HubspotContact)}</Heading>
           <Box justifyContent="center" alignItems="center" rowGap="space10" marginBottom="space80">
               <Label htmlFor="queue">Seleccione la cola</Label>
-              <Select id="queue" value={defaultQueue ?? queues.at(0)?.queueSid} onChange={handleSelectChange}>
+              <Select id="queue" value={selectedQueue ?? queues.at(0)?.queueSid} onChange={handleSelectChange}>
                 { queues.map((queue : TaskQueue) => (
                   <Option value={queue.queueSid} key={queue.queueSid}>{queue.queueName}</Option>
                 )) }
