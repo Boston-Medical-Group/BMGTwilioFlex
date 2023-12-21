@@ -3,8 +3,7 @@ const TokenValidator = require('twilio-flex-token-validator').validator;
 const { replaceTemplate } = require(Runtime.getFunctions()['helpers/template-replacer'].path);
 const fetch = require("node-fetch");
 
-//exports.handler = FunctionTokenValidator(async function (context, event, callback) {
-exports.handler = async function (context, event, callback) {
+exports.handler = FunctionTokenValidator(async function (context, event, callback) {
   const {
     hubspot_id,
     deal_id,
@@ -13,7 +12,7 @@ exports.handler = async function (context, event, callback) {
 
   try {
 
-    let defaultCountry = context.COUNTRY.substr(0, 2).toUpperCase();
+    let defaultCountry = context.COUNTRY === 'dev' ? 'DEV' : context.COUNTRY.substr(0, 2).toUpperCase();
 
     if (defaultCountry === 'ME') {
       defaultCountry = 'MX';

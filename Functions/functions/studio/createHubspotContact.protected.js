@@ -16,6 +16,7 @@ const countryMap = {
   ale: 'DE',
   deu: 'DE',
   bra: 'BR',
+  dev: 'ES',
 };
 
 exports.handler = async function (context, event, callback) {
