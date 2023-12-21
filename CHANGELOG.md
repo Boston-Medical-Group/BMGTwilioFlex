@@ -1,5 +1,8 @@
 # Changelog
 
+## 21/12/2023
+* Implementa pools para callerIds
+
 ## 05/12/2023
 * Corrige URL calendario cita desde contacto.
 * Corrige leads con deal vacio
