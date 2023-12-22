@@ -39,6 +39,7 @@ export default class FlexRingbellPlugin extends FlexPlugin {
         ['accepted', 'rejected', 'timeout', 'canceled', 'rescinded'].forEach((event) => {
           reservation.on(event, () => {
             incoming_voice.pause();
+            incoming_message.pause();
           })
         })
       });
