@@ -124,7 +124,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
         </ModalHeader>
         <ModalBody>
           <Heading as="h4" variant="heading40">Select the template</Heading>
-          <Grid gutter="space30" equalColumnHeights>
+          <Grid gutter="space30" equalColumnHeights rowGap="space30">
             {
               templateList.map((item, index) => {
                 return (
