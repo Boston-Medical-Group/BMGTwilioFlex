@@ -69,7 +69,8 @@ const getTemplatesFromManager = async function (countryCode, context) {
     // loop object
     for (let i = 0; i < data.data.length; i++) {
       const element = data.data[i];
-      templates.push(element.attributes.message);
+      // convert \n to line breaks on element
+      templates.push(element.attributes.message.replaceAll('\\n', '\n'));
     }
   }
 
