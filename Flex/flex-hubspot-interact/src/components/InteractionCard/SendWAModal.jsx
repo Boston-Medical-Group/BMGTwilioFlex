@@ -3,6 +3,7 @@ import { Alert } from '@twilio-paste/core/alert';
 import { Box } from '@twilio-paste/core/box';
 import { Button } from '@twilio-paste/core/button';
 import { Label } from '@twilio-paste/core/label';
+import { Badge } from '@twilio-paste/core/badge';
 import { Modal, ModalBody, ModalFooter, ModalFooterActions, ModalHeader, ModalHeading } from '@twilio-paste/core/modal';
 import { Text } from '@twilio-paste/core/text';
 import { TextArea } from '@twilio-paste/core/textarea';
@@ -124,14 +125,21 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
         </ModalHeader>
         <ModalBody>
           <Heading as="h4" variant="heading40">Select the template</Heading>
-          <Grid gutter="space30" equalColumnHeights rowGap="space30">
+          <Grid gutter="space30" equalColumnHeights rowGap="space30" columnGap="space30">
             {
               templateList.map((item, index) => {
                 return (
-                  <Column span={[12, 4, 4]} key={index} style={{'padding-top': '0.5rem', 'padding-bottom': '0.5rem'}}>
-                    <Box backgroundColor="colorBackgroundPrimaryWeakest" display="flex" flexDirection="column" width="100%" justifyContent="space-between" padding="space50">
+                  <Column span={[12, 4, 4]} key={index}>
+                    <Box backgroundColor="colorBackgroundPrimaryWeakest" display="flex" flexDirection="column"
+                      width="100%" justifyContent="space-between" padding="space50"
+                    marginBottom="space30">
                       <Paragraph style={{width: '100%'}}>{item}</Paragraph>
-                      <Button variant="primary" type='button' onClick={() => { setTemplate(item) }}>Select</Button>
+                      <Box>
+                        <Button variant="primary" type='button' onClick={() => { setTemplate(item.message) }}>Select</Button>
+                        <Badge as="span" variant="neutral">
+                          {item.name}
+                        </Badge>
+                      </Box>
                     </Box>
                   </Column>
                 )
