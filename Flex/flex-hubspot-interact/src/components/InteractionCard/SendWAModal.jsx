@@ -136,7 +136,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
                   </Column>
                 )
               })
-            }
+            } 
           </Grid>
         </ModalBody>
         <ModalFooter>
