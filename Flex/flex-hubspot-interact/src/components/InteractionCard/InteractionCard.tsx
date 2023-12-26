@@ -203,13 +203,13 @@ const InteractionCard = ({manager} : Props) => {
           <Heading as="h2" variant="heading20">Interactuar con {fullName(contact)}</Heading>
           <Paragraph>
             Seleccione el método de interacción con el contacto seleccionado.
-          </Paragraph>
-          <Stack orientation="horizontal" spacing="space30">
+            </Paragraph>
+          <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
             <Button variant="primary" title={actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call"} disabled={actionDisabled} onClick={() => initiateCallHandler(contact)}><FaPhoneAlt /> Call</Button>
               <Button variant="primary" title={actionDisabled ? "To send a SMS, please change your status from 'Offline'" : "Send a SMS"} disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
               <Button variant="primary" title={actionDisabled ? "To send a WhatsApp, please change your status from 'Offline'" : "Send a WhatsApp"} disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
               {calendarUrl !== '' && <Button variant="primary" title="Schedule a new appointment" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
-          </Stack>
+          </Box>
           </Card>
         </Box>
       </>

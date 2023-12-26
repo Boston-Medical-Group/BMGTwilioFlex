@@ -28,6 +28,12 @@ export default class HubspotInteractPlugin extends FlexPlugin {
 
     flex.NoTasksCanvas.Content.add(<InteractionCard key="HubspotInteractPlugin-component" manager={manager} />, options);
 
+    flex.AgentDesktopView.defaultProps.splitterOptions = {
+      initialFirstPanelSize: "300px",
+      minimumFirstPanelSize: "300px"
+      //minimumSecondPanelSize: "xx%"
+    };
+    
     // Fetch CallerID from Pools
     initializeCustomCallSids(Flex, manager);
 
