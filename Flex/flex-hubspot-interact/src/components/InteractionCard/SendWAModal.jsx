@@ -128,7 +128,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
             {
               templateList.map((item, index) => {
                 return (
-                  <Column span={[12, 4, 4]} key={index}>
+                  <Column span={[12, 4, 4]} key={index} style={{'padding-top': '0.5rem', 'padding-bottom': '0.5rem'}}>
                     <Box backgroundColor="colorBackgroundPrimaryWeakest" display="flex" flexDirection="column" width="100%" justifyContent="space-between" padding="space50">
                       <Paragraph style={{width: '100%'}}>{item}</Paragraph>
                       <Button variant="primary" type='button' onClick={() => { setTemplate(item) }}>Select</Button>
@@ -212,7 +212,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
         </ModalBody>
         <ModalFooter>
           <ModalFooterActions>
-            {isUsingTemplate && <Button variant="destructive" type='button' onClick={discardTemplate}>Discard template</Button>}
+            {isUsingTemplate && <Button variant="button" type='button' onClick={discardTemplate}>Editar plantilla</Button>}
             <Button variant="secondary" type='button' onClick={onSelectTemplateHandler}>Select template</Button>
             <Button variant="secondary" type='button' onClick={closeModal}>Cancel</Button>
             <Button variant="primary" type='submit' disabled={isProcessing}>{isProcessing ? 'Sending...' : 'Send'}</Button>
