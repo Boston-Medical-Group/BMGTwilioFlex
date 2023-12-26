@@ -1,4 +1,4 @@
-import { Heading, Paragraph, Spinner, Grid, Column } from '@twilio-paste/core';
+import { Heading, Paragraph, Spinner, Grid, Column, Stack } from '@twilio-paste/core';
 import { Alert } from '@twilio-paste/core/alert';
 import { Box } from '@twilio-paste/core/box';
 import { Button } from '@twilio-paste/core/button';
@@ -68,7 +68,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
     }
   }
 
-  
+
   const onSubmitHandler = useCallback((event) => {
     event.preventDefault();
 
@@ -119,6 +119,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
   }
 
   if (loadTemplates && templateList) {
+    console.log('TEMPLATES', templateList);
     return (
       <Modal size="wide" ariaLabelledby={MODAL_ID} isOpen onDismiss={closeModal}>
         <ModalHeader>
@@ -133,14 +134,14 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
                   <Column span={[12, 4, 4]} key={index}>
                     <Box backgroundColor="colorBackgroundPrimaryWeakest" display="flex" flexDirection="column"
                       width="100%" justifyContent="space-between" padding="space50"
-                    marginBottom="space30">
-                      <Paragraph style={{width: '100%'}}>{item}</Paragraph>
-                      <Box>
-                        <Button variant="primary" type='button' onClick={() => { setTemplate(item.message) }}>Select</Button>
-                        <Badge as="span" variant="neutral">
-                          {item.name}
-                        </Badge>
+                      marginBottom="space30">
+                      <Box spacing='space20' rowGap='space30' display="flex" flexDirection="column">
+                        <Badge as="span" variant="info" style={{marginBottom: '10px'}}>{item.name}</Badge>
+                        <Paragraph style={{ width: '100%' }}>{item.message}</Paragraph>
                       </Box>
+                      
+                      <Button variant="primary" type='button' onClick={() => { setTemplate(item.message) }}>Select</Button>
+
                     </Box>
                   </Column>
                 )
@@ -221,7 +222,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
         </ModalBody>
         <ModalFooter>
           <ModalFooterActions>
-            {isUsingTemplate && <Button variant="button" type='button' onClick={discardTemplate}>Editar plantilla</Button>}
+            {isUsingTemplate && <Button variant="secondary" type='button' onClick={discardTemplate}>Editar plantilla</Button>}
             <Button variant="secondary" type='button' onClick={onSelectTemplateHandler}>Select template</Button>
             <Button variant="secondary" type='button' onClick={closeModal}>Cancel</Button>
             <Button variant="primary" type='submit' disabled={isProcessing}>{isProcessing ? 'Sending...' : 'Send'}</Button>
