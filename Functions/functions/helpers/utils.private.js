@@ -1,5 +1,20 @@
 const axios = require('axios');
 
+
+const countryMap = {
+    'esp': 'ES',
+    'can': 'CA',
+    'col': 'CO',
+    'arg': 'AR',
+    'per': 'PE',
+    'ecu': 'EC',
+    'mex': 'MX',
+    'bra': 'BR',
+    'ale': 'DE',
+    'deu': 'DE',
+    'dev': 'DEV',
+}
+
 /**
  * Maps a country code to its ISO2 code.
  *
@@ -7,21 +22,11 @@ const axios = require('axios');
  * @return {string} The ISO2 code of the country.
  */
 exports.countryToIso2 = (country) => {
-    const countryMap = {
-        'esp': 'ES',
-        'can': 'CA',
-        'col': 'CO',
-        'arg': 'AR',
-        'per': 'PE',
-        'ecu': 'EC',
-        'mex': 'MX',
-        'bra': 'BR',
-        'ale': 'DE',
-        'deu': 'DE',
-        'dev': 'DEV',
-    }
-
     return countryMap[country.toLowerCase()];
+}
+
+exports.iso2ToCountry = (iso2) => {
+    return Object.keys(countryMap).find(key => countryMap[key] === iso2);
 }
 
 /**
