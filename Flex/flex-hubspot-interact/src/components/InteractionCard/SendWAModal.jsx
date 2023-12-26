@@ -68,6 +68,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
     }
   }
 
+  
   const onSubmitHandler = useCallback((event) => {
     event.preventDefault();
 

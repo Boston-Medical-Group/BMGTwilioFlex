@@ -79,6 +79,7 @@ const getTemplatesFromManager = async function (countryCode, context) {
 
   return templates;
 }
+
   
 const getTemplatesFromFiles = async function (defaultCountry, context, event) {
   const {
