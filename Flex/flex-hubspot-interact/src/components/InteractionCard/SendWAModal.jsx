@@ -128,7 +128,7 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
             {
               templateList.map((item, index) => {
                 return (
-                  <Column span={4} key={index}>
+                  <Column span={[12, 4, 4]} key={index}>
                     <Box backgroundColor="colorBackgroundPrimaryWeakest" display="flex" flexDirection="column" width="100%" justifyContent="space-between" padding="space50">
                       <Paragraph style={{width: '100%'}}>{item}</Paragraph>
                       <Button variant="primary" type='button' onClick={() => { setTemplate(item) }}>Select</Button>
