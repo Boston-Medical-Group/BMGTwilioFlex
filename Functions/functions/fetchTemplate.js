@@ -118,7 +118,7 @@ const extractTemplateParameters = (message) => {
     extractedParameters.push(match[1]);
   }
 
-  return  Array.from(new Set(array));
+  return Array.from(new Set(extractedParameters));
 }
 
 /**
