@@ -39,7 +39,14 @@ const SendWAModal = ({ selectedContact, dealId, handleClose, manager }) => {
     setIsLoadingTemplate(true);
     setTemplateList(undefined);
     setTemplateError(undefined);
-    getTemplate({ hubspot_id: selectedContact.hs_object_id, deal_id: dealId })
+    getTemplate({
+      hubspot: {
+        contact: selectedContact,
+        deal: selectedContact.deal ?? {},
+        hubspot_id: selectedContact.hs_object_id,
+        deal_id: dealId
+      }
+    })
       .then((data) => { setTemplateList(data) })
       .catch(() => setTemplateError("Error while loading tempaltes"))
       .finally(() => setIsLoadingTemplate(false));
