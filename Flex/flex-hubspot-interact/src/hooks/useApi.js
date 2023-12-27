@@ -61,7 +61,7 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
-  const getTemplate = useCallback(async ({ hubspot_id, deal_id }) => {
+  const getTemplate = useCallback(async (data) => {
 
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchTemplate`, {
       method: "POST",
@@ -69,8 +69,7 @@ const useApi = ({ token }) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        hubspot_id,
-        deal_id,
+        data,
         Token: token
       })
     });
