@@ -4,9 +4,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prestart": "tsc",
-    "start": "twilio-run start",
-    "predeploy": "tsc",
+    "start": "twilio-run start --inspect=''",
     "deploy": "twilio-run deploy"
   },
   "dependencies": {
