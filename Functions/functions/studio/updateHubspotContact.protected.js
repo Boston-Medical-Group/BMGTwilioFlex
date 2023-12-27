@@ -28,7 +28,7 @@ exports.handler = async function (context, event, callback) {
     data: {
       properties: {
         tf_inbound_ddi: to.replace(/\s/g, ""),
-        tf_inbound_date: Math.round((new Date()).getTime() / 1000),
+        tf_inbound_date: (new Date).getTime(),
       }
     }
   }).then(function (response) {
