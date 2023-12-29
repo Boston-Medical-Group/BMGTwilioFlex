@@ -19,8 +19,6 @@ export default class FlexChatHistoryPlugin extends FlexPlugin {
    * @param flex { typeof import('@twilio/flex-ui') }
    */
   async init(flex: typeof Flex, manager: Flex.Manager) {
-    const options: Flex.ContentFragmentProps = { sortOrder: -1 };
-
     Flex.setProviders({
       PasteThemeProvider: CustomizationProvider
     });

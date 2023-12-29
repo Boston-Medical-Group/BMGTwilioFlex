@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as Flex from '@twilio/flex-ui';
-import { ITask, Icon, withTaskContext } from '@twilio/flex-ui';
+import { ITask, Icon } from '@twilio/flex-ui';
 import { fetchConversationMessages } from '../../helpers/fetchConversationsAndMessages';
 import {
     ChatLog,
@@ -52,8 +52,8 @@ const ConversationHistoryTranscriptComponent = ({ manager, conversationSid }: My
     return (
         <ChatLog>
             {
-                messages?.map((message, index) => {
-                    let dateTime: string = message.dateCreated;
+                messages?.map((message) => {
+                    const dateTime: string = message.dateCreated;
                     const uuidPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
                     if (message.author.startsWith("whatsapp:") || message.author.startsWith("+") || uuidPattern.test(message.author) || message.author === 'Virtual Assistant') {
                         return (

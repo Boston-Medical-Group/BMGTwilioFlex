@@ -1,11 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import * as Flex from '@twilio/flex-ui';
-import { ITask, Icon, withTaskContext } from '@twilio/flex-ui';
+import { ITask, Icon, NotificationType, NotificationContentProps } from '@twilio/flex-ui';
 import { fetchConversationsByParticipant } from '../../helpers/fetchConversationsAndMessages';
 import { Disclosure, DisclosureHeading, DisclosureContent } from '@twilio-paste/core/disclosure';
 import { Box } from '@twilio-paste/core/box';
 import ConversationHistoryTranscriptComponent from '../ConversationHistoryTranscriptComponent/ConversationHistoryTranscriptComponent';
 import { Text } from '@twilio-paste/core';
+
+interface CustomNotificationProps extends NotificationContentProps {
+    customProp?: string;
+    notificationContext?: any;
+}
+
+const CustomNotificationElement = ({ notificationContext }: CustomNotificationProps = {}) => {
+    return (
+        <div>
+            {notificationContext.message}
+        </div>
+    );
+}
 
 type MyProps = {
     label: string;
@@ -20,26 +33,40 @@ type ConversationTrimmed = {
     conversationState: string
 }
 
-const ConversationHistoryTabComponent = ({ label, task, manager } : MyProps) => {
+const ConversationHistoryTabComponent = ({ task, manager } : MyProps) => {
 
     const [conversations, setConversations] = useState<ConversationTrimmed[]>([])
     const [phoneNumber, setPhoneNumber] = useState<string>('')
 
     useEffect(() => {
+        registerNotification();
+
         if (phoneNumber != task?.attributes.from) {
             fetchConversationsByParticipant(manager, task?.attributes.from)
                 .then((convos) => {
                     setConversations(convos)
                     setPhoneNumber(task?.attributes.from)
-            })
+                })
+                .catch(() => {
+                    Flex.Notifications.showNotification("loadConversations", { message: "No hemos podido cargar el historial de mensajes" });
+                })
         }
     }, [phoneNumber, task])
+
+    const registerNotification = useCallback(() => {
+        Flex.Notifications.registerNotification({
+            id: "loadConversations",
+            content: <CustomNotificationElement />,
+            closeButton: true,
+            type: NotificationType.error,
+        });
+    }, [])
 
     return (
         <Box padding="space20" width="100vw">
             {
                 conversations?.map((conversation, index) => {
-                    let dateTime: string = conversation.conversationDateCreated;
+                    const dateTime: string = conversation.conversationDateCreated;
                     if (conversation.conversationSid == task?.attributes.conversationSid) {
                         return;
                     }

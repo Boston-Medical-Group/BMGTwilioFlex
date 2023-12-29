@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "flex-plugin pre-script-check"
+    "postinstall": "flex-plugin pre-script-check",
+    "lint": "jshint ."
   },
   "dependencies": {
     "@twilio-paste/core": "^20.0.0",
@@ -20,6 +21,7 @@
     "@twilio/flex-ui": "^2.5.0",
     "@types/babel__core": "^7.20.5",
     "@types/node": "^20.10.5",
+    "jshint": "^2.13.6",
     "react-test-renderer": "17.0.2",
     "typescript": "^5.3.3"
   }
