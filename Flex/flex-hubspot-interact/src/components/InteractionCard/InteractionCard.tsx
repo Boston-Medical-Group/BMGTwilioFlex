@@ -34,7 +34,7 @@ const InteractionCard = ({manager} : Props) => {
   const [dealId, setDealId] = useState(null);
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [selectedSmsContact, setSelectedSmsContact] = useState();
-  const [selectedWAContact, setSelectedWAContact] = useState();
+  const [selectedWAContact, setSelectedWAContact] = useState<HubspotContact>();
   const [showCallCard, setShowCallCard] = useState(false);
   const [calendarUrl, setCalendarUrl] = useState<string>('');
   //const [callCard, setCallCard] = useState(false);
@@ -150,9 +150,21 @@ const InteractionCard = ({manager} : Props) => {
     setSelectedSmsContact(data);
   }, []);
 
-  const sendWAHandler = React.useCallback((data) => {
+  const sendWAHandler = React.useCallback((data : HubspotContact) => {
+    // get last active conversation window
+    const lastConversation = getLastConversation(data)
+
+    // if no conversation window, open whatsapp modal
     setSelectedWAContact(data);
   }, []);
+
+  const getLastConversation = (data : HubspotContact) => {
+    // obtiene la ultima conversacion activa
+    const lastConversation = manager.conversationsClient.getConversationByUniqueName('Outbound whatsapp:+13516665240 -> whatsapp: 56984786717')
+    console.log('LASTCONVERSATION', lastConversation)
+
+    return false;
+  }
 
   const handleCloseModel = React.useCallback(() => {
     setSelectedSmsContact(undefined);

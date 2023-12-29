@@ -6,6 +6,25 @@
             "request": "attach",
             "name": "Attach",
             "port": 9229
+        }, {
+            "name": "Chrome - FlexHubspotInteract",
+            "type": "chrome",
+            "request": "attach",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceRoot}/Flex/flex-hubspot-interact/src",
+            "sourceMapPathOverrides": {
+                "webpack:///src/": "${webRoot}/*"
+            }
+        },
+        {
+            "name": "Chrome - FlexChatHistory",
+            "type": "chrome",
+            "request": "attach",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceRoot}/Flex/flex-chat-history/src",
+            "sourceMapPathOverrides": {
+                "webpack:///src/": "${webRoot}/*"
+            }
         }
     ]
 }

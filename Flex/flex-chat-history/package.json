@@ -1,0 +1,26 @@
+{
+  "name": "flex-chat-history",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "flex-plugin pre-script-check"
+  },
+  "dependencies": {
+    "@twilio-paste/core": "^20.0.0",
+    "@twilio-paste/icons": "^12.0.0",
+    "@twilio/flex-plugin": "^6.2.3",
+    "@twilio/flex-plugin-scripts": "6.2.3",
+    "flex-plugin": "^3",
+    "flex-plugin-scripts": "^3",
+    "prop-types": "^15.7.2",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "@twilio/flex-ui": "^2.5.0",
+    "@types/babel__core": "^7.20.5",
+    "@types/node": "^20.10.5",
+    "react-test-renderer": "17.0.2",
+    "typescript": "^5.3.3"
+  }
+}
