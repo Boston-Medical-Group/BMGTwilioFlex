@@ -4,10 +4,11 @@
 import '@twilio-labs/serverless-runtime-types';
 import { Context, TwilioClient, ServerlessFunctionSignature, ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
 import { HandlerFn, Context as ValidatedContext, functionValidator as TokenValidator } from "twilio-flex-token-validator";
+import { ParticipantInstance } from 'twilio/lib/rest/conversations/v1/conversation/participant';
 
 //adds a messaging binding address (phone number) to an existing conversation
 //@ts-ignore
-async function addParticipant(client: TwilioClient, conversationSid: string, address: string) {
+async function addParticipant(client: TwilioClient, conversationSid: string, address: string) : Promise<void|ParticipantInstance> {
     //need to check if this is a phone number, otherwise we might invoke this with a chat identity 
     if (!address.startsWith('+')) {
         console.log("the address (phone number) provided does not start with a +. Address provided: ", address)

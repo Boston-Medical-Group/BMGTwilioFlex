@@ -7,22 +7,17 @@
     "lint": "jshint ."
   },
   "dependencies": {
-    "@twilio-paste/core": "^20.0.0",
-    "@twilio-paste/icons": "^12.0.0",
-    "@twilio/flex-plugin": "^6.2.3",
-    "@twilio/flex-plugin-scripts": "6.2.3",
-    "flex-plugin": "^3",
-    "flex-plugin-scripts": "^3",
-    "prop-types": "^15.7.2",
+    "@twilio-paste/chat-log": "^4.1.0",
+    "@twilio-paste/core": "^19.6.0",
+    "@twilio-paste/icons": "^11.2.2",
+    "@twilio/flex-plugin-scripts": "6.1.2",
+    "prop-types": "^15.8.1",
     "react": "17.0.2",
     "react-dom": "17.0.2"
   },
   "devDependencies": {
-    "@twilio/flex-ui": "^2.5.0",
-    "@types/babel__core": "^7.20.5",
-    "@types/node": "^20.10.5",
-    "jshint": "^2.13.6",
+    "@twilio/flex-ui": "2.4.0",
     "react-test-renderer": "17.0.2",
-    "typescript": "^5.3.3"
+    "typescript": "^4.9.5"
   }
 }

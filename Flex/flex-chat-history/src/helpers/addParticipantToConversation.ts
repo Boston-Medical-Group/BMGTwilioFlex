@@ -1,6 +1,6 @@
 import * as Flex from '@twilio/flex-ui';
 
-export const addParticipantToConversation = async (manager: Flex.Manager, conversationSid: string, address: string) : Promise<any> => {
+export const addParticipantToConversation = async (manager: Flex.Manager, conversationSid: string, address: string) => {
     const body = {
         //WorkspaceSid: 'WS45ce05b26c5bdc08e60bb4dbd7c6a46f',
         Token: manager.store.getState().flex.session.ssoTokenPayload.token

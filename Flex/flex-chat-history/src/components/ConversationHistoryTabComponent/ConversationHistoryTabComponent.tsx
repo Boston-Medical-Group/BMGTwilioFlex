@@ -1,24 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React from 'react';
 import * as Flex from '@twilio/flex-ui';
-import { ITask, Icon, NotificationType, NotificationContentProps } from '@twilio/flex-ui';
+import { ITask, Icon, withTaskContext } from '@twilio/flex-ui';
 import { fetchConversationsByParticipant } from '../../helpers/fetchConversationsAndMessages';
 import { Disclosure, DisclosureHeading, DisclosureContent } from '@twilio-paste/core/disclosure';
 import { Box } from '@twilio-paste/core/box';
 import ConversationHistoryTranscriptComponent from '../ConversationHistoryTranscriptComponent/ConversationHistoryTranscriptComponent';
 import { Text } from '@twilio-paste/core';
-
-interface CustomNotificationProps extends NotificationContentProps {
-    customProp?: string;
-    notificationContext?: any;
-}
-
-const CustomNotificationElement = ({ notificationContext }: CustomNotificationProps = {}) => {
-    return (
-        <div>
-            {notificationContext.message}
-        </div>
-    );
-}
 
 type MyProps = {
     label: string;
@@ -33,69 +20,67 @@ type ConversationTrimmed = {
     conversationState: string
 }
 
-const ConversationHistoryTabComponent = ({ task, manager } : MyProps) => {
+type MyState = {
+    conversations: ConversationTrimmed[];
+    phoneNumber: string;
+};
 
-    const [conversations, setConversations] = useState<ConversationTrimmed[]>([])
-    const [phoneNumber, setPhoneNumber] = useState<string>('')
+class ConversationHistoryTabComponent extends React.Component<MyProps, MyState> {
 
-    useEffect(() => {
-        registerNotification();
-
-        if (phoneNumber != task?.attributes.from) {
-            fetchConversationsByParticipant(manager, task?.attributes.from)
-                .then((convos) => {
-                    setConversations(convos)
-                    setPhoneNumber(task?.attributes.from)
-                })
-                .catch(() => {
-                    Flex.Notifications.showNotification("loadConversations", { message: "No hemos podido cargar el historial de mensajes" });
-                })
+    constructor(props: any) {
+        super(props);
+        this.state = {
+            conversations: [],
+            phoneNumber: ''
         }
-    }, [phoneNumber, task])
+    }
 
-    const registerNotification = useCallback(() => {
-        Flex.Notifications.registerNotification({
-            id: "loadConversations",
-            content: <CustomNotificationElement />,
-            closeButton: true,
-            type: NotificationType.error,
-        });
-    }, [])
+    async componentDidUpdate() {
+        if (this.state.phoneNumber != this.props.task?.attributes.from) {
+            const fetchConversationsRequest = await fetchConversationsByParticipant(this.props.manager, this.props.task?.attributes.from).then((convos) => {
+                this.setState({ conversations: convos });
+                this.setState({ phoneNumber: this.props.task?.attributes.from });
+            })
+        }
+    }
 
-    return (
-        <Box padding="space20" width="100vw">
-            {
-                conversations?.map((conversation, index) => {
-                    const dateTime: string = conversation.conversationDateCreated;
-                    if (conversation.conversationSid == task?.attributes.conversationSid) {
-                        return;
-                    }
-                    //define the icon based on the channel
-                    let channelIcon;
-                    switch (conversation.conversationOriginalChannel) {
-                        case 'whatsapp':
-                            channelIcon = <Icon icon="Whatsapp" />;
-                            break;
-                        case 'sms':
-                            channelIcon = <Icon icon="Sms" />;
-                            break;
-                        default:
-                            channelIcon = <Icon icon="Message" />;
-                    }
-                    return (
-                        <Disclosure key={conversation.conversationSid}>
-                            <DisclosureHeading as="h2" variant="heading50" key={conversation.conversationSid}>
-                                {channelIcon}{dateTime.slice(0, 24)} <Text color="colorTextWeak" fontSize="fontSize20" marginRight="space30" as="span"> ({conversation.conversationState})</Text>
-                            </DisclosureHeading>
-                            <DisclosureContent key={index}>
-                                <ConversationHistoryTranscriptComponent conversationSid={conversation.conversationSid} manager={manager} />
-                            </DisclosureContent>
-                        </Disclosure>
-                    )
-                })
-            }
-        </Box>
-    );
+    render() {
+
+        return (
+            <Box padding="space20" width="100vw">
+                {
+                    this.state.conversations?.map((conversation, index) => {
+                        let dateTime: string = conversation.conversationDateCreated;
+                        if (conversation.conversationSid == this.props.task?.attributes.conversationSid) {
+                            return;
+                        }
+                        //define the icon based on the channel
+                        let channelIcon;
+                        switch (conversation.conversationOriginalChannel) {
+                            case 'whatsapp':
+                                channelIcon = <Icon icon="Whatsapp" />;
+                                break;
+                            case 'sms':
+                                channelIcon = <Icon icon="Sms" />;
+                                break;
+                            default:
+                                channelIcon = <Icon icon="Message" />;
+                        }
+                        return (
+                            <Disclosure key={conversation.conversationSid}>
+                                <DisclosureHeading as="h2" variant="heading50" key={conversation.conversationSid}>
+                                    {channelIcon}{dateTime.slice(0, 24)} <Text color="colorTextWeak" fontSize="fontSize20" marginRight="space30" as="span"> ({conversation.conversationState})</Text>
+                                </DisclosureHeading>
+                                <DisclosureContent key={index}>
+                                    <ConversationHistoryTranscriptComponent conversationSid={conversation.conversationSid} manager={this.props.manager} />
+                                </DisclosureContent>
+                            </Disclosure>
+                        )
+                    })
+                }
+            </Box>
+        );
+    }
 }
 
-export default ConversationHistoryTabComponent;
+export default withTaskContext(ConversationHistoryTabComponent);

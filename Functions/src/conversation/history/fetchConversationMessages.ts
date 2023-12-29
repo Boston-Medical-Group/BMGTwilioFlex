@@ -1,11 +1,12 @@
 import { Context, ServerlessEventObject, ServerlessCallback, TwilioClient } from "@twilio-labs/serverless-runtime-types/types";
 import { functionValidator as TokenValidator } from "twilio-flex-token-validator";
+import { MessageInstance } from "twilio/lib/rest/conversations/v1/conversation/message";
 const MAX_MESSAGES_TO_FETCH = 100;
 
 /* Returns the messages within a given conversation */
-const getConversationMessages = async (client: TwilioClient, conversationSid: string) => {
-    var result = [];
-    var messages = await client.conversations.v1.conversations(conversationSid)
+const getConversationMessages = async (client: TwilioClient, conversationSid: string) : Promise<Array<any>> => {
+    var result : Array<any> = [];
+    var messages : MessageInstance[] = await client.conversations.v1.conversations(conversationSid)
         .messages
         .list({ limit: MAX_MESSAGES_TO_FETCH })
 
