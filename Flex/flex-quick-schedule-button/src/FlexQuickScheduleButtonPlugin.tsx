@@ -3,7 +3,6 @@ import * as Flex from '@twilio/flex-ui';
 import { ITask } from '@twilio/flex-ui'
 import { FlexPlugin } from '@twilio/flex-plugin';
 import { CustomizationProvider } from '@twilio-paste/core/customization'
-import axios from 'axios'
 
 import { CalendarButton } from './components';
 
