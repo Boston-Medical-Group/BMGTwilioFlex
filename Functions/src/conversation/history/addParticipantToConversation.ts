@@ -2,13 +2,14 @@
 * so that the live chat session can be surfaced on the previous chat conversations
 */
 import '@twilio-labs/serverless-runtime-types';
-import { Context, TwilioClient, ServerlessFunctionSignature, ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
+import { Context, ServerlessFunctionSignature, ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
 import { HandlerFn, Context as ValidatedContext, functionValidator as TokenValidator } from "twilio-flex-token-validator";
 import { ParticipantInstance } from 'twilio/lib/rest/conversations/v1/conversation/participant';
+import Twilio from 'twilio/lib/rest/Twilio';
 
 //adds a messaging binding address (phone number) to an existing conversation
 //@ts-ignore
-async function addParticipant(client: TwilioClient, conversationSid: string, address: string) : Promise<void|ParticipantInstance> {
+async function addParticipant(client: Twilio, conversationSid: string, address: string) : Promise<void|ParticipantInstance> {
     //need to check if this is a phone number, otherwise we might invoke this with a chat identity 
     if (!address.startsWith('+')) {
         console.log("the address (phone number) provided does not start with a +. Address provided: ", address)
@@ -17,9 +18,7 @@ async function addParticipant(client: TwilioClient, conversationSid: string, add
     const addParticipant = await client.conversations.v1.conversations(conversationSid)
         .participants
         .create({
-            messagingBinding: {
-                address: address
-            }
+            "messagingBinding.address": address
         })
         .then(participant => console.log(participant.sid));
 }
@@ -38,6 +37,7 @@ export const handler: ServerlessFunctionSignature = TokenValidator(async functio
 ) {
 
     const client = context.getTwilioClient();
+    //@ts-ignore
     const response = new Twilio.Response();
 
     // Set the CORS headers to allow Flex to make an error-free HTTP request to this Function
@@ -56,6 +56,7 @@ export const handler: ServerlessFunctionSignature = TokenValidator(async functio
         callback(null, response);
     }
 
+    //@ts-ignore
     const request = await addParticipant(client, conversationSid, address).then(function (resp) {
         var data = resp;
         if (typeof data !== 'undefined') {

@@ -1,10 +1,12 @@
-import { Context, ServerlessEventObject, ServerlessCallback, TwilioClient } from "@twilio-labs/serverless-runtime-types/types";
+import '@twilio-labs/serverless-runtime-types';
+import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types";
 import { functionValidator as TokenValidator } from "twilio-flex-token-validator";
 import { MessageInstance } from "twilio/lib/rest/conversations/v1/conversation/message";
+import Twilio from 'twilio/lib/rest/Twilio';
 const MAX_MESSAGES_TO_FETCH = 100;
 
 /* Returns the messages within a given conversation */
-const getConversationMessages = async (client: TwilioClient, conversationSid: string) : Promise<Array<any>> => {
+const getConversationMessages = async (client: Twilio, conversationSid: string) : Promise<Array<any>> => {
     var result : Array<any> = [];
     var messages : MessageInstance[] = await client.conversations.v1.conversations(conversationSid)
         .messages
@@ -37,13 +39,14 @@ type MyEvent = {
 //@ts-ignore
 export const handler = TokenValidator(async function (
     context: Context,
-    event: ServerlessEventObject<MyEvent>,
+    event: MyEvent,
     callback: ServerlessCallback
 ) {
     // Access the NodeJS Helper Library by calling context.getTwilioClient()
     const client = context.getTwilioClient();
 
     // Create a custom Twilio Response
+    //@ts-ignore
     const response = new Twilio.Response();
 
     // Set the CORS headers to allow Flex to make an error-free HTTP request to this Function
@@ -61,6 +64,7 @@ export const handler = TokenValidator(async function (
         callback(null, response);
     }
 
+    //@ts-ignore
     const request = await getConversationMessages(client, conversationSid).then(function (resp) {
         // handle success 
         var data = resp;

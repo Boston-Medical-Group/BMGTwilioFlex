@@ -1,4 +1,4 @@
-import { Context, ServerlessCallback, ServerlessEventObject, ServerlessFunctionSignature } from "@twilio-labs/serverless-runtime-types/types";
+import { Context, ServerlessCallback, ServerlessFunctionSignature } from "@twilio-labs/serverless-runtime-types/types";
 import fetch from "node-fetch";
 import { Client as HubspotClient } from '@hubspot/api-client'
 import { CollectionResponseWithTotalSimplePublicObjectForwardPaging } from "@hubspot/api-client/lib/codegen/crm/contacts";
@@ -16,6 +16,10 @@ type OwnerResponse = {
 const fetchOwner = async (context: Context<EnvVars>, phone: string): Promise<OwnerResponse> => {
     const result : OwnerResponse = {
         owner_id: null
+    }
+
+    if (phone === undefined || phone === '') {
+        return result
     }
     // Obtiene el owner de un contacto en Hubspot según su número de teléfono  
     try {
@@ -68,10 +72,14 @@ type MyEvent = {
 }
 export const handler  = async function (
     context: Context<EnvVars>,
-    event: ServerlessEventObject<MyEvent>,
+    event: MyEvent,
     callback: ServerlessCallback
 ) {
 
+    let phone = event.from.trim()
+    if (!phone.startsWith('+')) {
+        phone = `+${phone}`
+    }
     const result = await fetchOwner(context, event.from)
 
     const response = new Twilio.Response();

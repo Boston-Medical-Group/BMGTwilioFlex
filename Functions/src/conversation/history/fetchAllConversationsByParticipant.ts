@@ -1,6 +1,7 @@
-import { Context, ServerlessCallback, TwilioClient } from '@twilio-labs/serverless-runtime-types/types';
+import { Context, ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
 import { functionValidator as TokenValidator } from 'twilio-flex-token-validator';
 import { ParticipantConversationInstance } from 'twilio/lib/rest/conversations/v1/participantConversation';
+import Twilio from 'twilio/lib/rest/Twilio';
 
 /* Fetches all conversations by a participant.
 * The participant is either a phone number i.e. +447123123123 or a whatsapp:++447123123123 and then we bundle them together
@@ -20,7 +21,7 @@ function getPreviousDate(monthsAgo : number) : Date {
 
 /* Returns the conversations list in order. 
 ** Applies filter startDate > date, where date is at a maximum the MAX_PERIOD */
-async function getAllConversationsList(client: TwilioClient, fromAddress: string) {
+async function getAllConversationsList(client: Twilio, fromAddress: string) {
     var newDate = MAX_PERIOD;
     var result = [];
 
@@ -92,6 +93,7 @@ export const handler = TokenValidator(async function (
     const client = context.getTwilioClient();
 
     // Create a custom Twilio Response
+    //@ts-ignore
     const response = new Twilio.Response();
     //initialize vars
     var phoneNumber = '';
@@ -114,6 +116,7 @@ export const handler = TokenValidator(async function (
     }
 
 
+    //@ts-ignore
     const request = await getAllConversationsList(client, phoneNumber).then(function (resp) {
         // handle success 
         var data = resp;
