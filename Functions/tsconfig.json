@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "strict": true,
+        "strictNullChecks": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "outDir": "./functions",
+        "rootDir": "./src",
+        "inlineSourceMap": true
+    }
+}
