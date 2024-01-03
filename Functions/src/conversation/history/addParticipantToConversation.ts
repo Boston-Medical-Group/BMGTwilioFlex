@@ -42,7 +42,7 @@ export const handler: ServerlessFunctionSignature = TokenValidator(async functio
 
     // Set the CORS headers to allow Flex to make an error-free HTTP request to this Function
     response.appendHeader('Access-Control-Allow-Origin', '*');
-    response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET');
+    response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS POST GET');
     response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
     response.appendHeader('Content-Type', 'application/json');
 
