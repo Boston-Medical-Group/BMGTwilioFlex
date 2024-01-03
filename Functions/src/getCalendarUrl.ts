@@ -65,7 +65,6 @@ export const handler = TokenValidator(async (context: Context<MyContext>, event:
     response.appendHeader("Access-Control-Allow-Origin", "*");
     response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
     response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
-
     response.appendHeader("Content-Type", "application/json");
     response.setBody({ calendarUrl });
 
