@@ -42,7 +42,6 @@ exports.handler = FunctionTokenValidator(async function (context, event, callbac
     response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
 
     response.appendHeader("Content-Type", "application/json");
-    response.setCookie(`${queueSid}_count`, (count).toString());
     response.setBody({ callerId });
     // Return a success response using the callback function.
     callback(null, response);

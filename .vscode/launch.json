@@ -25,6 +25,16 @@
             "sourceMapPathOverrides": {
                 "webpack:///src/": "${webRoot}/*"
             }
+        },
+        {
+            "name": "Chrome - FlexQuickScheduleButton",
+            "type": "chrome",
+            "request": "attach",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceRoot}/Flex/flex-quick-schedule-button/src",
+            "sourceMapPathOverrides": {
+                "webpack:///src/": "${webRoot}/*"
+            }
         }
     ]
 }
