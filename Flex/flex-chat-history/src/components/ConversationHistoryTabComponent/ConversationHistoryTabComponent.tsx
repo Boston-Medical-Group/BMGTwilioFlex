@@ -37,7 +37,12 @@ class ConversationHistoryTabComponent extends React.Component<MyProps, MyState> 
 
     async componentDidUpdate() {
         if (this.state.phoneNumber != this.props.task?.attributes.from) {
-            const fetchConversationsRequest = await fetchConversationsByParticipant(this.props.manager, this.props.task?.attributes.from).then((convos) => {
+            const fetchConversationsRequest = await fetchConversationsByParticipant(
+                this.props.manager,
+                this.props.task?.attributes.direction.toUpperCase() === 'INBOUND'
+                    ? this.props.task?.attributes.from
+                    : this.props.task?.attributes.to
+            ).then((convos) => {
                 this.setState({ conversations: convos });
                 this.setState({ phoneNumber: this.props.task?.attributes.from });
             })
