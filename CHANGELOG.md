@@ -1,5 +1,8 @@
 # Changelog
 
+## 03/01/2024
+* Corrige deploy
+
 ## 21/12/2023
 * Implementa pools para callerIds
 
