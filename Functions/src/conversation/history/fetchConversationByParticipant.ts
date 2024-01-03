@@ -5,14 +5,15 @@
 */
 import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types";
 import { functionValidator as TokenValidator } from "twilio-flex-token-validator";
-import Twilio from "twilio/lib/rest/Twilio";
+import * as twilio from 'twilio';
+
 const MAX_CONVERSATIONS_TO_FETCH = 100;
 const MAX_CONVERSATIONS_TO_PRESENT = 20;
 const MAX_PERIOD = 12;
 
 /* Returns the conversations list in order. 
 ** Applies filter startDate > date, where date is at a maximum the MAX_PERIOD */
-const getConversationsList = async  (client: Twilio, fromAddress: string) => {
+const getConversationsList = async  (client: twilio.Twilio, fromAddress: string) => {
     var result = [];
 
     //fetch conversations with filters
