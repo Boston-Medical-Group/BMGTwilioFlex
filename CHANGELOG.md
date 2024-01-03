@@ -2,6 +2,7 @@
 
 ## 03/01/2024
 * Corrige deploy
+* Corrección dependencia Twilio
 
 ## 21/12/2023
 * Implementa pools para callerIds
