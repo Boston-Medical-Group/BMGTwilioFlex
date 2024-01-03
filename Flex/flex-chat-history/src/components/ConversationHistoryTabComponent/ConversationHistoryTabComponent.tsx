@@ -37,6 +37,7 @@ class ConversationHistoryTabComponent extends React.Component<MyProps, MyState> 
 
     async componentDidUpdate() {
         if (this.state.phoneNumber != this.props.task?.attributes.from) {
+            console.log(this.props.task)
             const fetchConversationsRequest = await fetchConversationsByParticipant(
                 this.props.manager,
                 this.props.task?.attributes.direction.toUpperCase() === 'INBOUND'
