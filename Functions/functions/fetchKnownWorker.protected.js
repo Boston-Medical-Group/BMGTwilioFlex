@@ -39,9 +39,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 var api_client_1 = require("@hubspot/api-client");
 var fetchOwner = function (context, phone) { return __awaiter(void 0, void 0, void 0, function () {
-    var result, hubspotClient_1, hubspotResult, error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var result, hubspotClient_1, hubspotResult, client, _a, error_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
                 result = {
                     owner_id: null
@@ -49,89 +49,112 @@ var fetchOwner = function (context, phone) { return __awaiter(void 0, void 0, vo
                 if (phone === undefined || phone === '') {
                     return [2 /*return*/, result];
                 }
-                _a.label = 1;
+                _b.label = 1;
             case 1:
-                _a.trys.push([1, 3, , 4]);
+                _b.trys.push([1, 5, , 6]);
                 hubspotClient_1 = new api_client_1.Client({ accessToken: context.HUBSPOT_TOKEN });
                 return [4 /*yield*/, hubspotClient_1.crm.contacts.searchApi.doSearch({
-                        'query': phone,
-                        'filterGroups': [],
-                        'sorts': ['phone'],
-                        //'query'?: string;
-                        'properties': ['firstname', 'lastname', 'owner_id'],
-                        'limit': 1,
-                        'after': 0
-                    }).then(function (response) { return __awaiter(void 0, void 0, void 0, function () {
-                        var contact;
+                        query: phone,
+                        filterGroups: [],
+                        sorts: ['phone'],
+                        properties: ['firstname', 'lastname', 'hubspot_owner_id'],
+                        limit: 1,
+                        after: 0
+                    }).then(function (contacts) { return __awaiter(void 0, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    if (!(response.total === 0)) return [3 /*break*/, 1];
-                                    return [2 /*return*/, null];
-                                case 1:
-                                    contact = response.results[0];
-                                    return [4 /*yield*/, hubspotClient_1.crm.contacts.basicApi.getById(contact.properties.hs_object_id, ['hubspot_owner_id'])
-                                            .then(function (response) { return __awaiter(void 0, void 0, void 0, function () {
-                                            var ownerId, client;
-                                            var _a;
-                                            return __generator(this, function (_b) {
-                                                switch (_b.label) {
-                                                    case 0:
-                                                        ownerId = (_a = response.properties) === null || _a === void 0 ? void 0 : _a.hubspot_owner_id;
-                                                        client = context.getTwilioClient();
-                                                        return [4 /*yield*/, client.taskrouter.v1
-                                                                .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
-                                                                .workers
-                                                                .list({
-                                                                targetWorkersExpression: "hubspot_owner_id=".concat(ownerId)
-                                                            }).then(function (workersList) {
-                                                                var _a;
-                                                                if (workersList.length === 0) {
-                                                                    return null;
-                                                                }
-                                                                else {
-                                                                    return (_a = workersList[0]) === null || _a === void 0 ? void 0 : _a.sid;
-                                                                }
-                                                            }).catch(function (err) { return null; })];
-                                                    case 1: return [2 /*return*/, _b.sent()];
-                                                }
+                                    if (!(contacts.total > 0)) return [3 /*break*/, 2];
+                                    return [4 /*yield*/, hubspotClient_1.crm.deals.searchApi.doSearch({
+                                            filterGroups: [{
+                                                    filters: [
+                                                        {
+                                                            propertyName: "associations.contact",
+                                                            operator: "EQ",
+                                                            value: "".concat(contacts.results[0].properties.hs_object_id)
+                                                        }
+                                                    ]
+                                                }],
+                                            sorts: ["hs_lastmodifieddate"],
+                                            limit: 1,
+                                            properties: ["hubspot_owner_id"],
+                                            after: 0
+                                        })
+                                            .then(function (deals) { return __awaiter(void 0, void 0, void 0, function () {
+                                            return __generator(this, function (_a) {
+                                                return [2 /*return*/, deals.total > 0
+                                                        ? deals.results[0].properties.hubspot_owner_id
+                                                        : (contacts.total > 0
+                                                            ? contacts.results[0].properties.hubspot_owner_id
+                                                            : null)];
                                             });
                                         }); })
-                                            .catch(function (err) { return null; })];
-                                case 2: return [2 /*return*/, _a.sent()];
+                                            .catch(function (err) {
+                                            return null;
+                                        })];
+                                case 1: 
+                                // Obtiene el negocio más reciente del contacto
+                                return [2 /*return*/, _a.sent()];
+                                case 2: return [2 /*return*/, null];
                             }
                         });
-                    }); }).catch(function (err) { return null; })];
+                    }); }).catch(function (err) {
+                        console.log(err);
+                        return null;
+                    })];
             case 2:
-                hubspotResult = _a.sent();
-                result.owner_id = hubspotResult;
-                return [3 /*break*/, 4];
+                hubspotResult = _b.sent();
+                if (!(hubspotResult !== null)) return [3 /*break*/, 4];
+                client = context.getTwilioClient();
+                _a = result;
+                return [4 /*yield*/, client.taskrouter.v1
+                        .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
+                        .workers
+                        .list({
+                        targetWorkersExpression: "hubspot_owner_id=".concat(hubspotResult)
+                    })
+                        .then(function (workersList) { var _a; return workersList.length === 0 ? null : (_a = workersList[0]) === null || _a === void 0 ? void 0 : _a.sid; })
+                        .catch(function (err) { return null; })];
             case 3:
-                error_1 = _a.sent();
+                _a.owner_id = _b.sent();
+                _b.label = 4;
+            case 4: return [3 /*break*/, 6];
+            case 5:
+                error_1 = _b.sent();
                 console.log(error_1);
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/, result];
+                return [3 /*break*/, 6];
+            case 6: return [2 /*return*/, result];
         }
     });
 }); };
 var handler = function (context, event, callback) {
     return __awaiter(this, void 0, void 0, function () {
-        var phone, result, response;
+        var response, result, phone, error_2;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    phone = event.from.trim();
-                    if (!phone.startsWith('+')) {
-                        phone = "+".concat(phone);
-                    }
-                    return [4 /*yield*/, fetchOwner(context, event.from)];
-                case 1:
-                    result = _a.sent();
                     response = new Twilio.Response();
                     response.appendHeader("Access-Control-Allow-Origin", "*");
                     response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
                     response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
                     response.appendHeader("Content-Type", "application/json");
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    phone = event.from.trim();
+                    if (!phone.startsWith('+')) {
+                        phone = "+".concat(phone);
+                    }
+                    return [4 /*yield*/, fetchOwner(context, event.from)];
+                case 2:
+                    result = _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_2 = _a.sent();
+                    result = { status: 'err' };
+                    response.setStatusCode(500);
+                    return [3 /*break*/, 4];
+                case 4:
                     response.setBody(result);
                     // Return a success response using the callback function.
                     callback(null, response);
@@ -141,4 +164,4 @@ var handler = function (context, event, callback) {
     });
 };
 exports.handler = handler;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmV0Y2hLbm93bldvcmtlci5wcm90ZWN0ZWQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvZmV0Y2hLbm93bldvcmtlci5wcm90ZWN0ZWQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBRUEsa0RBQTZEO0FBYTdELElBQU0sVUFBVSxHQUFHLFVBQU8sT0FBeUIsRUFBRSxLQUFhOzs7OztnQkFDeEQsTUFBTSxHQUFtQjtvQkFDM0IsUUFBUSxFQUFFLElBQUk7aUJBQ2pCLENBQUE7Z0JBRUQsSUFBSSxLQUFLLEtBQUssU0FBUyxJQUFJLEtBQUssS0FBSyxFQUFFLEVBQUUsQ0FBQztvQkFDdEMsc0JBQU8sTUFBTSxFQUFBO2dCQUNqQixDQUFDOzs7O2dCQUdTLGtCQUFnQixJQUFJLG1CQUFhLENBQUMsRUFBRSxXQUFXLEVBQUUsT0FBTyxDQUFDLGFBQWEsRUFBRSxDQUFDLENBQUE7Z0JBQ3pELHFCQUFNLGVBQWEsQ0FBQyxHQUFHLENBQUMsUUFBUSxDQUFDLFNBQVMsQ0FBQyxRQUFRLENBQUM7d0JBQ3RFLE9BQU8sRUFBRSxLQUFLO3dCQUNkLGNBQWMsRUFBRSxFQUFFO3dCQUNsQixPQUFPLEVBQUUsQ0FBQyxPQUFPLENBQUM7d0JBQ2xCLG1CQUFtQjt3QkFDbkIsWUFBWSxFQUFFLENBQUMsV0FBVyxFQUFFLFVBQVUsRUFBRSxVQUFVLENBQUM7d0JBQ25ELE9BQU8sRUFBRSxDQUFDO3dCQUNWLE9BQU8sRUFBRSxDQUFDO3FCQUNiLENBQUMsQ0FBQyxJQUFJLENBQUMsVUFBTyxRQUFvRTs7Ozs7eUNBQzNFLENBQUEsUUFBUSxDQUFDLEtBQUssS0FBSyxDQUFDLENBQUEsRUFBcEIsd0JBQW9CO29DQUNwQixzQkFBTyxJQUFJLEVBQUE7O29DQUVMLE9BQU8sR0FBRyxRQUFRLENBQUMsT0FBTyxDQUFDLENBQUMsQ0FBQyxDQUFBO29DQUM1QixxQkFBTSxlQUFhLENBQUMs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
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmV0Y2hLbm93bldvcmtlci5wcm90ZWN0ZWQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi9zcmMvZmV0Y2hLbm93bldvcmtlci5wcm90ZWN0ZWQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQ0Esa0RBQTZEO0FBYzdELElBQU0sVUFBVSxHQUFHLFVBQU8sT0FBeUIsRUFBRSxLQUFhOzs7OztnQkFDeEQsTUFBTSxHQUFtQjtvQkFDM0IsUUFBUSxFQUFFLElBQUk7aUJBQ2pCLENBQUE7Z0JBRUQsSUFBSSxLQUFLLEtBQUssU0FBUyxJQUFJLEtBQUssS0FBSyxFQUFFLEVBQUU7b0JBQ3JDLHNCQUFPLE1BQU0sRUFBQTtpQkFDaEI7Ozs7Z0JBR1Msa0JBQWdCLElBQUksbUJBQWEsQ0FBQyxFQUFFLFdBQVcsRUFBRSxPQUFPLENBQUMsYUFBYSxFQUFFLENBQUMsQ0FBQTtnQkFDekQscUJBQU0sZUFBYSxDQUFDLEdBQUcsQ0FBQyxRQUFRLENBQUMsU0FBUyxDQUFDLFFBQVEsQ0FBQzt3QkFDdEUsS0FBSyxFQUFFLEtBQUs7d0JBQ1osWUFBWSxFQUFFLEVBQUU7d0JBQ2hCLEtBQUssRUFBRSxDQUFDLE9BQU8sQ0FBQzt3QkFDaEIsVUFBVSxFQUFFLENBQUMsV0FBVyxFQUFFLFVBQVUsRUFBRSxrQkFBa0IsQ0FBQzt3QkFDekQsS0FBSyxFQUFFLENBQUM7d0JBQ1IsS0FBSyxFQUFFLENBQUM7cUJBQ1gsQ0FBQyxDQUFDLElBQUksQ0FBQyxVQUFPLFFBQTRCOzs7O3lDQUNuQyxDQUFBLFFBQVEsQ0FBQyxLQUFLLEdBQUcsQ0FBQyxDQUFBLEVBQWxCLHdCQUFrQjtvQ0FFWCxxQkFBTSxlQUFhLENBQUMsR0FBRyxDQUFDLEtBQUssQ0FBQyxTQUFTLENBQUMsUUFBUSxDQUFDOzRDQUNwRCxZQUFZLEVBQUUsQ0FBQztvREFDWCxPQUFPLEVBQUU7d0RBQ0w7NERBQ0ksWUFBWSxFQUFF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
