@@ -38,14 +38,13 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
 
   return (
     <>
-      <Button variant="primary" href={calendarUrl} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
+      <Button variant="primary" onClick={sendCalendarHandler} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
         {isLoading ? (
           <Spinner size='sizeIcon10' decorative={false} title='Loading' />
         ) : (
         <CalendarIcon decorative={false}
           title='Agendar cita'
           size='sizeIcon10'
-          onClick={sendCalendarHandler}
           />
         )}
       </Button>
