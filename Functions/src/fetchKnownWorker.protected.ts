@@ -1,7 +1,7 @@
-import { Context, ServerlessCallback, ServerlessFunctionSignature } from "@twilio-labs/serverless-runtime-types/types";
-import fetch from "node-fetch";
+import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types";
 import { Client as HubspotClient } from '@hubspot/api-client'
-import { CollectionResponseWithTotalSimplePublicObjectForwardPaging } from "@hubspot/api-client/lib/codegen/crm/contacts";
+import { CollectionResponseWithTotalSimplePublicObjectForwardPaging as ContactsCollection } from "@hubspot/api-client/lib/codegen/crm/contacts";
+import { CollectionResponseWithTotalSimplePublicObjectForwardPaging as DealsCollection } from "@hubspot/api-client/lib/codegen/crm/deals";
 
 type EnvVars = {
     FLEXMANAGER_API_URL: string
@@ -21,45 +21,62 @@ const fetchOwner = async (context: Context<EnvVars>, phone: string): Promise<Own
     if (phone === undefined || phone === '') {
         return result
     }
-    // Obtiene el owner de un contacto en Hubspot según su número de teléfono  
+    // Obtiene el contacto según su telefono
     try {
         const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
         const hubspotResult = await hubspotClient.crm.contacts.searchApi.doSearch({
-            'query': phone,
-            'filterGroups': [],
-            'sorts': ['phone'],
-            //'query'?: string;
-            'properties': ['firstname', 'lastname', 'owner_id'],
-            'limit': 1,
-            'after': 0
-        }).then(async (response: CollectionResponseWithTotalSimplePublicObjectForwardPaging) => {
-            if (response.total === 0) {
-                return null
-            } else {
-                const contact = response.results[0]
-                return await hubspotClient.crm.contacts.basicApi.getById(contact.properties.hs_object_id as string, ['hubspot_owner_id'])
-                    .then(async response => {
-                        const ownerId = response.properties?.hubspot_owner_id
-                        const client = context.getTwilioClient();
-                        return await client.taskrouter.v1
-                            .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
-                            .workers
-                            .list({
-                                targetWorkersExpression: `hubspot_owner_id=${ownerId}`
-                            }).then((workersList): null | string => {
-                                if (workersList.length === 0) {
-                                    return null
-                                } else {
-                                    return workersList[0]?.sid
-                                }
-                            }).catch(err => null)
-
-                    })
-                    .catch(err => null)
+            query: phone,
+            filterGroups: [],
+            sorts: ['phone'],
+            properties: ['firstname', 'lastname', 'hubspot_owner_id'],
+            limit: 1,
+            after: 0
+        }).then(async (contacts: ContactsCollection) => {
+            if (contacts.total > 0) {
+                // Obtiene el negocio más reciente del contacto
+                return await hubspotClient.crm.deals.searchApi.doSearch({
+                    filterGroups: [{
+                        filters: [
+                            {
+                                propertyName: "associations.contact",
+                                operator: "EQ",
+                                value: `${contacts.results[0].properties.hs_object_id}`
+                            }
+                        ]
+                    }],
+                    sorts: ["hs_lastmodifieddate"],
+                    limit: 1,
+                    properties: ["hubspot_owner_id"],
+                    after: 0
+                })
+                    .then(async (deals: DealsCollection) => deals.total > 0
+                        ? deals.results[0].properties.hubspot_owner_id
+                        : (contacts.total > 0
+                            ? contacts.results[0].properties.hubspot_owner_id
+                            : null)
+                    )
+                    .catch((err) => {
+                        return null
+                })
             }
-        }).catch(err => null)
 
-        result.owner_id = hubspotResult
+            return null
+        }).catch((err) => {
+            console.log(err)
+            return null
+        })
+
+        if (hubspotResult !== null) {
+            const client = context.getTwilioClient();
+            result.owner_id = await client.taskrouter.v1
+                .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
+                .workers
+                .list({
+                    targetWorkersExpression: `hubspot_owner_id=${hubspotResult}`
+                })
+                .then((workersList): null | string => workersList.length === 0 ? null : workersList[0]?.sid)
+                .catch(err => null)
+        }
     } catch (error) {
         console.log(error)
     }
@@ -75,19 +92,26 @@ export const handler  = async function (
     event: MyEvent,
     callback: ServerlessCallback
 ) {
-
-    let phone = event.from.trim()
-    if (!phone.startsWith('+')) {
-        phone = `+${phone}`
-    }
-    const result = await fetchOwner(context, event.from)
-
     const response = new Twilio.Response();
     response.appendHeader("Access-Control-Allow-Origin", "*");
     response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
     response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
 
     response.appendHeader("Content-Type", "application/json");
+
+    let result;
+    try {
+        let phone = event.from.trim()
+        if (!phone.startsWith('+')) {
+            phone = `+${phone}`
+        }
+
+        result = await fetchOwner(context, event.from)
+    } catch (error) {
+        result = { status: 'err' }
+        response.setStatusCode(500);
+    }
+
     response.setBody(result);
 
     // Return a success response using the callback function.
