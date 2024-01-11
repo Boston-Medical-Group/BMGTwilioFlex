@@ -19,6 +19,12 @@ export default class HubspotCrmPlugin extends FlexPlugin {
 
     flex.AgentDesktopView.Panel1.Content.add(<SyncHubspotUser key="HubspotCrmPlugin-component-SyncHubspotUser" manager={manager} />)
 
+    flex.Actions.addListener("afterAcceptTask", (payload) => {
+      if (payload.task.attributes.direction.toLowerCase() === 'inbound' && payload.task.attributes.crmid) {
+        window.open(`https://app-eu1.hubspot.com/contacts/${process.env.FLEX_APP_HUBSPOT_CRMID}/contact/${payload.task.attributes.crmid}`, '_blank');
+      }
+    });
+
     /**
     let currentCrmId = null;
 
