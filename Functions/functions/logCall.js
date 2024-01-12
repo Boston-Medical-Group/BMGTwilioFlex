@@ -56,9 +56,16 @@ exports.handler = FunctionTokenValidator(async function (_,  event,  callback) {
     };
 
     if (hubspot_deal_id !== undefined && hubspot_deal_id !== null) {
-      toHubspot.associations[0].types.push({
-        associationCategory: "HUBSPOT_DEFINED",
-        associationTypeId: 206
+      toHubspot.associations.push({
+        to: {
+          id: hubspot_deal_id
+        },
+        types: [
+          {
+            associationCategory: "HUBSPOT_DEFINED",
+            associationTypeId: 206
+          }
+        ]
       })
     }
     
