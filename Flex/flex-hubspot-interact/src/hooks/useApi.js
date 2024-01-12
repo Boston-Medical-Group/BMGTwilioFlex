@@ -143,13 +143,31 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
+  const getMessageErrors = useCallback(async (conversationSid) => {
+
+    const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/getMessageErrors`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        conversationSid,
+        Token: token
+      })
+    });
+
+    return await request.json();
+
+  }, [token]);
+
   return {
     getDataByContactId,
     getDataByDealId,
     getTemplate,
     getTemplates,
     sendOutboundMessage,
-    startOutboundConversation
+    startOutboundConversation,
+    getMessageErrors
   }
 }
 

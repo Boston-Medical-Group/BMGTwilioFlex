@@ -48,7 +48,5 @@ export default class HubspotInteractPlugin extends FlexPlugin {
     });
 
     addWhatsAppTemplatesDropdownToMessageInputActions(flex, manager);
-
-    initializeMessageStatus(flex, manager);
   }
 }
