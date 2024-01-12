@@ -55,7 +55,7 @@ export const handler = TokenValidator(async (context: Context<MyContext>, event:
         await client.conversations.v1.conversations(event.conversationSid).messages.list({
             limit: 1,
             order: 'desc'
-        }).then(async (messages: MessageInstance[]) : any => {
+        }).then(async (messages: MessageInstance[]) => {
             if (messages.length > 0) {
                 const message = messages[0]
                 const receipts = message.deliveryReceipts()
