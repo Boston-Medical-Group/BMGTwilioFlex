@@ -61,6 +61,23 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
+  const getTemplates = useCallback(async (data) => {
+
+    const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchTemplate`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data,
+        Token: token
+      })
+    });
+
+    return await request.json();
+
+  }, [token]);
+
   const getTemplate = useCallback(async (data) => {
 
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchTemplate`, {
@@ -102,11 +119,55 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
+  const startOutboundConversation = useCallback(async ({ To, customerName, WorkerFriendlyName, KnownAgentRoutingFlag, OpenChatFlag, hubspotContact, hubspot_contact_id, hubspot_deal_id }) => {
+
+    const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/startOutboundConversation`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        To,
+        customerName,
+        WorkerFriendlyName,
+        KnownAgentRoutingFlag,
+        OpenChatFlag,
+        hubspotContact,
+        hubspot_contact_id,
+        hubspot_deal_id,
+        Token: token
+      })
+    });
+
+    return await request.json();
+
+  }, [token]);
+
+  const getMessageErrors = useCallback(async (conversationSid) => {
+
+    const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/getMessageErrors`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        conversationSid,
+        Token: token
+      })
+    });
+
+    return await request.json();
+
+  }, [token]);
+
   return {
     getDataByContactId,
     getDataByDealId,
     getTemplate,
-    sendOutboundMessage
+    getTemplates,
+    sendOutboundMessage,
+    startOutboundConversation,
+    getMessageErrors
   }
 }
 

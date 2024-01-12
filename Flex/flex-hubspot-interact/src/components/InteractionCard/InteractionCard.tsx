@@ -26,7 +26,7 @@ type Deal = {
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
 const InteractionCard = ({manager} : Props) => {
-  const { getDataByContactId, getDataByDealId } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
+  const { getDataByContactId, getDataByDealId, startOutboundConversation } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
   const [contact, setContact] = useState({});
   const [contactId, setContactId] = useState(null);
@@ -150,6 +150,7 @@ const InteractionCard = ({manager} : Props) => {
     setSelectedSmsContact(data);
   }, []);
 
+  /*
   const sendWAHandler = React.useCallback((data : HubspotContact) => {
     // get last active conversation window
     const lastConversation = getLastConversation(data)
@@ -157,14 +158,20 @@ const InteractionCard = ({manager} : Props) => {
     // if no conversation window, open whatsapp modal
     setSelectedWAContact(data);
   }, []);
+  */
 
-  const getLastConversation = (data : HubspotContact) => {
-    // obtiene la ultima conversacion activa
-    const lastConversation = manager.conversationsClient.getConversationByUniqueName('Outbound whatsapp:+13516665240 -> whatsapp: 56984786717')
-    console.log('LASTCONVERSATION', lastConversation)
-
-    return false;
-  }
+  const sendWAHandler = useCallback((data: HubspotContact) => {
+    startOutboundConversation({
+        To: `whatsapp:${ data.phone }`,
+        customerName: `${data.firstname || ''} ${data.lastname || ''}`.trim(),
+        WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
+        KnownAgentRoutingFlag: false,
+        OpenChatFlag: true,
+        hubspotContact: data,
+        hubspot_contact_id: data.hs_object_id,
+        hubspot_deal_id: dealId ?? null
+      })
+  }, []);
 
   const handleCloseModel = React.useCallback(() => {
     setSelectedSmsContact(undefined);
