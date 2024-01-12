@@ -4,8 +4,11 @@ import * as Flex from "@twilio/flex-ui";
 
 import { initializeCustomCallSids } from './initializers/initializeCustomCallSids';
 import { initializeOutboundCall } from './initializers/initializeOutboundCall';
+import { initializeMessageStatus } from './initializers/initializeMessageStatus';
+//import CustomizePasteElements from './utils/PasteThemeProvider';
+import addWhatsAppTemplatesDropdownToMessageInputActions from './flex-hooks/components/MessageInputActions';
 import InteractionCard from './components/InteractionCard/InteractionCard';
-
+import { CustomizationProvider } from '@twilio-paste/core/customization';
 import { namespace, reducers } from './states';
 
 const PLUGIN_NAME = 'HubspotInteractPlugin';
@@ -29,8 +32,8 @@ export default class HubspotInteractPlugin extends FlexPlugin {
     flex.NoTasksCanvas.Content.add(<InteractionCard key="HubspotInteractPlugin-component" manager={manager} />, options);
 
     flex.AgentDesktopView.defaultProps.splitterOptions = {
-      initialFirstPanelSize: "300px",
-      minimumFirstPanelSize: "300px"
+      initialFirstPanelSize: "800px",
+      minimumFirstPanelSize: "800px"
       //minimumSecondPanelSize: "xx%"
     };
     
@@ -38,5 +41,12 @@ export default class HubspotInteractPlugin extends FlexPlugin {
     initializeCustomCallSids(Flex, manager);
 
     initializeOutboundCall(Flex, manager);
+
+    //CustomizePasteElements(flex, manager);
+    Flex.setProviders({
+      PasteThemeProvider: CustomizationProvider
+    });
+
+    addWhatsAppTemplatesDropdownToMessageInputActions(flex, manager);
   }
 }

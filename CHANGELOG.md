@@ -1,5 +1,12 @@
 # Changelog
 
+## 12/01/2024
+* Agrega poll de URL calendario de contactos para actualizarla en caso que aún no exista
+* Rewrite del flujo en contactación whatsapp con reporte de error
+* Agrega plantillas de whatspp
+* Pasos a TS
+* Correcciones, etc.
+
 ## 03/01/2024
 * Corrige deploy
 * Corrección dependencia Twilio

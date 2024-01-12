@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { Button, ITask } from '@twilio/flex-ui'
 import { CalendarIcon } from '@twilio-paste/icons/esm/CalendarIcon'
 import { Spinner } from '@twilio-paste/core/spinner'
@@ -15,18 +15,42 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
 
   const [isLoading, setIsLoading] = useState(false)
   const [calendarUrl, setCalendarUrl] = useState('')
+  const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
+  const [isPollingEnabled, setIsPollingEnabled] = useState(true);
 
   useEffect(() => {
     setIsLoading(true)
-    getCalendarUrl(task)
-      .then(({calendarUrl }: { calendarUrl: string }) => {
-        setCalendarUrl(calendarUrl ?? '')
-    }).catch(err => {
-      setCalendarUrl('')
-    }).finally(() => {
-      setIsLoading(false)
-    })
-  }, [])
+    
+    const pollingCallback = async () => {
+      await getCalendarUrl(task)
+        .then(({ calendarUrl }: { calendarUrl: string }) => {
+          if (calendarUrl !== null && calendarUrl !== '') {
+            setCalendarUrl(calendarUrl ?? '')
+            setIsLoading(false)
+          }
+        }).catch(err => {
+          setCalendarUrl('')
+        })
+    };
+
+    const startPolling = () => {
+      timerIdRef.current = setInterval(pollingCallback, 5000);
+    };
+
+    const stopPolling = () => {
+      clearInterval(timerIdRef.current);
+    };
+
+    if (calendarUrl === null || calendarUrl === '') {
+      startPolling();
+    } else {
+      stopPolling();
+    }
+
+    return () => {
+      stopPolling();
+    };
+  }, [calendarUrl, isPollingEnabled])
 
   const sendCalendarHandler = useCallback(() => {
     window.open(calendarUrl, '_blank');
