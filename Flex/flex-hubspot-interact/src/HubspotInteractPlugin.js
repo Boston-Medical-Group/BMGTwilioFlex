@@ -4,7 +4,6 @@ import * as Flex from "@twilio/flex-ui";
 
 import { initializeCustomCallSids } from './initializers/initializeCustomCallSids';
 import { initializeOutboundCall } from './initializers/initializeOutboundCall';
-import { initializeMessageStatus } from './initializers/initializeMessageStatus';
 //import CustomizePasteElements from './utils/PasteThemeProvider';
 import addWhatsAppTemplatesDropdownToMessageInputActions from './flex-hooks/components/MessageInputActions';
 import InteractionCard from './components/InteractionCard/InteractionCard';
