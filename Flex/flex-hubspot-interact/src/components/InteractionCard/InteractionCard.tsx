@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import * as Flex from "@twilio/flex-ui";
 import { Theme } from '@twilio-paste/core/theme';
-import { Box, Card, Heading, Paragraph, Stack } from '@twilio-paste/core';
+import { Box, Card, Heading, Paragraph } from '@twilio-paste/core';
 import { Button } from '@twilio-paste/core/button';
 import { FaCalendar, FaPhoneAlt, FaSms, FaWhatsapp } from 'react-icons/fa';
 import useApi from '../../hooks/useApi';
@@ -224,10 +224,10 @@ const InteractionCard = ({manager} : Props) => {
             Seleccione el método de interacción con el contacto seleccionado.
             </Paragraph>
           <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
-            <Button variant="primary" title={actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call"} disabled={actionDisabled} onClick={() => initiateCallHandler(contact)}><FaPhoneAlt /> Call</Button>
-              <Button variant="primary" title={actionDisabled ? "To send a SMS, please change your status from 'Offline'" : "Send a SMS"} disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
-              <Button variant="primary" title={actionDisabled ? "To send a WhatsApp, please change your status from 'Offline'" : "Send a WhatsApp"} disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
-              {calendarUrl !== '' && <Button variant="primary" title="Schedule a new appointment" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
+            <Button variant="primary" disabled={actionDisabled} onClick={() => initiateCallHandler(contact)}><FaPhoneAlt /> Call</Button>
+              <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
+              <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
+              {calendarUrl !== '' && <Button variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
           </Box>
           </Card>
         </Box>
