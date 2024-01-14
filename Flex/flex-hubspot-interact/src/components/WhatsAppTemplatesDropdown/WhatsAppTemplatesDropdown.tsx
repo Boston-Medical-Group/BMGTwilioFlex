@@ -11,7 +11,7 @@ import { Button } from '@twilio-paste/core/button';
 import * as Flex from "@twilio/flex-ui";
 import { WhatsAppTemplate } from '../../types/WhatsAppTemplates';
 import useApi from '../../hooks/useApi';
-import { Card, Heading, Input, Label, Stack, Text } from '@twilio-paste/core';
+import { Card, Heading, Input, Label, Stack } from '@twilio-paste/core';
 import { DescriptionList, DescriptionListDetails, DescriptionListSet, DescriptionListTerm } from '@twilio-paste/description-list';
 import { Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions, Paragraph } from '@twilio-paste/core';
 
@@ -103,7 +103,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                 {isLoading && <SkeletonLoader />}
                 {Boolean(templateList) && !isLoading && (
                     <>
-                        <Button variant="secondary" size="icon_small" onClick={handleOpenModal}>
+                        <Button variant="secondary" size="circle" onClick={handleOpenModal}>
                             <ChatIcon decorative={false} title="Plantillas" />
                         </Button>
                         <Modal ariaLabelledby="whatsapp-templates-modal" isOpen={isModalOpen} onDismiss={handleCloseModal} size="wide">
@@ -153,7 +153,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                 )}
             </Box>
             <Box paddingLeft='space30' paddingTop='space20'>
-                <Button variant="secondary" size="icon_small" onClick={handleOpenErrors}>
+                <Button variant="secondary" size="circle" onClick={handleOpenErrors}>
                     <WarningIcon decorative={false} title="Ver errores" />
                 </Button>
                 <Modal ariaLabelledby="message-errors-modal" isOpen={isErrorsOpen} onDismiss={handleCloseErrors} size="default">

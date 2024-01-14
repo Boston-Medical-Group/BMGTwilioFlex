@@ -1,8 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import * as Flex from "@twilio/flex-ui";
 import { Theme } from '@twilio-paste/core/theme';
-import { Box, Card, Heading, Paragraph } from '@twilio-paste/core';
-import { Button } from '@twilio-paste/core/button';
+import { Box, Card, Heading, Paragraph, Button } from '@twilio-paste/core';
 import { FaCalendar, FaPhoneAlt, FaSms, FaWhatsapp } from 'react-icons/fa';
 import useApi from '../../hooks/useApi';
 import SendSmsModal from './SendSmsModal';
