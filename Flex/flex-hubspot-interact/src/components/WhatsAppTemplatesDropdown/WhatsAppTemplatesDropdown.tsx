@@ -7,11 +7,12 @@ import { ChatIcon } from '@twilio-paste/icons/esm/ChatIcon';
 import { ErrorIcon } from '@twilio-paste/icons/esm/ErrorIcon';
 import { WarningIcon } from '@twilio-paste/icons/esm/WarningIcon';
 import { CloseIcon } from '@twilio-paste/icons/esm/CloseIcon';
-import { Button } from '@twilio-paste/button';
+import { Button } from '@twilio-paste/core/button';
 import * as Flex from "@twilio/flex-ui";
 import { WhatsAppTemplate } from '../../types/WhatsAppTemplates';
 import useApi from '../../hooks/useApi';
-import { Card, DescriptionList, DescriptionListDetails, DescriptionListSet, DescriptionListTerm, Heading, Input, Label, Stack, Text } from '@twilio-paste/core';
+import { Card, Heading, Input, Label, Stack } from '@twilio-paste/core';
+import { DescriptionList, DescriptionListDetails, DescriptionListSet, DescriptionListTerm } from '@twilio-paste/description-list';
 import { Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions, Paragraph } from '@twilio-paste/core';
 
 interface WhatsAppTemplatesDropdownProps {
@@ -98,7 +99,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
 
     return (
         <>
-            <Box paddingLeft='space30'>
+            <Box paddingLeft='space30' paddingTop='space20'>
                 {isLoading && <SkeletonLoader />}
                 {Boolean(templateList) && !isLoading && (
                     <>
@@ -151,7 +152,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                     </>
                 )}
             </Box>
-            <Box paddingLeft='space30'>
+            <Box paddingLeft='space30' paddingTop='space20'>
                 <Button variant="secondary" size="circle" onClick={handleOpenErrors}>
                     <WarningIcon decorative={false} title="Ver errores" />
                 </Button>
@@ -161,10 +162,13 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                     </ModalHeader>
                     <ModalBody>
                         
-                        <DescriptionList>                        
-                            {isErrorsOpen && isLoadingErrors && (<SkeletonLoader />)}
-                            {!isLoadingErrors &&
-                                messageErrors.map((error : { date: Date, code: number }, index) => {
+                        {isErrorsOpen && isLoadingErrors && (<SkeletonLoader />)}
+                        {!isLoadingErrors && messageErrors.length === 0 && (
+                            <Paragraph>No hay errores recientes</Paragraph>
+                        )}
+                        {!isLoadingErrors && messageErrors.length > 0 && (
+                            <DescriptionList>
+                                {messageErrors.map((error: { date: Date, code: number }, index) => {
                                     return (
                                         <DescriptionListSet key={index}>
                                             <DescriptionListTerm>{error.date}</DescriptionListTerm>
@@ -174,9 +178,10 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                                             </DescriptionListDetails>
                                         </DescriptionListSet>
                                     )
-                                })
-                            }
-                        </DescriptionList>
+                                })}
+                            </DescriptionList>
+                        )}
+                        
                     </ModalBody>
                 </Modal>
                 {error && (

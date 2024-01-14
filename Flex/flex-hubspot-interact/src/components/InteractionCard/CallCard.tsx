@@ -1,8 +1,7 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import * as Flex from "@twilio/flex-ui";
 import { Theme } from '@twilio-paste/core/theme';
-import { Box, Card, Heading, Select, Option, Stack, Label } from '@twilio-paste/core';
-import { Button } from '@twilio-paste/core/button';
+import { Box, Card, Heading, Select, Option, Stack, Label, Button } from '@twilio-paste/core';
 import { FaPhoneAlt } from 'react-icons/fa';
 import { Workspace, TaskQueue } from "twilio-taskrouter";
 import { CallCardType, HubspotContact } from '../../Types';
