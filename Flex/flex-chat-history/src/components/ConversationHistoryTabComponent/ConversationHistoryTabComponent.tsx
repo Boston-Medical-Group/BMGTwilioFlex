@@ -41,7 +41,7 @@ class ConversationHistoryTabComponent extends React.Component<MyProps, MyState> 
                 this.props.manager,
                 this.props.task?.attributes.direction.toUpperCase() === 'INBOUND'
                     ? this.props.task?.attributes.from
-                    : this.props.task?.attributes.outbound_to
+                    : (this.props.task?.attributes.outbound_to ?? this.props.task?.attributes.from)
             ).then((convos) => {
                 this.setState({ conversations: convos });
                 this.setState({ phoneNumber: this.props.task?.attributes.from });

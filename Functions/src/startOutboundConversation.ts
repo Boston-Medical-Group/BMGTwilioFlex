@@ -36,7 +36,7 @@ const openAChatTask = async (
                     name: customerName,
                     hubspot_contact_id,
                     hubspot_deal_id,
-                    from: To,
+                    from: To, // todo From debería ser el agente y debería enviar To como destinatario (contacto)
                     direction: "outbound",
                     customerName: customerName,
                     customerAddress: To,

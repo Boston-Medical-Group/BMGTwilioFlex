@@ -26,7 +26,6 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
         .then(({ calendarUrl }: { calendarUrl: string }) => {
           if (calendarUrl !== null && calendarUrl !== '') {
             setCalendarUrl(calendarUrl ?? '')
-            setIsLoading(false)
           }
         }).catch(err => {
           setCalendarUrl('')
@@ -38,6 +37,7 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
     };
 
     const stopPolling = () => {
+      setIsLoading(false)
       clearInterval(timerIdRef.current);
     };
 
