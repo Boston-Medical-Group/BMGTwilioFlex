@@ -8,6 +8,9 @@
         "esModuleInterop": true,
         "outDir": "./functions",
         "rootDir": "./src",
-        "inlineSourceMap": true
+        "inlineSourceMap": true,
+        "lib": [
+            "ES2021.String"
+        ]
     }
 }

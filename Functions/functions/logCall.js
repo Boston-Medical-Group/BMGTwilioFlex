@@ -68,6 +68,13 @@ exports.handler = FunctionTokenValidator(async function (_,  event,  callback) {
         ]
       })
     }
+
+    const response = new Twilio.Response();
+    response.appendHeader("Access-Control-Allow-Origin", "*");
+    response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
+    response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    response.appendHeader("Content-Type", "application/json");
     
     const request = await fetch(`https://api.hubapi.com/crm/v3/objects/calls`, {
       method: "POST",
@@ -78,19 +85,18 @@ exports.handler = FunctionTokenValidator(async function (_,  event,  callback) {
       body: JSON.stringify(toHubspot)
     });
 
-    if (!request.ok) {
+    if (request.ok) {
+      response.setBody({
+        statusText: request.statusText,
+        error: request.error()
+      })
       console.log(request)
-      throw new Error('Error while retrieving data from hubspot');
+      callback(null, response);
+      return;
     }
 
     const data = await request.json();
-
-    const response = new Twilio.Response();
-    response.appendHeader("Access-Control-Allow-Origin", "*");
-    response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
-    response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
-
-    response.appendHeader("Content-Type", "application/json");
+    
     response.setBody(data);
     // Return a success response using the callback function.
     callback(null, response);
