@@ -49,8 +49,8 @@ export const initializeOutboundCall = async (flex : typeof Flex, manager: Flex.M
 
                 contact.phone = contact.phone ?? data.phone;
                 manager.store.dispatch(actions.interactionCallCard.setCallCard({
-                    data: contact,
-                    dealId: data.deal_id ?? null
+                    contact: contact,
+                    deal: data.deal_id ?? null
                 }))
             } else if (data.actionType === 'gotoCustomer') {
                 const response = await loadHubspotData(data, manager);
