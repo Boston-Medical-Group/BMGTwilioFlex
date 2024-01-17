@@ -8,7 +8,7 @@ import SendSmsModal from './SendSmsModal';
 import SendWAModal from './SendWAModal';
 import CallCard from './CallCard';
 import { actions, AppState } from '../../states';
-import { HubspotContact } from 'Types';
+import { HubspotContact, HubspotDeal } from 'Types';
 // @ts-ignore
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -158,16 +158,16 @@ const InteractionCard = ({manager} : Props) => {
   }, []);
   */
 
-  const sendWAHandler = useCallback((data: HubspotContact) => {
+  const sendWAHandler = useCallback((contact: HubspotContact, deal: HubspotDeal) => {
     startOutboundConversation({
-        To: `whatsapp:${ data.phone }`,
-        customerName: `${data.firstname || ''} ${data.lastname || ''}`.trim(),
+        To: `whatsapp:${ contact.phone }`,
+        customerName: `${contact.firstname || ''} ${contact.lastname || ''}`.trim(),
         WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
         KnownAgentRoutingFlag: false,
         OpenChatFlag: true,
-        hubspotContact: data,
-        hubspot_contact_id: data.hs_object_id,
-        hubspot_deal_id: dealId ?? null
+        hubspotContact: contact,
+        hubspot_contact_id: contact.hs_object_id,
+        hubspot_deal_id: deal?.hs_object_id ?? null
       })
   }, []);
 
@@ -223,8 +223,8 @@ const InteractionCard = ({manager} : Props) => {
             </Paragraph>
           <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
             <Button variant="primary" disabled={actionDisabled} onClick={() => initiateCallHandler(contact, deal)}><FaPhoneAlt /> Call</Button>
-              <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
-              <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
+              <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact, deal)}><FaSms /> SMS</Button>
+              <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact, deal)}><FaWhatsapp /> WhatsApp</Button>
               {calendarUrl !== '' && <Button variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
           </Box>
           </Card>
