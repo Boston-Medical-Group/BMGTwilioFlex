@@ -6,7 +6,7 @@ const useApi = ({ token }) => {
     let bodytoSend = {};
     if (data.contact_id) {
       bodytoSend = {
-        crmid: data.contact_id,
+        contact_id: data.contact_id,
         Token: manager.store.getState().flex.session.ssoTokenPayload.token
       }
     } else if (data.deal_id) {
@@ -36,7 +36,7 @@ const useApi = ({ token }) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        crmid : contact_id,
+        contact_id : contact_id,
         Token: token
       })
     });

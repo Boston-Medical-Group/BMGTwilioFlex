@@ -3,9 +3,18 @@ export type HubspotContact = {
     lastname?: string
     phone?: string
     hs_object_id?: string
+    email?: string
+    reservar_cita?: string
+}
+
+export type HubspotDeal = {
+    dealname?: string
+    dealstage?: string
+    hs_object_id?: string
+    reservar_cita?: string
 }
 
 export type CallCardType = {
-    data?: HubspotContact,
-    dealId?: string | null
+    contact?: HubspotContact,
+    deal?: HubspotDeal
 }

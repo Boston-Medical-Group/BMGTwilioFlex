@@ -138,10 +138,10 @@ const InteractionCard = ({manager} : Props) => {
     return fullName;
   }
 
-  const initiateCallHandler = useCallback((data) => {
+  const initiateCallHandler = useCallback(() => {
     dispatch(actions.interactionCallCard.setCallCard({
-      data: data,
-      dealId: dealId ?? null
+      contact,
+      deal
     }))
   }, []);
 
@@ -223,7 +223,7 @@ const InteractionCard = ({manager} : Props) => {
             Seleccione el método de interacción con el contacto seleccionado.
             </Paragraph>
           <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
-            <Button variant="primary" disabled={actionDisabled} onClick={() => initiateCallHandler(contact)}><FaPhoneAlt /> Call</Button>
+            <Button variant="primary" disabled={actionDisabled} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Call</Button>
               <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
               <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
               {calendarUrl !== '' && <Button variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
