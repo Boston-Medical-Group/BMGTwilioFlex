@@ -32,7 +32,7 @@ const InteractionCard = ({manager} : Props) => {
   const [deal, setDeal] = useState<Deal>({});
   const [dealId, setDealId] = useState(null);
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
-  const [selectedSmsContact, setSelectedSmsContact] = useState();
+  const [selectedSmsContact, setSelectedSmsContact] = useState<HubspotContact>();
   const [selectedWAContact, setSelectedWAContact] = useState<HubspotContact>();
   const [showCallCard, setShowCallCard] = useState(false);
   const [calendarUrl, setCalendarUrl] = useState<string>('');
@@ -144,8 +144,8 @@ const InteractionCard = ({manager} : Props) => {
     }))
   }, []);
 
-  const sendSmsHandler = React.useCallback((data) => {
-    setSelectedSmsContact(data);
+  const sendSmsHandler = useCallback((contact: HubspotContact, deal: HubspotDeal) => {
+    setSelectedSmsContact(contact);
   }, []);
 
   /*
