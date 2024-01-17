@@ -104,7 +104,7 @@ exports.handler = FunctionTokenValidator(async function (
 
     
     
-    const hubspotClient = new HubspotClient({ apiKey: context.HUBSPOT_TOKEN });
+    const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
     await hubspotClient.crm.objects.calls.basicApi.create(toHubspot)
       .then((call: SimplePublicObject) => {
         response.appendHeader("Content-Type", "application/json");
