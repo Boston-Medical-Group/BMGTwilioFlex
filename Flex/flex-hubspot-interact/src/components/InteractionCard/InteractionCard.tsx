@@ -77,7 +77,6 @@ const InteractionCard = ({manager} : Props) => {
       // Invoke the Flex Outbound Call Action
       const { data } = event;
       if (data.from === 'FLEX_SCRIPT') {
-        //console.log('LOCALDEV', event);
         if (data.actionType === 'gotoInteraction') {
           setShowCallCard(false)
           dispatch(actions.interactionCallCard.setCallCard({}))
@@ -138,10 +137,10 @@ const InteractionCard = ({manager} : Props) => {
     return fullName;
   }
 
-  const initiateCallHandler = useCallback(() => {
+  const initiateCallHandler = useCallback((contact, deal) => {
     dispatch(actions.interactionCallCard.setCallCard({
-      contact,
-      deal
+      contact: contact,
+      deal: deal
     }))
   }, []);
 
@@ -205,7 +204,7 @@ const InteractionCard = ({manager} : Props) => {
     return null;
   }
 
-  if (showCallCard) {
+  if (showCallCard && contact) {
     return (
       <CallCard manager={manager} />
     )
@@ -223,7 +222,7 @@ const InteractionCard = ({manager} : Props) => {
             Seleccione el método de interacción con el contacto seleccionado.
             </Paragraph>
           <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
-            <Button variant="primary" disabled={actionDisabled} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Call</Button>
+            <Button variant="primary" disabled={actionDisabled} onClick={() => initiateCallHandler(contact, deal)}><FaPhoneAlt /> Call</Button>
               <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
               <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
               {calendarUrl !== '' && <Button variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
