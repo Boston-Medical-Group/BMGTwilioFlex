@@ -50,12 +50,7 @@ type MyEvent = {
 }
 
 //@ts-ignore
-/*exports.handler = FunctionTokenValidator(async function (
-  context: Context<MyContext>,
-  event: MyEvent,
-  callback: ServerlessCallback
-) {*/
-export const handler = async function (
+exports.handler = FunctionTokenValidator(async function (
   context: Context<MyContext>,
   event: MyEvent,
   callback: ServerlessCallback
@@ -101,5 +96,4 @@ export const handler = async function (
     }
 
   }
-  //})
-}
+})
