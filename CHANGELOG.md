@@ -1,5 +1,8 @@
 # Changelog
 
+## 17/01/2024
+* Corrige access token
+
 ## 16/01/2024
 * Modificacion en pool ddi
 * correccion en logs
