@@ -109,15 +109,15 @@ const InteractionCard = ({manager} : Props) => {
     if (contactId) {
       getDataByContactId({ contact_id: contactId })
         .then(data => {
-          setContact(data)
+          setContact(data.properties)
         })
         .catch(() => console.log("Error while fetching data from Hubspot"));
     } else if (dealId) {
       getDataByDealId({ deal_id: dealId })
         .then((data) => {
-          setContact(data)
+          setContact(data.properties)
           if (data.deal !== undefined && data.deal !== null) {
-            setDeal(data.deal)
+            setDeal(data.deal.properties)
           }
         })
         .catch(() => console.log("Error while fetching data from Hubspot"));
