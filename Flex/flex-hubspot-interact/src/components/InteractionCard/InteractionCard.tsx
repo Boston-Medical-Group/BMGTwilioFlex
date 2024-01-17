@@ -54,8 +54,8 @@ const InteractionCard = ({manager} : Props) => {
   }, []);
 
   useEffect(() => {
-    if (callCard !== undefined && callCard.hasOwnProperty('data')) {
-      setContact(callCard.data);
+    if (callCard !== undefined && callCard.hasOwnProperty('contact')) {
+      setContact(callCard.contact);
       setShowCallCard(true);
     } else {
       setShowCallCard(false);
