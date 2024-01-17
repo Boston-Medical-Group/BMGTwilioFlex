@@ -8,7 +8,7 @@ import SendSmsModal from './SendSmsModal';
 import SendWAModal from './SendWAModal';
 import CallCard from './CallCard';
 import { actions, AppState } from '../../states';
-import { HubspotContact } from 'Types';
+import { HubspotContact, HubspotDeal } from 'Types';
 // @ts-ignore
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -32,7 +32,7 @@ const InteractionCard = ({manager} : Props) => {
   const [deal, setDeal] = useState<Deal>({});
   const [dealId, setDealId] = useState(null);
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
-  const [selectedSmsContact, setSelectedSmsContact] = useState();
+  const [selectedSmsContact, setSelectedSmsContact] = useState<HubspotContact>();
   const [selectedWAContact, setSelectedWAContact] = useState<HubspotContact>();
   const [showCallCard, setShowCallCard] = useState(false);
   const [calendarUrl, setCalendarUrl] = useState<string>('');
@@ -54,8 +54,8 @@ const InteractionCard = ({manager} : Props) => {
   }, []);
 
   useEffect(() => {
-    if (callCard !== undefined && callCard.hasOwnProperty('data')) {
-      setContact(callCard.data);
+    if (callCard !== undefined && callCard.hasOwnProperty('contact')) {
+      setContact(callCard.contact);
       setShowCallCard(true);
     } else {
       setShowCallCard(false);
@@ -77,7 +77,6 @@ const InteractionCard = ({manager} : Props) => {
       // Invoke the Flex Outbound Call Action
       const { data } = event;
       if (data.from === 'FLEX_SCRIPT') {
-        //console.log('LOCALDEV', event);
         if (data.actionType === 'gotoInteraction') {
           setShowCallCard(false)
           dispatch(actions.interactionCallCard.setCallCard({}))
@@ -138,15 +137,15 @@ const InteractionCard = ({manager} : Props) => {
     return fullName;
   }
 
-  const initiateCallHandler = useCallback((data) => {
+  const initiateCallHandler = useCallback((contact, deal) => {
     dispatch(actions.interactionCallCard.setCallCard({
-      data: data,
-      dealId: dealId ?? null
+      contact: contact,
+      deal: deal
     }))
   }, []);
 
-  const sendSmsHandler = React.useCallback((data) => {
-    setSelectedSmsContact(data);
+  const sendSmsHandler = useCallback((contact: HubspotContact, deal: HubspotDeal) => {
+    setSelectedSmsContact(contact);
   }, []);
 
   /*
@@ -159,16 +158,16 @@ const InteractionCard = ({manager} : Props) => {
   }, []);
   */
 
-  const sendWAHandler = useCallback((data: HubspotContact) => {
+  const sendWAHandler = useCallback((contact: HubspotContact, deal: HubspotDeal) => {
     startOutboundConversation({
-        To: `whatsapp:${ data.phone }`,
-        customerName: `${data.firstname || ''} ${data.lastname || ''}`.trim(),
+        To: `whatsapp:${ contact.phone }`,
+        customerName: `${contact.firstname || ''} ${contact.lastname || ''}`.trim(),
         WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
         KnownAgentRoutingFlag: false,
         OpenChatFlag: true,
-        hubspotContact: data,
-        hubspot_contact_id: data.hs_object_id,
-        hubspot_deal_id: dealId ?? null
+        hubspotContact: contact,
+        hubspot_contact_id: contact.hs_object_id,
+        hubspot_deal_id: deal?.hs_object_id ?? null
       })
   }, []);
 
@@ -205,7 +204,7 @@ const InteractionCard = ({manager} : Props) => {
     return null;
   }
 
-  if (showCallCard) {
+  if (showCallCard && contact) {
     return (
       <CallCard manager={manager} />
     )
@@ -223,9 +222,9 @@ const InteractionCard = ({manager} : Props) => {
             Seleccione el método de interacción con el contacto seleccionado.
             </Paragraph>
           <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
-            <Button variant="primary" disabled={actionDisabled} onClick={() => initiateCallHandler(contact)}><FaPhoneAlt /> Call</Button>
-              <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact)}><FaSms /> SMS</Button>
-              <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact)}><FaWhatsapp /> WhatsApp</Button>
+            <Button variant="primary" disabled={actionDisabled} onClick={() => initiateCallHandler(contact, deal)}><FaPhoneAlt /> Call</Button>
+              <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact, deal)}><FaSms /> SMS</Button>
+              <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact, deal)}><FaWhatsapp /> WhatsApp</Button>
               {calendarUrl !== '' && <Button variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
           </Box>
           </Card>

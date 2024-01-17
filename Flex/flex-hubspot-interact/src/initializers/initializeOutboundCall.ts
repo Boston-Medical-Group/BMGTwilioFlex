@@ -11,7 +11,7 @@ async function loadHubspotData(data : HubspotRequestData, manager : Flex.Manager
     let bodytoSend = {};
     if (data.contact_id) {
         bodytoSend = {
-            crmid: data.contact_id,
+            contact_id: data.contact_id,
             Token: manager.store.getState().flex.session.ssoTokenPayload.token
         }
     } else if (data.deal_id) {
@@ -49,14 +49,14 @@ export const initializeOutboundCall = async (flex : typeof Flex, manager: Flex.M
 
                 contact.phone = contact.phone ?? data.phone;
                 manager.store.dispatch(actions.interactionCallCard.setCallCard({
-                    data: contact,
-                    dealId: data.deal_id ?? null
+                    contact: contact,
+                    deal: response.deal ? response.deal.properties : null
                 }))
             } else if (data.actionType === 'gotoCustomer') {
                 const response = await loadHubspotData(data, manager);
                 const contact = response.properties ?? {};
-                // todo navigate to customer view with route params (crmid)
-                Flex.Actions.invokeAction("NavigateToView", { viewName: data.viewName, crmid: contact.hs_object_id });
+                // todo navigate to customer view with route params (contact_id)
+                Flex.Actions.invokeAction("NavigateToView", { viewName: data.viewName, contact_id: contact.hs_object_id });
 
             }
 

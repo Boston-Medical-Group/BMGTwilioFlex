@@ -24,7 +24,7 @@ const CallCard = ({ manager } : Props) => {
   const [defaultQueue] = useState<string>(FLEX_APP_OUTBOUND_QUEUE_SID as string);
   const [selectedQueue, setSelectedQueue] = useState<string>('');
 
-  const callCard = useSelector(
+  const callCard : CallCardType = useSelector(
     (state: AppState) => state.interactionCallCardState.interactionCallCard.callCard
   );
 
@@ -60,7 +60,11 @@ const CallCard = ({ manager } : Props) => {
   }, [])
 
 
-  const fullName = (contact : HubspotContact) => {
+  const fullName = (contact: HubspotContact) => {
+    if (!contact) {
+      return 'Unknown name';
+    }
+    
     let fullName = `${contact.firstname ?? ''} ${contact.lastname ?? ''}`;
     if (fullName.trim() == '') {
       return 'Unknown name';
@@ -71,12 +75,12 @@ const CallCard = ({ manager } : Props) => {
 
   const initiateCallHandler = useCallback(() => {
     Flex.Actions.invokeAction("StartOutboundCall", {
-      destination: callCard?.data?.phone,
+      destination: callCard?.contact?.phone,
       queueSid: selectedQueue,
       taskAttributes: {
-        name: `${callCard?.data?.firstname || ''} ${callCard?.data?.lastname || ''}`.trim(),
-        hubspot_contact_id: callCard?.data?.hs_object_id,
-        hubspot_deal_id: callCard?.dealId ?? null
+        name: `${callCard?.contact?.firstname || ''} ${callCard?.contact?.lastname || ''}`.trim(),
+        hubspot_contact_id: callCard?.contact?.hs_object_id,
+        hubspot_deal_id: callCard?.deal?.hs_object_id
       }
     });
   }, [selectedQueue]);
@@ -86,7 +90,7 @@ const CallCard = ({ manager } : Props) => {
       <>
         <Box paddingTop="space60" marginX="space60">
         <Card>
-          <Heading as="h2" variant="heading20">Llamar a {fullName(callCard?.data as HubspotContact)}</Heading>
+          <Heading as="h2" variant="heading20">Llamar a {fullName(callCard?.contact as HubspotContact)}</Heading>
           <Box justifyContent="center" alignItems="center" rowGap="space10" marginBottom="space80">
               <Label htmlFor="queue">Seleccione la cola</Label>
               <Select id="queue" value={selectedQueue ?? queues.at(0)?.queueSid} onChange={handleSelectChange}>
