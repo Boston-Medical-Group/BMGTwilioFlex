@@ -2,6 +2,8 @@
 
 ## 17/01/2024
 * Corrige access token
+* Update de carga de crmid
+* Mejoras en api de fetchHubspotContact
 
 ## 16/01/2024
 * Modificacion en pool ddi
