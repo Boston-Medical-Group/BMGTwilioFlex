@@ -85,10 +85,9 @@ exports.handler = FunctionTokenValidator(async function (_,  event,  callback) {
       body: JSON.stringify(toHubspot)
     });
 
-    if (request.ok) {
+    if (!request.ok) {
       response.setBody({
         statusText: request.statusText,
-        error: request.error()
       })
       console.log(request)
       callback(null, response);
