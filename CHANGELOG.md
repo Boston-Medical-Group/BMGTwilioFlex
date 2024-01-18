@@ -1,5 +1,9 @@
 # Changelog
 
+## 18/01/2024
+* Upgrade de versiones FlexUI
+* Corrección de token agentes
+
 ## 17/01/2024
 * Corrige access token
 * Update de carga de crmid

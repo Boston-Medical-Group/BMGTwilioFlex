@@ -7,12 +7,12 @@ const useApi = ({ token }) => {
     if (data.contact_id) {
       bodytoSend = {
         contact_id: data.contact_id,
-        Token: manager.store.getState().flex.session.ssoTokenPayload.token
+        Token: token
       }
     } else if (data.deal_id) {
       bodytoSend = {
         deal_id: data.deal_id,
-        Token: manager.store.getState().flex.session.ssoTokenPayload.token
+        Token: token
       }
     } else {
       return;
