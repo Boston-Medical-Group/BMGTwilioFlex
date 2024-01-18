@@ -137,7 +137,7 @@ exports.handler = FunctionTokenValidator(async function (
             {
                 workspace_sid: context.TASK_ROUTER_WORKSPACE_SID,
                 workflow_sid: context.TASK_ROUTER_WORKFLOW_SID,
-                queue_sid: context.TASK_ROUTER_QUEUE_SID,
+                //queue_sid: context.TASK_ROUTER_QUEUE_SID,
                 worker_sid: worker_sid
             }
         );
