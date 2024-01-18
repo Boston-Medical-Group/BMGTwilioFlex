@@ -1,6 +1,6 @@
 {
   "name": "flex-callback",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "id": "flex-callback",
   "private": true,
   "scripts": {
@@ -15,19 +15,18 @@
     "@twilio-paste/core": "^17.2.0",
     "@twilio-paste/icons": "^9.4.2",
     "@twilio/flex-dev-utils": "^5.1.3",
-    "@twilio/flex-plugin-scripts": "6.0.3",
     "@twilio/flex-ui-telemetry": "^1.3.1",
-    "@types/jest": "^26.0.20",
     "lodash": "^4.17.20",
     "luxon": "^3.1.1",
     "rrule": "^2.7.1",
-    "tzdata": "^1.0.35"
+    "tzdata": "^1.0.35",
+    "@twilio/flex-plugin-scripts": "6.2.3"
   },
   "devDependencies": {
-    "@twilio/flex-ui": "2.1.1",
+    "@twilio/flex-ui": "2.5.0",
     "@types/luxon": "^3.1.0",
-    "@types/react-redux": "^7.1.1",
-    "typescript": "^4"
+    "typescript": "^4",
+    "react-test-renderer": "17.0.2"
   },
   "jest-junit": {
     "outputDirectory": "./test-results"

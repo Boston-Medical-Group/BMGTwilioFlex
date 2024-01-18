@@ -35,8 +35,8 @@ export default class BmgFlexAdminPlugin extends FlexPlugin {
         initializeSettings(flex, manager);
         initializeDonotcall(flex, manager);
         initializeBlacklist(flex, manager);
-        initializeDowntimeManager(flex, manager);
-        initializeWrapupCodes(flex, manager);
+        //initializeDowntimeManager(flex, manager);
+        //initializeWrapupCodes(flex, manager);
     }
 
     /**
