@@ -163,6 +163,7 @@ type MyContext = {
     TASK_ROUTER_WORKSPACE_SID: string
     TASK_ROUTER_WORKFLOW_SID: string
     TASK_ROUTER_QUEUE_SID: string
+    FLEX_APP_OUTBOUND_WHATSAPP_QUEUE_SID: string
     INBOUND_SMS_STUDIO_FLOW: string
 }
 
@@ -226,7 +227,7 @@ exports.handler = FunctionTokenValidator(async function (
                 {
                     workspace_sid: context.TASK_ROUTER_WORKSPACE_SID,
                     workflow_sid: context.TASK_ROUTER_WORKFLOW_SID,
-                    queue_sid: context.TASK_ROUTER_QUEUE_SID,
+                    queue_sid: context.FLEX_APP_OUTBOUND_WHATSAPP_QUEUE_SID,
                     worker_sid: worker_sid
                 }
             );
