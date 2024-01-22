@@ -9,6 +9,7 @@ import addWhatsAppTemplatesDropdownToMessageInputActions from './flex-hooks/comp
 import InteractionCard from './components/InteractionCard/InteractionCard';
 import { CustomizationProvider } from '@twilio-paste/core/customization';
 import { namespace, reducers } from './states';
+import InteractionContainer from './components/InteractionContainer';
 
 const PLUGIN_NAME = 'HubspotInteractPlugin';
 
@@ -28,7 +29,8 @@ export default class HubspotInteractPlugin extends FlexPlugin {
     
     const options = { sortOrder: 1000 };
 
-    flex.NoTasksCanvas.Content.add(<InteractionCard key="HubspotInteractPlugin-component" manager={manager} />, options);
+    //flex.NoTasksCanvas.Content.add(<InteractionCard key="HubspotInteractPlugin-component" manager={manager} />, options);
+    flex.CRMContainer.Content.replace(<InteractionContainer key="InteractionContainer-component" flex={flex} manager={manager} />, options);
 
     flex.AgentDesktopView.defaultProps.splitterOptions = {
       initialFirstPanelSize: "800px",
@@ -39,7 +41,7 @@ export default class HubspotInteractPlugin extends FlexPlugin {
     // Fetch CallerID from Pools
     initializeCustomCallSids(Flex, manager);
 
-    initializeOutboundCall(Flex, manager);
+    //initializeOutboundCall(Flex, manager);
 
     //CustomizePasteElements(flex, manager);
     Flex.setProviders({
