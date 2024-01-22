@@ -1,5 +1,8 @@
 # Changelog
 
+# 22/01/2024
+* Modifica comportamiento de tarjeta de interacción
+
 ## 19/01/2024
 * Quita loop de notificación de mensaje
 
