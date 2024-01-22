@@ -5,6 +5,7 @@
 
 ## 19/01/2024
 * Quita loop de notificación de mensaje
+* Corrige problema de CRMID en log
 
 ## 18/01/2024
 * Upgrade de versiones FlexUI

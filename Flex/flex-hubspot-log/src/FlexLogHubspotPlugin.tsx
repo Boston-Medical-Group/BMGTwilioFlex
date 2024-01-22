@@ -19,6 +19,7 @@ const LogHubspotCall = async (task : CancelableTask, manager : Flex.Manager) => 
   let params : any = {}
   if (direction === 'INBOUND') {
     params = {
+      direction: 'inbound',
       //hs_object_id: task.attributes.hubspot_contact_id ?? null,
       hs_call_callee_object_id: task.attributes.hubspot_contact_id ?? null,
       hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
@@ -39,6 +40,7 @@ const LogHubspotCall = async (task : CancelableTask, manager : Flex.Manager) => 
     }
   } else if (direction === 'OUTBOUND') {
     params = {
+      direction: 'outbound',
       //hs_object_id: task.attributes.hubspot_contact_id ?? null,
       hs_call_callee_object_id: task.attributes.hubspot_contact_id ?? null,
       hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
