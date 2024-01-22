@@ -6,7 +6,7 @@ import { Reservation, Task } from 'twilio-taskrouter';
 
 const PLUGIN_NAME = 'FlexLogHubspotPlugin';
 
-const DELAY_TO_LOG_CALL_TASKS = 10;
+const DELAY_TO_LOG_CALL_TASKS = 5;
 
 type CancelableTask = { _reservation: Reservation } & ITask
 
@@ -19,7 +19,6 @@ const LogHubspotCall = async (task : CancelableTask, manager : Flex.Manager) => 
   let params : any = {}
   if (direction === 'INBOUND') {
     params = {
-      direction: 'inbound',
       //hs_object_id: task.attributes.hubspot_contact_id ?? null,
       hs_call_callee_object_id: task.attributes.hubspot_contact_id ?? null,
       hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
@@ -40,7 +39,6 @@ const LogHubspotCall = async (task : CancelableTask, manager : Flex.Manager) => 
     }
   } else if (direction === 'OUTBOUND') {
     params = {
-      direction: 'outbound',
       //hs_object_id: task.attributes.hubspot_contact_id ?? null,
       hs_call_callee_object_id: task.attributes.hubspot_contact_id ?? null,
       hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
@@ -49,7 +47,7 @@ const LogHubspotCall = async (task : CancelableTask, manager : Flex.Manager) => 
       // @todo custom disposition codes
       hs_call_body: `NOTA: "${task.attributes.conversations?.content ?? '--'}"`,
       hs_call_callee_object_type_id: '0-1',
-      hs_call_direction: task.attributes.direction?.toUpperCase(),
+      hs_call_direction: direction,
       //hs_call_disposition: mapOutcome[task.attributes.conversations?.outcome],
       hs_call_duration: task.age * 1000,
       hs_call_from_number: task.formattedAttributes.from,

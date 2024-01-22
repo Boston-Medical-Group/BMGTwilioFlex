@@ -34,7 +34,6 @@ exports.handler = FunctionTokenValidator(async function (
 ) {
 
   const {
-    direction,
     hs_bject_id,
     hs_timestamp,
     hs_call_body,
@@ -62,7 +61,7 @@ exports.handler = FunctionTokenValidator(async function (
     if (!hs_call_callee_object_id) {
       // FIX: si se marca desde dialpad, no tenemos CRMID así que buscamos el telefono en Hubspot
       const seachedCRMID : string | boolean = await hubspotClient.crm.contacts.searchApi.doSearch({
-        query: direction.toLowerCase() === 'inbound' ? hs_call_from_number : hs_call_to_number,
+        query: hs_call_direction === 'INBOUND' ? hs_call_from_number : hs_call_to_number,
         filterGroups: [],
         limit: 1,
         after: 0,
