@@ -1,8 +1,11 @@
 # Changelog
 
+# 22/01/2024
+* Modifica comportamiento de tarjeta de interacción
+* Corrige problema de CRMID en log
+
 ## 19/01/2024
 * Quita loop de notificación de mensaje
-* Corrige problema de CRMID en log
 
 ## 18/01/2024
 * Upgrade de versiones FlexUI
