@@ -4,6 +4,7 @@ import { AppState as FlexAppState } from '@twilio/flex-ui';
 import interactionCallCardReducer, {
     InteractionCallCardState,
     setCallCard,
+    setIsLoading
 } from './interactionCallCardState';
 
 // You need to register your redux store(s) under a unique namespace
@@ -13,6 +14,7 @@ export const namespace = 'interactionCallCardState';
 export const actions = {
     interactionCallCard: {
         setCallCard,
+        setIsLoading
     },
 };
 

@@ -43,6 +43,7 @@ export const initializeOutboundCall = async (flex : typeof Flex, manager: Flex.M
         // Invoke the Flex Outbound Call Action
         const { data } = event;
         if (data.from === 'FLEX_SCRIPT') {
+            manager.store.dispatch(actions.interactionCallCard.setCallCard({}))
             if (data.actionType === 'dial') {
                 const response = await loadHubspotData(data, manager);
                 const contact = response.properties ?? {};

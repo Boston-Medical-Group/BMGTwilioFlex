@@ -3,12 +3,14 @@ import { CallCardType } from '../Types';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface InteractionCallCardState {
-    callCard?: CallCardType;
+    callCard?: CallCardType
+    isLoading?: boolean
 }
 
 // Define the initial state for your reducer
 const initialState : InteractionCallCardState = {
     callCard: undefined,
+    isLoading: false
 };
 
 // Create your reducer and actions in one function call
@@ -23,10 +25,14 @@ export const interactionCallCardSlice = createSlice({
             // immutability aspects under the hood for you
             state.callCard = action.payload;
         },
+
+        setIsLoading: (state, action: PayloadAction<boolean>) => {
+            state.isLoading = action.payload
+        }
     },
 });
 
 // You can now export your reducer and actions
 // with none of the old boilerplate
-export const { setCallCard } = interactionCallCardSlice.actions;
+export const { setCallCard, setIsLoading } = interactionCallCardSlice.actions;
 export default interactionCallCardSlice.reducer;

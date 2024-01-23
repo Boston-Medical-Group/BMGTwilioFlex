@@ -5,6 +5,7 @@ export type HubspotContact = {
     hs_object_id?: string
     email?: string
     reservar_cita?: string
+    [key: string]: any
 }
 
 export type HubspotDeal = {
@@ -12,6 +13,7 @@ export type HubspotDeal = {
     dealstage?: string
     hs_object_id?: string
     reservar_cita?: string
+    [key: string]: any
 }
 
 export type CallCardType = {

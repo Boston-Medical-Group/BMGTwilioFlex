@@ -21,7 +21,7 @@ export default class FlexRingbellPlugin extends FlexPlugin {
     const incoming_voice = new Audio('//media.twiliocdn.com/sdk/js/client/sounds/releases/1.0.0/incoming.mp3');
     const incoming_message = new Audio('//media.twiliocdn.com/sdk/js/client/sounds/releases/1.0.0/incoming.mp3');
     incoming_voice.loop = true;
-    incoming_message.loop = true;
+    incoming_message.loop = false;
 
     const workerClient = manager.workerClient;
     if (workerClient) {

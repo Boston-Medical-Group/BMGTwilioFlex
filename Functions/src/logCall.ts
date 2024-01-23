@@ -1,32 +1,33 @@
 import { functionValidator as FunctionTokenValidator } from "twilio-flex-token-validator";
 import { Client as HubspotClient } from "@hubspot/api-client";
 import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types";
-import { SimplePublicObjectInputForCreate } from "@hubspot/api-client/lib/codegen/crm/objects";
-import { SimplePublicObject } from "@hubspot/api-client/lib/codegen/crm/objects";
+import { SimplePublicObjectInputForCreate } from "@hubspot/api-client/lib/codegen/crm/objects/communications";
+import { SimplePublicObject, CollectionResponseWithTotalSimplePublicObjectForwardPaging } from '@hubspot/api-client/lib/codegen/crm/contacts';
 
 type MyContext = {
   HUBSPOT_TOKEN: string,
 }
 
 type MyEvent = {
-  hs_bject_id: string,
-  hs_call_callee_object_id: string,
-  hs_timestamp: string,
-  hs_call_body: string,
-  hs_call_callee_object_type_id: string,
-  hs_call_direction: string,
-  hs_call_disposition: string,
-  hs_call_duration: string,
-  hs_call_from_number: string,
-  hs_call_to_number: string,
-  hs_call_recording_url: string,
-  hs_call_status: string,
-  hubspot_owner_id: string,
+  direction: string
+  hs_bject_id: string
+  hs_call_callee_object_id: string
+  hs_timestamp: string
+  hs_call_body: string
+  hs_call_callee_object_type_id: string
+  hs_call_direction: string
+  hs_call_disposition: string
+  hs_call_duration: string
+  hs_call_from_number: string
+  hs_call_to_number: string
+  hs_call_recording_url: string
+  hs_call_status: string
+  hubspot_owner_id: string
   hubspot_deal_id: string
 }
 
 //@ts-ignore
-exports.handler = FunctionTokenValidator(async function (
+export const handler = FunctionTokenValidator(async function (
   context: Context<MyContext>,
   event: MyEvent,
   callback: ServerlessCallback
@@ -34,7 +35,6 @@ exports.handler = FunctionTokenValidator(async function (
 
   const {
     hs_bject_id,
-    hs_call_callee_object_id,
     hs_timestamp,
     hs_call_body,
     hs_call_callee_object_type_id,
@@ -49,14 +49,46 @@ exports.handler = FunctionTokenValidator(async function (
     hubspot_deal_id
   } = event
 
+  let hs_call_callee_object_id = event.hs_call_callee_object_id
+
   const response = new Twilio.Response();
   response.appendHeader("Access-Control-Allow-Origin", "*");
   response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
   response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
 
+  const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
   try {
     if (!hs_call_callee_object_id) {
-      throw new Error('CRMID Inválido');
+      let fixedNumber = hs_call_direction === 'INBOUND' ? hs_call_from_number : hs_call_to_number
+      // Remove dash, spaces and parenthesis from the number
+      fixedNumber = fixedNumber.replace(/[- )(]/g, '')
+
+      // FIX: si se marca desde dialpad, no tenemos CRMID así que buscamos el telefono en Hubspot
+      const seachedCRMID : string | boolean = await hubspotClient.crm.contacts.searchApi.doSearch({
+        query: fixedNumber,
+        filterGroups: [],
+        limit: 1,
+        after: 0,
+        sorts: ['phone'],
+        properties: ['hs_object_id']
+      }).then((contacts: CollectionResponseWithTotalSimplePublicObjectForwardPaging) => {
+        if (contacts.results.length > 0) {
+          return contacts.results[0].properties.hs_object_id as string
+        } else {
+          return false;
+        }
+      }).catch((error) => {
+        console.log(error)
+        return false
+      })
+
+      if (seachedCRMID !== false) {
+        hs_call_callee_object_id = seachedCRMID as string
+      } else {
+        // SI no tenemos CRMID, algo anda mal porque este se crea en inbounds 
+        // y no debería hacer log a contactos inexistentes en HS
+        throw new Error('CRMID Inválido');
+      }
     }
 
     const toHubspot : SimplePublicObjectInputForCreate = {
@@ -102,26 +134,18 @@ exports.handler = FunctionTokenValidator(async function (
       })
     }
 
-    
-    
-    const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
-    await hubspotClient.crm.objects.calls.basicApi.create(toHubspot)
-      .then((call: SimplePublicObject) => {
-        response.appendHeader("Content-Type", "application/json");
-        response.setBody(call);
-        // Return a success response using the callback function.
-        callback(null, response);
-      }).catch((err) => {
-        response.appendHeader("Content-Type", "plain/text");
-        response.setBody(err.message);
-        response.setStatusCode(500);
-        // If there's an error, send an error response
-        // Keep using the response object for CORS purposes
+    const call = await hubspotClient.crm.objects.calls.basicApi.create(toHubspot)
+      .then((call: SimplePublicObject) => call)
+      .catch((err) => {
         console.error(err);
-        callback(null, response);
+        return {}
       })
-  } catch (err) {
 
+    response.appendHeader("Content-Type", "application/json");
+    response.setBody(call);
+
+    return callback(null, response);
+  } catch (err) {
     if (err instanceof Error) {
       response.appendHeader("Content-Type", "plain/text");
       response.setBody(err.message);
