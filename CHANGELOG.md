@@ -1,5 +1,8 @@
 # Changelog
 
+# 23/01/2024
+* Agrega log a fetchCallerId
+
 # 22/01/2024
 * Modifica comportamiento de tarjeta de interacción
 * Corrige problema de CRMID en log
