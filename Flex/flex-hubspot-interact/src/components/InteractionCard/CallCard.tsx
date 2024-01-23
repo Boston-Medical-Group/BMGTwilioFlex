@@ -62,7 +62,12 @@ const CallCard = ({ manager, contact, deal } : Props) => {
       taskAttributes: {
         name: `${contact.firstname || ''} ${contact?.lastname || ''}`.trim(),
         hubspot_contact_id: contact.hs_object_id,
-        hubspot_deal_id: deal?.hs_object_id
+        hubspot_deal_id: deal?.hs_object_id,
+        customers: {
+          external_id: contact.hs_object_id,
+          phone: contact.phone,
+          email: contact.email
+        }
       }
     });
   }, [selectedQueue]);

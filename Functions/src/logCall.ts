@@ -27,7 +27,7 @@ type MyEvent = {
 }
 
 //@ts-ignore
-exports.handler = FunctionTokenValidator(async function (
+export const handler = FunctionTokenValidator(async function (
   context: Context<MyContext>,
   event: MyEvent,
   callback: ServerlessCallback
@@ -59,9 +59,13 @@ exports.handler = FunctionTokenValidator(async function (
   const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
   try {
     if (!hs_call_callee_object_id) {
+      let fixedNumber = hs_call_direction === 'INBOUND' ? hs_call_from_number : hs_call_to_number
+      // Remove dash, spaces and parenthesis from the number
+      fixedNumber = fixedNumber.replace(/[- )(]/g, '')
+
       // FIX: si se marca desde dialpad, no tenemos CRMID así que buscamos el telefono en Hubspot
       const seachedCRMID : string | boolean = await hubspotClient.crm.contacts.searchApi.doSearch({
-        query: hs_call_direction === 'INBOUND' ? hs_call_from_number : hs_call_to_number,
+        query: fixedNumber,
         filterGroups: [],
         limit: 1,
         after: 0,
@@ -130,23 +134,18 @@ exports.handler = FunctionTokenValidator(async function (
       })
     }
 
-    await hubspotClient.crm.objects.calls.basicApi.create(toHubspot)
-      .then((call: SimplePublicObject) => {
-        response.appendHeader("Content-Type", "application/json");
-        response.setBody(call);
-        // Return a success response using the callback function.
-        callback(null, response);
-      }).catch((err) => {
-        response.appendHeader("Content-Type", "plain/text");
-        response.setBody(err.message);
-        response.setStatusCode(500);
-        // If there's an error, send an error response
-        // Keep using the response object for CORS purposes
+    const call = await hubspotClient.crm.objects.calls.basicApi.create(toHubspot)
+      .then((call: SimplePublicObject) => call)
+      .catch((err) => {
         console.error(err);
-        callback(null, response);
+        return {}
       })
-  } catch (err) {
 
+    response.appendHeader("Content-Type", "application/json");
+    response.setBody(call);
+
+    return callback(null, response);
+  } catch (err) {
     if (err instanceof Error) {
       response.appendHeader("Content-Type", "plain/text");
       response.setBody(err.message);

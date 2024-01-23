@@ -3,6 +3,16 @@ import { Context } from '@twilio-labs/serverless-runtime-types/types';
 import { Callback, functionValidator as FunctionTokenValidator, validator as TokenValidator } from 'twilio-flex-token-validator'
 import * as twilio from 'twilio';
 
+export type HubspotContact = {
+    firstname?: string
+    lastname?: string
+    phone?: string
+    hs_object_id?: string
+    email?: string
+    reservar_cita?: string
+    [key: string]: any
+}
+
 const openAChatTask = async (
     client: twilio.Twilio,
     To: string,
@@ -10,7 +20,7 @@ const openAChatTask = async (
     From: string,
     WorkerConversationIdentity: string,
     channel: any,
-    hubspotContact: object,
+    hubspotContact: HubspotContact,
     hubspot_contact_id: string,
     hubspot_deal_id: string,
     routingProperties: any
@@ -41,7 +51,12 @@ const openAChatTask = async (
                     customerName: customerName,
                     customerAddress: To,
                     twilioNumber: From,
-                    channelType: channel
+                    channelType: channel,
+                    customers: {
+                        external_id: hubspotContact.hs_object_id || null,
+                        phone: hubspotContact.phone || null,
+                        email: hubspotContact.email || null
+                    }
                 },
             },
         }
