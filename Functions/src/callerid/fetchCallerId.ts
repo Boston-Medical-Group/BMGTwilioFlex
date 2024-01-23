@@ -118,7 +118,11 @@ exports.handler = FunctionTokenValidator(async function (
 
       count++
       utils.updateRRCounter(queueSid, count, context)
+      if (callerId === null) {
+        console.log('CALLERID NULL')
+      }
     } catch (err) {
+      console.log(err)
       callerId = null;
     }
 
