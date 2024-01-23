@@ -64,18 +64,12 @@ type CallerIdsResponse = {
   data: Array<ItemResponse<CallerIdAttributes>>
 }
 
-
-
 //@ts-ignore
-/*
 exports.handler = FunctionTokenValidator(async function (
   context: Context<MyContext>,
   event: MyEvent,
   callback: ServerlessCallback
-) {*/
-  exports.handler = async function (context: Context<MyContext>,
-    event: MyEvent,
-    callback: ServerlessCallback) {
+) {
   const {
     Token
   } = event;
@@ -108,7 +102,12 @@ exports.handler = FunctionTokenValidator(async function (
           'Authorization': `Bearer ${context.FLEXMANAGER_API_KEY}`
         }
       })
-        .then(async (res) => await res.json())
+        .then(async (res) => {
+          console.log(res)
+          return await res.json()
+        })
+      
+      console.log(callerIdsResponse)
       
       count = await utils.getRRCounter(queryQueue, context) || 0;
       if (count >= callerIdsResponse.meta.page.total) {
@@ -154,5 +153,4 @@ exports.handler = FunctionTokenValidator(async function (
     }
 
   }
-//})
-}
+})
