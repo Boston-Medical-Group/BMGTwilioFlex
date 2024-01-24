@@ -36,6 +36,7 @@ const openAChatTask = async (
                     proxy_address: From,
                 },
             ],
+            xTwilioWebhookEnabled: true
         },
         routing: {
             properties: {
@@ -63,6 +64,8 @@ const openAChatTask = async (
     });
 
     const taskAttributes = JSON.parse(interaction.routing.properties.attributes);
+
+    client.conversations.v1.conversations(taskAttributes.conversationSid).webhooks.
 
     return {
         success: true,
