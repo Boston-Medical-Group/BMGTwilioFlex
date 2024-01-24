@@ -26,13 +26,12 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
       await getCalendarUrl(task)
         .then(({ calendarUrl }: { calendarUrl: string }) => {
           if (calendarUrl !== null && calendarUrl !== '') {
-            setPollCounter(pollCounter + 1)
             setCalendarUrl(calendarUrl ?? '')
           }
         }).catch(err => {
-          setPollCounter(pollCounter + 1)
           setCalendarUrl('')
         }).finally(() => {
+          setPollCounter(pollCounter + 1)
           if (pollCounter > 5) {
             setIsPollingEnabled(false)
           }
