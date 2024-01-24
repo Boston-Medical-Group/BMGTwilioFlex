@@ -31,7 +31,7 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
       await getCalendarUrl(task)
         .then(({ calendarUrl }: { calendarUrl: string }) => {
           if (calendarUrl !== null && calendarUrl !== '') {
-            setPollCounter(0)
+            //setPollCounter(0)
             setCalendarUrl(calendarUrl)
             setRunPoll(false)
           }
