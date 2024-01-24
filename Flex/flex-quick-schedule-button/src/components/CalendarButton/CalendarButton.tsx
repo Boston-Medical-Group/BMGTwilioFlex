@@ -14,6 +14,7 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
   const { getCalendarUrl } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
   const [isLoading, setIsLoading] = useState(false)
+  const [pollCounter, setPollCounter] = useState(0)
   const [calendarUrl, setCalendarUrl] = useState('')
   const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
@@ -25,10 +26,16 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
       await getCalendarUrl(task)
         .then(({ calendarUrl }: { calendarUrl: string }) => {
           if (calendarUrl !== null && calendarUrl !== '') {
+            setPollCounter(pollCounter + 1)
             setCalendarUrl(calendarUrl ?? '')
           }
         }).catch(err => {
+          setPollCounter(pollCounter + 1)
           setCalendarUrl('')
+        }).finally(() => {
+          if (pollCounter > 5) {
+            setIsPollingEnabled(false)
+          }
         })
     };
 
