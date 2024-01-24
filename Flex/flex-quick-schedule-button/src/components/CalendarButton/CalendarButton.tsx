@@ -39,6 +39,7 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
           //setCalendarUrl('')
         }).finally(() => {
           setPollCounter(pollCounter + 1)
+          console.log(pollCounter)
           if (pollCounter > 5) {
             setPollCounter(0)
             setRunPoll(false)
