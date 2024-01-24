@@ -65,8 +65,6 @@ const openAChatTask = async (
 
     const taskAttributes = JSON.parse(interaction.routing.properties.attributes);
 
-    client.conversations.v1.conversations(taskAttributes.conversationSid).webhooks.
-
     return {
         success: true,
         interactionSid: interaction.sid,
