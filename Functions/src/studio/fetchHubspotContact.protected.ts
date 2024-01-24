@@ -47,7 +47,7 @@ exports.handler = async function (
             result.lastname = `${contact.properties.lastname}`;
             result.fullname = `${contact.properties.firstname ?? ''} ${contact.properties.lastname ?? ''}`;
             result.lifecyclestage = `${contact.properties?.lifecyclestage ?? 'lead'}`;
-            if ((result.lifecyclestage != 'lead') && (result.lifecyclestage != 'marketingqualifiedlead') && (result.lifecyclestage != 'opportunity')) {
+            if ((result.lifecyclestage != 'lead') && (result.lifecyclestage != 'marketingqualifiedlead') && (result.lifecyclestage != 'opportunity' && (result.lifecyclestage !== 'subscriber'))) {
                 result.leadorpatient = 'patient';
             }
             if (result.fullname.trim() == '') {
