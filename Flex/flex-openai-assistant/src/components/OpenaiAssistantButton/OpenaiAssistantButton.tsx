@@ -63,6 +63,7 @@ export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
                 }).finally(() => {
                     setPollCounter(pollCounter + 1)
                     if (pollCounter > 5) {
+                        setPollCounter(0)
                         setRunData(null)
                         setIsPollingEnabled(false)
                     }
