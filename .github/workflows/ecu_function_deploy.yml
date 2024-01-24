@@ -48,6 +48,8 @@ jobs:
           FLEXMANAGER_API_URL: ${{vars.FLEXMANAGER_API_URL}}
           COUNTRY: ${{vars.COUNTRY}}
           FLEX_APP_OUTBOUND_WHATSAPP_QUEUE_SID: ${{vars.FLEX_APP_OUTBOUND_WHATSAPP_QUEUE_SID}}
+          OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
+          OPENAI_ASSITANT_ID: ${{vars.OPENAI_ASSITANT_ID}}
         run: twilio serverless:deploy --env .env.example --load-system-env --environment=dev --force -n bmg-elexial-cc-stack --override-existing-project -l=debug
 
   
