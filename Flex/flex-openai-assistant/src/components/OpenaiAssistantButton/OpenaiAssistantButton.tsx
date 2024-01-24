@@ -3,7 +3,6 @@ import { Button, Spinner, Box } from "@twilio-paste/core"
 import { NewIcon } from "@twilio-paste/icons/esm/NewIcon"
 import { useCallback, useState, useEffect, useRef } from "react"
 import useApi from "../../hooks/useApi"
-import OpenAI from "openai"
 
 type MyProps = {
     task: Flex.ITask
@@ -14,7 +13,7 @@ type RunData = {
     thread_id: string
     run_id: string
 }
-type RunResult = {} & OpenAI.Beta.Threads.Runs.Run
+type RunResult = null | RunData
 
 export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
 
@@ -35,10 +34,10 @@ export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
         await createRun({
             conversation_sid: conversationSid
         }).then(async (run: RunResult) => {
-            if (run.id) {
+            if (run !== null) {
                 setRunData({
                     thread_id: run.thread_id,
-                    run_id: run.id
+                    run_id: run.run_id
                 })
             }
         })
@@ -111,7 +110,7 @@ export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
 
     return (
         <Box marginRight="space30">
-            <Button variant="secondary" size="circle" onClick={handleIAGenerate}>
+            <Button variant="secondary" size="circle" disabled={isLoading} onClick={handleIAGenerate}>
                 {isLoading &&
                     <Spinner decorative={false} title="Loading" />}
                 
