@@ -18,6 +18,11 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
   const [calendarUrl, setCalendarUrl] = useState('')
   const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
+  const [runPoll, setRunPoll] = useState(false)
+
+  useEffect(() => {
+    setRunPoll(true)
+  }, [])
 
   useEffect(() => {
     setIsLoading(true)
@@ -26,13 +31,15 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
       await getCalendarUrl(task)
         .then(({ calendarUrl }: { calendarUrl: string }) => {
           if (calendarUrl !== null && calendarUrl !== '') {
-            setCalendarUrl(calendarUrl ?? '')
+            setCalendarUrl(calendarUrl)
+            setRunPoll(false)
           }
         }).catch(err => {
           setCalendarUrl('')
         }).finally(() => {
           setPollCounter(pollCounter + 1)
           if (pollCounter > 5) {
+            setRunPoll(false)
             setIsPollingEnabled(false)
           }
         })
@@ -47,7 +54,7 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
       clearInterval(timerIdRef.current);
     };
 
-    if (calendarUrl === null || calendarUrl === '') {
+    if (runPoll && (calendarUrl === null || calendarUrl === '')) {
       startPolling();
     } else {
       stopPolling();
@@ -56,7 +63,7 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
     return () => {
       stopPolling();
     };
-  }, [calendarUrl, isPollingEnabled])
+  }, [runPoll, isPollingEnabled])
 
   const sendCalendarHandler = useCallback(() => {
     window.open(calendarUrl, '_blank');
