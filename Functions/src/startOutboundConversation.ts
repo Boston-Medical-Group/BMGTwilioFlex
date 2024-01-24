@@ -36,7 +36,8 @@ const openAChatTask = async (
                     proxy_address: From,
                 },
             ],
-            xTwilioWebhookEnabled: true
+            xTwilioWebhookEnabled: true,
+            friendlyName: `Outbound: ${From} -> ${To}`,
         },
         routing: {
             properties: {
@@ -44,6 +45,7 @@ const openAChatTask = async (
                 task_channel_unique_name: channel === 'whatsapp' ? 'chat' : channel,
                 attributes: {
                     hubspotContact,
+                    xTwilioWebhookEnabled: true,
                     name: customerName,
                     hubspot_contact_id,
                     hubspot_deal_id,
