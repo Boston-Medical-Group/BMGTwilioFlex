@@ -1,5 +1,9 @@
 # Changelog
 
+# 24/01/2024
+* Agrega funcion IA
+* Modifica comportamiento IA
+
 # 23/01/2024
 * Agrega log a fetchCallerId
 
