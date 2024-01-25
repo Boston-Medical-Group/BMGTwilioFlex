@@ -34,6 +34,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
     const [isErrorsOpen, setIsErrorsOpen] = useState(false);
     const conversationSid = task.attributes.conversationSid ?? task.attributes.channelSid;
     const inputState = useFlexSelector((state) => state.flex.chat.conversationInput[conversationSid]?.inputText);
+    const [workerAttributes, setWorkerAttributes] = useState(manager.workerClient?.attributes)
 
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
@@ -90,6 +91,11 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                 hubspot_id: task.attributes.hubspot_contact_id ?? null,
                 contact_id: task.attributes.hubspot_contact_id ?? null,
                 deal_id: task.attributes.hubspot_deal_id ?? null,
+            },
+            flex: {
+                agent: {
+                    full_name: workerAttributes?.full_name ?? 'Agente',
+                }
             }
         })
             .then((data) => { setTemplateList(data) })
