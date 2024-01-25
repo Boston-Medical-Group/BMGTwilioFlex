@@ -16,9 +16,9 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [pollCounter, setPollCounter] = useState(0)
   const [calendarUrl, setCalendarUrl] = useState('')
-  const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
   const [runPoll, setRunPoll] = useState(false)
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | undefined>()
 
   // Escribe código para React que haga poll a un servicio ajax cada 5 segundos hasta recibir un resultado esperado o hasta que lo haya intentado 4 veces.
   useEffect(() => {
@@ -28,24 +28,24 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
       if (response.calendarUrl !== null && response.calendarUrl !== '') {
         setIsLoading(false)
         setCalendarUrl(response.calendarUrl)
-        clearInterval(timerIdRef.current);
+        clearInterval(timerId);
       } else {
         setPollCounter((prevCounter) => prevCounter + 1);
 
         if (pollCounter >= 5) {
           setIsLoading(false)
-          clearInterval(timerIdRef.current);
+          clearInterval(timerId);
         }
       }
     };
 
-    timerIdRef.current = setInterval(pollingCallback, 5000);
+    setTimerId(setInterval(pollingCallback, 5000))
 
     return () => {
       setIsLoading(false)
-      clearInterval(timerIdRef.current);
+      clearInterval(timerId);
     };
-  }, []);
+  }, [timerId]);
 
   const sendCalendarHandler = useCallback(() => {
     window.open(calendarUrl, '_blank');
