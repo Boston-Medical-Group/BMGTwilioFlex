@@ -32,7 +32,6 @@ export const handler = (
     conversations.abandoned_phase = "IVR";
     conversations.communication_channel = "IVR";
     conversations.IVR_time_start = timestamp.getTime();
-WorkspaceContextImpl
     client.taskrouter.v1
         .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
         .tasks.create({

@@ -47,7 +47,7 @@ export const handler = (
             }
 
             //update the task
-            client.taskrouter.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
+            client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
                 .tasks(taskSid)
                 .update({
                     assignmentStatus: 'canceled',
