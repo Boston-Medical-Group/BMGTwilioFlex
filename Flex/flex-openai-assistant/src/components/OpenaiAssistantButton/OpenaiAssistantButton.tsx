@@ -17,7 +17,7 @@ type RunResult = null | RunData
 
 export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
 
-    const { createRun, getRunStatus } = useApi({ token: process.env.FLEX_APP_TWILIO_SERVERLESS_TOKEN as string });
+    const { createRun, getRunStatus } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
     const [isLoading, setIsLoading] = useState(false);
     const [pollCounter, setPollCounter] = useState(0)
