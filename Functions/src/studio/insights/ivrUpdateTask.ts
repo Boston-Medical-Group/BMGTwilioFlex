@@ -2,7 +2,7 @@ import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-typ
 
 
 type MyContext = {
-    TWILIO_WORKSPACE_SID: string
+    TASK_ROUTER_WORKSPACE_SID: string
 }
 
 type MyEvent = {
@@ -24,7 +24,7 @@ export const handler = (
 
     const taskFilter = `conversations.conversation_id == '${callSid}'`
 
-    client.taskrouter.v1.workspaces(context.TWILIO_WORKSPACE_SID)
+    client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
         .tasks
         .list({ evaluateTaskAttributes: taskFilter })
         .then(tasks => {
@@ -47,7 +47,7 @@ export const handler = (
             }
 
             //update the task
-            client.taskrouter.workspaces(context.TWILIO_WORKSPACE_SID)
+            client.taskrouter.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
                 .tasks(taskSid)
                 .update({
                     assignmentStatus: 'canceled',

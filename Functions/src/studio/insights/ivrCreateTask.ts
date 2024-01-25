@@ -1,8 +1,9 @@
 import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types";
+import { WorkspaceContextImpl } from "twilio/lib/rest/taskrouter/v1/workspace";
 
 type MyContext = {
-    TWILIO_WORKSPACE_SID: string
-    TWILIO_NOBODY_WORKFLOW_SID: string
+    TASK_ROUTER_WORKSPACE_SID: string
+    TASK_ROUTER_NOBODY_WORKFLOW_SID: string
 }
 
 type MyEvent = {
@@ -31,12 +32,12 @@ export const handler = (
     conversations.abandoned_phase = "IVR";
     conversations.communication_channel = "IVR";
     conversations.IVR_time_start = timestamp.getTime();
-
+WorkspaceContextImpl
     client.taskrouter.v1
-        .workspaces(context.TWILIO_WORKSPACE_SID)
+        .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
         .tasks.create({
             attributes: JSON.stringify({ "from": from, conversations }),
-            workflowSid: context.TWILIO_NOBODY_WORKFLOW_SID,
+            workflowSid: context.TASK_ROUTER_NOBODY_WORKFLOW_SID,
             timeout: 300
         }).then(() => {
             callback(null);
