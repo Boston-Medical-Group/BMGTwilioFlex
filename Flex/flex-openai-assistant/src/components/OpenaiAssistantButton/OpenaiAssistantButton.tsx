@@ -37,9 +37,8 @@ const AssitantButton = ({ task, manager }: MyProps) => {
     const conversationSid = task.attributes.conversationSid ?? task.attributes.channelSid;
     const inputState = Flex.useFlexSelector((state) => state.flex.chat.conversationInput[conversationSid]?.inputText);
 
-    const [runPoll, setRunPoll] = useState(false)
-
     const handleIAGenerate = async () => {
+        console.log('SHOWING SPINNER')
         setShowSpinner(true)
         await createRun({
             conversation_sid: conversationSid
@@ -56,7 +55,7 @@ const AssitantButton = ({ task, manager }: MyProps) => {
         })
     }
 
-    const { isLoading, isError, data } = useQuery({
+    const { isLoading, isInitialLoading, isError, data } = useQuery({
         //@ts-ignore
         queryKey: ['iaMessage'],
         queryFn: async () => getRunStatus(runData).then((msg: { code: string, body: string | null }) => {
@@ -99,11 +98,11 @@ const AssitantButton = ({ task, manager }: MyProps) => {
 
     return (
         <Box marginRight="space30">
-            <Button variant="secondary" size="circle" disabled={isLoading || showSpinner} onClick={handleIAGenerate}>
-                {(isLoading || showSpinner) &&
+            <Button variant="secondary" size="circle" disabled={isInitialLoading || showSpinner} onClick={handleIAGenerate}>
+                {(isInitialLoading || showSpinner) &&
                     <Spinner decorative={false} title="Loading" />}
                 
-                {(!isLoading && !showSpinner) &&
+                {(!isInitialLoading && !showSpinner) &&
                     <NewIcon decorative={false} title="Generar respuesta con IA" />}
             </Button>
         </Box>
