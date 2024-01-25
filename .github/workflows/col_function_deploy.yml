@@ -1,12 +1,5 @@
 name: Twilio Functions - COLOMBIA
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Functions/*'
-      - 'CHANGELOG.md'
-      - 'CHANGELOG_COL.md'
   pull_request:
     branches:
       - main

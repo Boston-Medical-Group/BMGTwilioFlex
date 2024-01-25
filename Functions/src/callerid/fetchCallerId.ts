@@ -70,6 +70,7 @@ exports.handler = FunctionTokenValidator(async function (
   event: MyEvent,
   callback: ServerlessCallback
 ) {
+  const PAGE_SIZE = 150
   const {
     Token
   } = event;
@@ -94,7 +95,7 @@ exports.handler = FunctionTokenValidator(async function (
       
       const defaultQueue = countryResponse.data.attributes.defaultQueue
       const queryQueue = event.queueSid || defaultQueue
-      const callerIdsResponse: CallerIdsResponse = await fetch(`${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${queryQueue}`, {
+      const callerIdsResponse: CallerIdsResponse = await fetch(`${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${queryQueue}&page[size]=${PAGE_SIZE}`, {
         method: "GET",
         headers: {
           'Content-Type': 'application/vnd.api+json',
@@ -102,17 +103,14 @@ exports.handler = FunctionTokenValidator(async function (
         }
       })
         .then(async (res) => {
-          console.log(res)
           return await res.json()
         })
       
-      console.log(JSON.stringify(callerIdsResponse.data))
       
       count = await utils.getRRCounter(queryQueue, context) || 0;
       if (count >= callerIdsResponse.meta.page.total) {
         count = 0;
       }
-      console.log('FETCHINGCALLERID', JSON.stringify(callerIdsResponse.data.at(count)))
       callerId = callerIdsResponse.data.at(count)?.attributes.ddi || null;
 
       count++
