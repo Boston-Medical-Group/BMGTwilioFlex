@@ -20,53 +20,32 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
   const [runPoll, setRunPoll] = useState(false)
 
-  useEffect(() => {
-    setRunPoll(true)
-  }, [])
-
+  // Escribe código para React que haga poll a un servicio ajax cada 5 segundos hasta recibir un resultado esperado o hasta que lo haya intentado 4 veces.
   useEffect(() => {
     setIsLoading(true)
-    
     const pollingCallback = async () => {
-      await getCalendarUrl(task)
-        .then(({ calendarUrl }: { calendarUrl: string }) => {
-          if (calendarUrl !== null && calendarUrl !== '') {
-            //setPollCounter(0)
-            setCalendarUrl(calendarUrl)
-            setRunPoll(false)
-          }
-        }).catch(err => {
-          //setCalendarUrl('')
-        }).finally(() => {
-          setPollCounter(pollCounter + 1)
-          console.log(pollCounter)
-          if (pollCounter > 5) {
-            setPollCounter(0)
-            setRunPoll(false)
-            setIsPollingEnabled(false)
-          }
-        })
+      const response = await getCalendarUrl(task)
+      if (response.calendarUrl !== null && response.calendarUrl !== '') {
+        setIsLoading(false)
+        setCalendarUrl(response.calendarUrl)
+        clearInterval(timerIdRef.current);
+      } else {
+        setPollCounter((prevCounter) => prevCounter + 1);
+
+        if (pollCounter >= 5) {
+          setIsLoading(false)
+          clearInterval(timerIdRef.current);
+        }
+      }
     };
 
-    const startPolling = () => {
-      timerIdRef.current = setInterval(pollingCallback, 5000);
-    };
+    timerIdRef.current = setInterval(pollingCallback, 5000);
 
-    const stopPolling = () => {
+    return () => {
       setIsLoading(false)
       clearInterval(timerIdRef.current);
     };
-
-    if (runPoll && (calendarUrl === null || calendarUrl === '')) {
-      startPolling();
-    } else {
-      stopPolling();
-    }
-
-    return () => {
-      stopPolling();
-    };
-  }, [runPoll, isPollingEnabled])
+  }, []);
 
   const sendCalendarHandler = useCallback(() => {
     window.open(calendarUrl, '_blank');
