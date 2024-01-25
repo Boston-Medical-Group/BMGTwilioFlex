@@ -32,7 +32,7 @@ export const handler = (
     conversations.communication_channel = "IVR";
     conversations.IVR_time_start = timestamp.getTime();
 
-    client.taskrouter
+    client.taskrouter.v1
         .workspaces(context.TWILIO_WORKSPACE_SID)
         .tasks.create({
             attributes: JSON.stringify({ "from": from, conversations }),

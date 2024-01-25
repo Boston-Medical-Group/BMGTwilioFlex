@@ -24,7 +24,7 @@ export const handler = (
 
     const taskFilter = `conversations.conversation_id == '${callSid}'`
 
-    client.taskrouter.workspaces(context.TWILIO_WORKSPACE_SID)
+    client.taskrouter.v1.workspaces(context.TWILIO_WORKSPACE_SID)
         .tasks
         .list({ evaluateTaskAttributes: taskFilter })
         .then(tasks => {
