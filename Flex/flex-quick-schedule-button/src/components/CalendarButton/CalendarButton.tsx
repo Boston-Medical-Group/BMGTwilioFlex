@@ -4,6 +4,9 @@ import { CalendarIcon } from '@twilio-paste/icons/esm/CalendarIcon'
 import { Spinner } from '@twilio-paste/core/spinner'
 import { Flex } from '@twilio/flex-ui/src/FlexGlobal'
 import useApi from '../../hooks/useApi'
+import { useQuery, QueryClient, QueryClientProvider, useMutation, useQueryClient } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 type MyProps = {
   manager: Flex.Manager
@@ -11,74 +14,56 @@ type MyProps = {
 }
 
 export const CalendarButton = ({ manager, task }: MyProps) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <QuickScheduleButton manager={manager} task={task} />
+    </QueryClientProvider>
+  )
+}
+
+const QuickScheduleButton = ({ manager, task }: MyProps) => {
   const { getCalendarUrl } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
-  const [isLoading, setIsLoading] = useState(false)
+  //const queryClient = useQueryClient()
+
   const [pollCounter, setPollCounter] = useState(0)
   const [calendarUrl, setCalendarUrl] = useState('')
   const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
-  const [runPoll, setRunPoll] = useState(false)
+  const [runPoll, setRunPoll] = useState(true)
 
-  useEffect(() => {
-    setRunPoll(true)
+  const { isLoading, isError, data, error } = useQuery({
+    //@ts-ignore
+    queryKey: ['todos'],
+    queryFn: async () => getCalendarUrl(task).then((result) => {
+        if (result.calendarUrl === '') {
+          throw new Error('URL not found')
+        } else {
+          return result
+        }
+      }),
+    retry: 3,
+  })
+  
+
+  
+
+  const sendCalendarHandler = useCallback((data) => {
+    window.open(data.calendarUrl, '_blank');
   }, [])
 
-  useEffect(() => {
-    setIsLoading(true)
-    
-    const pollingCallback = async () => {
-      await getCalendarUrl(task)
-        .then(({ calendarUrl }: { calendarUrl: string }) => {
-          if (calendarUrl !== null && calendarUrl !== '') {
-            //setPollCounter(0)
-            setCalendarUrl(calendarUrl)
-            setRunPoll(false)
-          }
-        }).catch(err => {
-          //setCalendarUrl('')
-        }).finally(() => {
-          setPollCounter(pollCounter + 1)
-          console.log(pollCounter)
-          if (pollCounter > 5) {
-            setPollCounter(0)
-            setRunPoll(false)
-            setIsPollingEnabled(false)
-          }
-        })
-    };
+  if (isLoading) {
+    return null
+  }
 
-    const startPolling = () => {
-      timerIdRef.current = setInterval(pollingCallback, 5000);
-    };
-
-    const stopPolling = () => {
-      setIsLoading(false)
-      clearInterval(timerIdRef.current);
-    };
-
-    if (runPoll && (calendarUrl === null || calendarUrl === '')) {
-      startPolling();
-    } else {
-      stopPolling();
-    }
-
-    return () => {
-      stopPolling();
-    };
-  }, [runPoll, isPollingEnabled])
-
-  const sendCalendarHandler = useCallback(() => {
-    window.open(calendarUrl, '_blank');
-  }, [calendarUrl])
-
-  if (calendarUrl === '') {
+  //@ts-ignore
+  if (isError || data?.calendarUrl === '') {
     return null
   }
 
   return (
-    <>
-      <Button variant="primary" onClick={sendCalendarHandler} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
+    //@ts-ignore
+      <Button variant="primary" onClick={sendCalendarHandler(data?.calendarUrl)} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
         {isLoading ? (
           <Spinner size='sizeIcon10' decorative={false} title='Loading' />
         ) : (
@@ -88,6 +73,5 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
           />
         )}
       </Button>
-    </>
   )
 }
