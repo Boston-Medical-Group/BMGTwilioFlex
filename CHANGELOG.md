@@ -1,5 +1,10 @@
 # Changelog
 
+# 25/01/2024
+* Corrige variables de entorno
+* Corrige polling
+* Implementa ReactQuery
+
 # 24/01/2024
 * Agrega funcion IA
 * Modifica comportamiento IA
