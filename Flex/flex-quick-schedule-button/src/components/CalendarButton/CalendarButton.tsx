@@ -34,22 +34,18 @@ const QuickScheduleButton = ({ manager, task }: MyProps) => {
 
   const { isLoading, isError, data, error } = useQuery({
     //@ts-ignore
-    queryKey: ['todos'],
+    queryKey: ['calendarUrl'],
     queryFn: async () => getCalendarUrl(task).then((result) => {
         if (result.calendarUrl === '') {
+          setRunPoll(false)
           throw new Error('URL not found')
         } else {
+          setRunPoll(false)
           return result
         }
       }),
     retry: 3,
-  })
-  
-
-  
-
-  const sendCalendarHandler = useCallback((data) => {
-    window.open(data.calendarUrl, '_blank');
+    enabled: runPoll
   }, [])
 
   if (isLoading) {
@@ -63,7 +59,7 @@ const QuickScheduleButton = ({ manager, task }: MyProps) => {
 
   return (
     //@ts-ignore
-      <Button variant="primary" onClick={sendCalendarHandler(data?.calendarUrl)} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
+    <Button variant="primary" href={data.calendarUrl} target="_blank" isLink={true} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
         {isLoading ? (
           <Spinner size='sizeIcon10' decorative={false} title='Loading' />
         ) : (
