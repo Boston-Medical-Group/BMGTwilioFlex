@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useState } from 'react'
 import { Button, ITask } from '@twilio/flex-ui'
 import { CalendarIcon } from '@twilio-paste/icons/esm/CalendarIcon'
 import { Spinner } from '@twilio-paste/core/spinner'
@@ -26,13 +26,9 @@ const QuickScheduleButton = ({ manager, task }: MyProps) => {
 
   //const queryClient = useQueryClient()
 
-  const [pollCounter, setPollCounter] = useState(0)
-  const [calendarUrl, setCalendarUrl] = useState('')
-  const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
-  const [isPollingEnabled, setIsPollingEnabled] = useState(true);
   const [runPoll, setRunPoll] = useState(task?.attributes?.hubspot_contact_id !== '' || task?.attributes?.hubspot_deal_id !== '')
 
-  const { isLoading, isError, data, error } = useQuery({
+  const { isLoading, isError, data } = useQuery({
     //@ts-ignore
     queryKey: ['calendarUrl'],
     queryFn: async () => getCalendarUrl(task).then((result) => {
