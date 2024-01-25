@@ -1,9 +1,12 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react'
+import React, { useState } from 'react'
 import { Button, ITask } from '@twilio/flex-ui'
 import { CalendarIcon } from '@twilio-paste/icons/esm/CalendarIcon'
 import { Spinner } from '@twilio-paste/core/spinner'
 import { Flex } from '@twilio/flex-ui/src/FlexGlobal'
 import useApi from '../../hooks/useApi'
+import { useQuery, QueryClient, QueryClientProvider, useMutation, useQueryClient } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 type MyProps = {
   manager: Flex.Manager
@@ -11,65 +14,48 @@ type MyProps = {
 }
 
 export const CalendarButton = ({ manager, task }: MyProps) => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <QuickScheduleButton manager={manager} task={task} />
+    </QueryClientProvider>
+  )
+}
+
+const QuickScheduleButton = ({ manager, task }: MyProps) => {
   const { getCalendarUrl } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [pollCounter, setPollCounter] = useState(0)
-  const [calendarUrl, setCalendarUrl] = useState('')
-  const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
-  const [isPollingEnabled, setIsPollingEnabled] = useState(true);
+  //const queryClient = useQueryClient()
 
-  useEffect(() => {
-    setIsLoading(true)
-    
-    const pollingCallback = async () => {
-      await getCalendarUrl(task)
-        .then(({ calendarUrl }: { calendarUrl: string }) => {
-          if (calendarUrl !== null && calendarUrl !== '') {
-            setPollCounter(pollCounter + 1)
-            setCalendarUrl(calendarUrl ?? '')
-          }
-        }).catch(err => {
-          setPollCounter(pollCounter + 1)
-          setCalendarUrl('')
-        }).finally(() => {
-          if (pollCounter > 5) {
-            setIsPollingEnabled(false)
-          }
-        })
-    };
+  const [runPoll, setRunPoll] = useState(task?.attributes?.hubspot_contact_id !== '' || task?.attributes?.hubspot_deal_id !== '')
 
-    const startPolling = () => {
-      timerIdRef.current = setInterval(pollingCallback, 5000);
-    };
+  const { isLoading, isError, data } = useQuery({
+    //@ts-ignore
+    queryKey: ['calendarUrl'],
+    queryFn: async () => getCalendarUrl(task).then((result) => {
+        if (result.calendarUrl === '') {
+          setRunPoll(false)
+          throw new Error('URL not found')
+        } else {
+          setRunPoll(false)
+          return result
+        }
+      }),
+    retry: 3,
+    enabled: runPoll
+  }, [])
 
-    const stopPolling = () => {
-      setIsLoading(false)
-      clearInterval(timerIdRef.current);
-    };
+  if (isLoading) {
+    return null
+  }
 
-    if (calendarUrl === null || calendarUrl === '') {
-      startPolling();
-    } else {
-      stopPolling();
-    }
-
-    return () => {
-      stopPolling();
-    };
-  }, [calendarUrl, isPollingEnabled])
-
-  const sendCalendarHandler = useCallback(() => {
-    window.open(calendarUrl, '_blank');
-  }, [calendarUrl])
-
-  if (calendarUrl === '') {
+  //@ts-ignore
+  if (isError || data?.calendarUrl === '') {
     return null
   }
 
   return (
-    <>
-      <Button variant="primary" onClick={sendCalendarHandler} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
+    //@ts-ignore
+    <Button variant="primary" href={data.calendarUrl} target="_blank" isLink={true} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
         {isLoading ? (
           <Spinner size='sizeIcon10' decorative={false} title='Loading' />
         ) : (
@@ -79,6 +65,5 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
           />
         )}
       </Button>
-    </>
   )
 }

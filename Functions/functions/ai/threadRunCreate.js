@@ -41,8 +41,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
 var openai_1 = __importDefault(require("openai"));
-var handler = function (context, event, callback) { return __awaiter(void 0, void 0, void 0, function () {
-    var response, client, threadId, openai, run;
+var twilio_flex_token_validator_1 = require("twilio-flex-token-validator");
+//@ts-ignore
+exports.handler = (0, twilio_flex_token_validator_1.functionValidator)(function (context, event, callback) { return __awaiter(void 0, void 0, void 0, function () {
+    var response, client, threadMessages, openai, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -50,58 +52,74 @@ var handler = function (context, event, callback) { return __awaiter(void 0, voi
                 response.appendHeader("Access-Control-Allow-Origin", "*");
                 response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
                 response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
-                response.setStatusCode(200);
+                response.appendHeader("Content-Type", "application/json");
                 if (!event.conversation_sid) {
                     response.setStatusCode(404);
                     response.setBody({});
                     callback(null, response);
                 }
                 client = context.getTwilioClient();
-                return [4 /*yield*/, client.conversations.v1.conversations(event.conversation_sid).fetch()
-                        .then(function (conversation) { return __awaiter(void 0, void 0, void 0, function () {
-                        var conversationAttributes;
+                threadMessages = [];
+                //Obtiene los mensajes de la conversacion
+                return [4 /*yield*/, client.conversations.v1.conversations(event.conversation_sid).messages.list({
+                        limit: 20,
+                        order: 'desc'
+                    }).then(function (messages) { return __awaiter(void 0, void 0, void 0, function () {
                         return __generator(this, function (_a) {
-                            conversationAttributes = JSON.parse(conversation.attributes);
-                            if (!conversationAttributes.thread_id) {
-                                return [2 /*return*/, null];
+                            messages.map(function (message) {
+                                threadMessages.push({
+                                    role: "user",
+                                    content: message.body
+                                });
+                            });
+                            return [2 /*return*/];
+                        });
+                    }); })];
+            case 1:
+                //Obtiene los mensajes de la conversacion
+                _a.sent();
+                openai = new openai_1.default({ apiKey: context.OPENAI_API_KEY });
+                return [4 /*yield*/, openai.beta.threads.create({
+                        messages: threadMessages
+                    }).then(function (thread) { return __awaiter(void 0, void 0, void 0, function () {
+                        var run;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, openai.beta.threads.runs.create(thread.id, {
+                                        assistant_id: context.OPENAI_ASSITANT_ID
+                                    })
+                                        .then(function (run) { return (run); })
+                                        .catch(function (error) {
+                                        console.log(error);
+                                        return null;
+                                    })];
+                                case 1:
+                                    run = _a.sent();
+                                    return [2 /*return*/, {
+                                            thread_id: thread.id,
+                                            run_id: run === null || run === void 0 ? void 0 : run.id
+                                        }];
                             }
-                            return [2 /*return*/, conversationAttributes.thread_id];
                         });
                     }); }).catch(function (error) {
-                        console.log(error);
-                        return null;
-                    })];
-            case 1:
-                threadId = _a.sent();
-                if (!threadId || threadId === null) {
-                    response.setStatusCode(404);
-                    response.setBody({});
-                    callback(null, response);
-                }
-                openai = new openai_1.default({ apiKey: context.OPENAI_API_KEY });
-                return [4 /*yield*/, openai.beta.threads.runs.create(threadId, {
-                        assistant_id: context.OPENAI_ASSITANT_ID
-                    })
-                        .then(function (run) { return (run); })
-                        .catch(function (error) {
-                        console.log(error);
+                        console.error(error);
                         return null;
                     })];
             case 2:
-                run = _a.sent();
-                if (!run || run === null) {
+                result = _a.sent();
+                if (!result) {
                     console.log('NO RUN FOUND');
                     response.setStatusCode(400);
                     response.setBody({});
                     callback(null, response);
                 }
                 else {
-                    response.setBody(run);
+                    response.setStatusCode(200);
+                    response.setBody(result);
                     callback(null, response);
                 }
                 return [2 /*return*/];
         }
     });
-}); };
-exports.handler = handler;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWFkUnVuQ3JlYXRlLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2FpL3RocmVhZFJ1bkNyZWF0ZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFDQSxrREFBNEI7QUFnQnJCLElBQU0sT0FBTyxHQUFHLFVBQ25CLE9BQTJCLEVBQzNCLEtBQWMsRUFDZCxRQUE0Qjs7Ozs7Z0JBRXRCLFFBQVEsR0FBRyxJQUFJLE1BQU0sQ0FBQyxRQUFRLEVBQUUsQ0FBQztnQkFDdkMsUUFBUSxDQUFDLFlBQVksQ0FBQyw2QkFBNkIsRUFBRSxHQUFHLENBQUMsQ0FBQztnQkFDMUQsUUFBUSxDQUFDLFlBQVksQ0FBQyw4QkFBOEIsRUFBRSxrQkFBa0IsQ0FBQyxDQUFDO2dCQUMxRSxRQUFRLENBQUMsWUFBWSxDQUFDLDhCQUE4QixFQUFFLGNBQWMsQ0FBQyxDQUFDO2dCQUN0RSxRQUFRLENBQUMsYUFBYSxDQUFDLEdBQUcsQ0FBQyxDQUFBO2dCQUUzQixJQUFJLENBQUMsS0FBSyxDQUFDLGdCQUFnQixFQUFFO29CQUN6QixRQUFRLENBQUMsYUFBYSxDQUFDLEdBQUcsQ0FBQyxDQUFBO29CQUMzQixRQUFRLENBQUMsT0FBTyxDQUFDLEVBQUUsQ0FBQyxDQUFBO29CQUNwQixRQUFRLENBQUMsSUFBSSxFQUFFLFFBQVEsQ0FBQyxDQUFBO2lCQUMzQjtnQkFFSyxNQUFNLEdBQUcsT0FBTyxDQUFDLGVBQWUsRUFBRSxDQUFBO2dCQUNQLHFCQUFNLE1BQU0sQ0FBQyxhQUFhLENBQUMsRUFBRSxDQUFDLGFBQWEsQ0FBQyxLQUFLLENBQUMsZ0JBQWdCLENBQUMsQ0FBQyxLQUFLLEVBQUU7eUJBQ3ZHLElBQUksQ0FBQyxVQUFPLFlBQVk7Ozs0QkFDZixzQkFBc0IsR0FBMkIsSUFBSSxDQUFDLEtBQUssQ0FBQyxZQUFZLENBQUMsVUFBVSxDQUFDLENBQUE7NEJBQzFGLElBQUksQ0FBQyxzQkFBc0IsQ0FBQyxTQUFTLEVBQUU7Z0NBQ25DLHNCQUFPLElBQUksRUFBQTs2QkFDZDs0QkFFRCxzQkFBTyxzQkFBc0IsQ0FBQyxTQUFTLEVBQUE7O3lCQUMxQyxDQUFDLENBQUMsS0FBSyxDQUFDLFVBQUMsS0FBSzt3QkFDWCxPQUFPLENBQUMsR0FBRyxDQUFDLEtBQUssQ0FBQyxDQUFBO3dCQUNsQixPQUFPLElBQUksQ0FBQTtvQkFDZixDQUFDLENBQUMsRUFBQTs7Z0JBWEEsUUFBUSxHQUFtQixTQVczQjtnQkFFTixJQUFJLENBQUMsUUFBUSxJQUFJLFFBQVEsS0FBSyxJQUFJLEVBQUU7b0JBQ2hDLFFBQVEsQ0FBQyxhQUFhLENBQUMsR0FBRyxDQUFDLENBQUE7b0JBQzNCLFFBQVEsQ0FBQyxPQUFPLENBQUMsRUFBRSxDQUFDLENBQUE7b0JBQ3BCLFFBQVEsQ0FBQyxJQUFJLEVBQUUsUUFBUSxDQUFDLENBQUE7aUJBQzNCO2dCQUVLLE1BQU0sR0FBRyxJQUFJLGdCQUFNLENBQUMsRUFBRSxNQUFNLEVBQUUsT0FBTyxDQUFDLGNBQWMsRUFBRSxDQUFDLENBQUM7Z0JBQ2xELHFCQUFNLE1BQU0sQ0FBQyxJQUFJLENBQUMsT0FBTyxDQUFDLElBQUksQ0FBQyxNQUFNLENBQzdDLFFBQWtCLEVBQ2xCO3dCQUNJLFlBQVksRUFBRSxPQUFPLENBQUMsa0JBQWtCO3FCQUMzQyxDQUNKO3lCQUNJLElBQUksQ0FBQyxVQUFDLEdBQUcsSUFBSyxPQUFBLENBQUMsR0FBRyxDQUFDLEVBQUwsQ0FBSyxDQUFDO3lCQUNwQixLQUFLLENBQUMsVUFBQyxLQUFLO3dCQUNULE9BQU8sQ0FBQyxHQUFHLENBQUMsS0FBSyxDQUFDLENBQUE7d0JBQ2xCLE9BQU8sSUFBSSxDQUFBO29CQUNmLENBQUMsQ0FBQyxFQUFBOztnQkFWQSxHQUFHLEdBQUcsU0FVTjtnQkFFTixJQUFJLENBQUMsR0FBRyxJQUFJLEdBQUcsS0FBSyxJQUFJLEVBQUU7b0JBQ3RCLE9BQU8sQ0FBQyxHQUFHLENBQUMsY0FBYyxDQUFDLENBQUE7b0JBQzNCLFFBQVEsQ0FBQyxhQUFhLENBQUMsR0FBRyxDQUFDLENBQUE7b0JBQzNCLFFBQVEsQ0FBQyxPQUFPLENBQUMsRUFBRSxDQUFDLENBQUE7b0JBQ3BCLFFBQVEsQ0FBQyxJQUFJLEVBQUUsUUFBUSxDQUFDLENBQUE7aUJBQzNCO3FCQUFNO29CQUNILFFBQVEsQ0FBQyxPQUFPLENBQUMsR0FBRyxDQUFDLENBQUE7b0JBQ3JCLFFBQVEsQ0FBQyxJQUFJLEVBQUUsUUFBUSxDQUFDLENBQUE7aUJBQzNCOzs7O0tBQ0osQ0FBQTtBQTNEWSxRQUFBLE9BQU8sV0EyRG5CIn0=
+}); });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGhyZWFkUnVuQ3JlYXRlLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2FpL3RocmVhZFJ1bkNyZWF0ZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFDQSxrREFBNEI7QUFDNUIsMkVBQWdFO0FBaUJoRSxZQUFZO0FBQ0MsUUFBQSxPQUFPLEdBQUcsSUFBQSwrQ0FBaUIsRUFBQyxVQUNyQyxPQUEyQixFQUMzQixLQUFjLEVBQ2QsUUFBNEI7Ozs7O2dCQUV0QixRQUFRLEdBQUcsSUFBSSxNQUFNLENBQUMsUUFBUSxFQUFFLENBQUM7Z0JBQ3ZDLFFBQVEsQ0FBQyxZQUFZLENBQUMsNkJBQTZCLEVBQUUsR0FBRyxDQUFDLENBQUM7Z0JBQzFELFFBQVEsQ0FBQyxZQUFZLENBQUMsOEJBQThCLEVBQUUsa0JBQWtCLENBQUMsQ0FBQztnQkFDMUUsUUFBUSxDQUFDLFlBQVksQ0FBQyw4QkFBOEIsRUFBRSxjQUFjLENBQUMsQ0FBQztnQkFDdEUsUUFBUSxDQUFDLFlBQVksQ0FBQyxjQUFjLEVBQUUsa0JBQWtCLENBQUMsQ0FBQztnQkFFMUQsSUFBSSxDQUFDLEtBQUssQ0FBQyxnQkFBZ0IsRUFBRTtvQkFDekIsUUFBUSxDQUFDLGFBQWEsQ0FBQyxHQUFHLENBQUMsQ0FBQTtvQkFDM0IsUUFBUSxDQUFDLE9BQU8sQ0FBQyxFQUFFLENBQUMsQ0FBQTtvQkFDcEIsUUFBUSxDQUFDLElBQUksRUFBRSxRQUFRLENBQUMsQ0FBQTtpQkFDM0I7Z0JBRUssTUFBTSxHQUFHLE9BQU8sQ0FBQyxlQUFlLEVBQUUsQ0FBQTtnQkFDbEMsY0FBYyxHQUE4QyxFQUFFLENBQUE7Z0JBQ3BFLHlDQUF5QztnQkFDekMscUJBQU0sTUFBTSxDQUFDLGFBQWEsQ0FBQyxFQUFFLENBQUMsYUFBYSxDQUFDLEtBQUssQ0FBQyxnQkFBZ0IsQ0FBQyxDQUFDLFFBQVEsQ0FBQyxJQUFJLENBQUM7d0JBQzlFLEtBQUssRUFBRSxFQUFFO3dCQUNULEtBQUssRUFBRSxNQUFNO3FCQUNoQixDQUFDLENBQUMsSUFBSSxDQUFDLFVBQU8sUUFBUTs7NEJBQ25CLFFBQVEsQ0FBQyxHQUFHLENBQUMsVUFBQyxPQUFPO2dDQUNqQixjQUFjLENBQUMsSUFBSSxDQUFDO29DQUNoQixJQUFJLEVBQUUsTUFBTTtvQ0FDWixPQUFPLEVBQUUsT0FBTyxDQUFDLElBQUk7aUNBQ3hCLENBQUMsQ0FBQTs0QkFDTixDQUFDLENBQUMsQ0FBQTs7O3lCQUNMLENBQUMsRUFBQTs7Z0JBWEYseUNBQXlDO2dCQUN6QyxTQVVFLENBQUE7Z0JBR0ksTUFBTSxHQUFHLElBQUksZ0JBQU0sQ0FBQyxFQUFFLE1BQU0sRUFBRSxPQUFPLENBQUMsY0FBYyxFQUFFLENBQUMsQ0FBQztnQkFDaEMscUJBQU0sTUFBTSxDQUFDLElBQUksQ0FBQyxPQUFPLENBQUMsTUFBTSxDQUFDO3dCQUMzRCxRQUFRLEVBQUUsY0FBYztxQkFDM0IsQ0FBQyxDQUFDLElBQUksQ0FBQyxVQUFNLE1BQU07Ozs7d0NBQ0oscUJBQU0sTUFBTSxDQUFDLElBQUksQ0FBQyxPQUFPLENBQUMsSUFBSSxDQUFDLE1BQU0sQ0FBQyxNQUFNLENBQUMsRUFBRSxFQUFFO3dDQUN6RCxZQUFZLEVBQUUsT0FBTyxDQUFDLGtCQUFrQjtxQ0FDM0MsQ0FBQzt5Q0FDRyxJQUFJLENBQUMsVUFBQyxHQUFHLElBQUssT0FBQSxDQUFDLEdBQUcsQ0FBQyxFQUFMLENBQUssQ0FBQzt5Q0FDcEIsS0FBSyxDQUFDLFVBQUMsS0FBSzt3Q0FDVCxPQUFPLENBQUMsR0FBRyxDQUFDLEtBQUssQ0FBQyxDQUFBO3dDQUNsQixPQUFPLElBQUksQ0FBQTtvQ0FDZixDQUFDLENBQUMsRUFBQTs7b0NBUEEsR0FBRyxHQUFHLFNBT047b0NBRU4sc0JBQU87NENBQ0gsU0FBUyxFQUFFLE1BQU0sQ0FBQyxFQUFFOzRDQUNwQixNQUFNLEVBQUUsR0FBRyxhQUFILEdBQUcsdUJBQUgsR0FBRyxDQUFFLEVBQUU7eUNBQ2xCLEVBQUE7Ozt5QkFDSixDQUFDLENBQUMsS0FBSyxDQUFDLFVBQUMsS0FBSzt3QkFDWCxPQUFPLENBQUMsS0FBSyxDQUFDLEtBQUssQ0FBQyxDQUFBO3dCQUNwQixPQUFPLElBQUksQ0FBQTtvQkFDZixDQUFDLENBQUMsRUFBQTs7Z0JBbkJJLE1BQU0sR0FBa0IsU0FtQjVCO2dCQUVGLElBQUksQ0FBQyxNQUFNLEVBQUU7b0JBQ1QsT0FBTyxDQUFDLEdBQUcsQ0FBQyxjQUFjLENBQUMsQ0FBQTtvQkFDM0IsUUFBUSxDQUFDLGFBQWEsQ0FBQyxHQUFHLENBQUMsQ0FBQTtvQkFDM0IsUUFBUSxDQUFDLE9BQU8sQ0FBQyxFQUFFLENBQUMsQ0FBQTtvQkFDcEIsUUFBUSxDQUFDLElBQUksRUFBRSxRQUFRLENBQUMsQ0FBQTtpQkFDM0I7cUJBQU07b0JBQ0gsUUFBUSxDQUFDLGFBQWEsQ0FBQyxHQUFHLENBQUMsQ0FBQTtvQkFDM0IsUUFBUSxDQUFDLE9BQU8sQ0FBQyxNQUFNLENBQUMsQ0FBQTtvQkFDeEIsUUFBUSxDQUFDLElBQUksRUFBRSxRQUFRLENBQUMsQ0FBQTtpQkFDM0I7Ozs7S0FDSixDQUFDLENBQUEifQ==

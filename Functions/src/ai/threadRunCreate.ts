@@ -1,5 +1,6 @@
 import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types";
 import OpenAI from "openai";
+import { functionValidator } from "twilio-flex-token-validator";
 
 type MyContext = {
     OPENAI_API_KEY: string
@@ -8,6 +9,7 @@ type MyContext = {
 
 type MyEvent = {
     conversation_sid: string
+    thread_id?: string
 }
 
 type ConversationAttributes = {
@@ -15,7 +17,8 @@ type ConversationAttributes = {
     [key: string]: any
 }
 
-export const handler = async (
+//@ts-ignore
+export const handler = functionValidator(async (
     context: Context<MyContext>,
     event: MyEvent,
     callback: ServerlessCallback
@@ -24,7 +27,7 @@ export const handler = async (
     response.appendHeader("Access-Control-Allow-Origin", "*");
     response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
     response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
-    response.setStatusCode(200)
+    response.appendHeader("Content-Type", "application/json");
 
     if (!event.conversation_sid) {
         response.setStatusCode(404)
@@ -33,45 +36,51 @@ export const handler = async (
     }
 
     const client = context.getTwilioClient()
-    const threadId : string | null = await client.conversations.v1.conversations(event.conversation_sid).fetch()
-        .then(async (conversation) => {
-            const conversationAttributes: ConversationAttributes = JSON.parse(conversation.attributes)
-            if (!conversationAttributes.thread_id) {
-                return null
-            }
-
-            return conversationAttributes.thread_id
-        }).catch((error) => {
-            console.log(error)
-            return null
+    const threadMessages: OpenAI.Beta.Threads.MessageCreateParams[] = []
+    //Obtiene los mensajes de la conversacion
+    await client.conversations.v1.conversations(event.conversation_sid).messages.list({
+        limit: 20,
+        order: 'desc'
+    }).then(async (messages) => {
+        messages.map((message) => {
+            threadMessages.push({
+                role: "user",
+                content: message.body
+            })
         })
-    
-    if (!threadId || threadId === null) {
-        response.setStatusCode(404)
-        response.setBody({})
-        callback(null, response)
-    }
+    })
 
+    type ReturnResult = null | { thread_id: string, run_id?: string }
     const openai = new OpenAI({ apiKey: context.OPENAI_API_KEY });
-    const run = await openai.beta.threads.runs.create(
-        threadId as string,
-        {
+    const result : ReturnResult = await openai.beta.threads.create({
+        messages: threadMessages
+    }).then(async thread => {
+        const run = await openai.beta.threads.runs.create(thread.id, {
             assistant_id: context.OPENAI_ASSITANT_ID
-        }
-    )
-        .then((run) => (run))
-        .catch((error) => {
-            console.log(error)
-            return null
-        });
+        })
+            .then((run) => (run))
+            .catch((error) => {
+                console.log(error)
+                return null
+            });
 
-    if (!run || run === null) {
+        return {
+            thread_id: thread.id,
+            run_id: run?.id
+        }
+    }).catch((error) => {
+        console.error(error)
+        return null
+    })
+
+    if (!result) {
         console.log('NO RUN FOUND')
         response.setStatusCode(400)
         response.setBody({})
         callback(null, response)
     } else {
-        response.setBody(run)
+        response.setStatusCode(200)
+        response.setBody(result)
         callback(null, response)
     }
-}
+})

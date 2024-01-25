@@ -55,7 +55,7 @@ const createRRCounter = async (queue, context) => {
                 }
             }
         }).then(({ data }) => {
-            return data.data.attributes.counter;
+            return parseInt(data.data.attributes.counter);
         }).catch(function (err) {
             return false;
         });
@@ -81,7 +81,7 @@ const getRRCounter = async (queue, context) => {
                 'Content-Type': 'application/vnd.api+json'
             }
         }).then(({ data }) => {
-            return data.data.attributes.counter;
+            return parseInt(data.data.attributes.counter);
         }).catch(async function (err) {
             return await createRRCounter(queue, context);
         });
@@ -118,7 +118,7 @@ const updateRRCounter = async (queue, count, context) => {
                 }
             }
         }).then(({ data }) => {
-            return data.data.attributes.counter;
+            return parseInt(data.data.attributes.counter);
         }).catch(function (err) {
             console.log(err);
             return false;

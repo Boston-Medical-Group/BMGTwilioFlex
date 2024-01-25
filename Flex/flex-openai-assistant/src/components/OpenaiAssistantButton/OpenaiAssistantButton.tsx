@@ -3,7 +3,9 @@ import { Button, Spinner, Box } from "@twilio-paste/core"
 import { NewIcon } from "@twilio-paste/icons/esm/NewIcon"
 import { useCallback, useState, useEffect, useRef } from "react"
 import useApi from "../../hooks/useApi"
-import OpenAI from "openai"
+import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 type MyProps = {
     task: Flex.ITask
@@ -14,81 +16,66 @@ type RunData = {
     thread_id: string
     run_id: string
 }
-type RunResult = {} & OpenAI.Beta.Threads.Runs.Run
+type RunResult = null | RunData
 
-export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
 
-    const { createRun, getRunStatus } = useApi({ token: process.env.FLEX_APP_TWILIO_SERVERLESS_TOKEN as string });
+export const OpenaiAssistantButton = ({ manager, task }: MyProps) => {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <AssitantButton manager={manager} task={task} />
+        </QueryClientProvider>
+    )
+}
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [pollCounter, setPollCounter] = useState(0)
-    const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
-    const [isPollingEnabled, setIsPollingEnabled] = useState(true);
+const AssitantButton = ({ task, manager }: MyProps) => {
+
+    const { createRun, getRunStatus } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
+
+    const [showSpinner, setShowSpinner] = useState(false)
     const [runData, setRunData] = useState<null | RunData>(null)
     const [message, setMessage] = useState('')
     const conversationSid = task.attributes.conversationSid ?? task.attributes.channelSid;
     const inputState = Flex.useFlexSelector((state) => state.flex.chat.conversationInput[conversationSid]?.inputText);
 
-    const handleIAGenerate = useCallback(async () => {
-        setIsLoading(true);
-
+    const handleIAGenerate = async () => {
+        console.log('SHOWING SPINNER')
+        setShowSpinner(true)
         await createRun({
             conversation_sid: conversationSid
         }).then(async (run: RunResult) => {
-            if (run.id) {
+            if (run !== null) {
                 setRunData({
                     thread_id: run.thread_id,
-                    run_id: run.id
+                    run_id: run.run_id
                 })
             }
+        }).catch((err) => {
+            console.error(err)
+            setShowSpinner(false)
         })
+    }
+
+    const { isLoading, isInitialLoading, isError, data } = useQuery({
+        //@ts-ignore
+        queryKey: ['iaMessage'],
+        queryFn: async () => getRunStatus(runData).then((msg: { code: string, body: string | null }) => {
+            if (msg.code === "SUCCESS" && msg.body !== null) {
+                setRunData(null)
+                setMessage(msg.body)
+                setShowSpinner(false)
+            } else if (msg.code === "NOT_FOUND" || msg.code === "NOT_TEXT") {
+                setRunData(null)
+                setMessage('')
+                setShowSpinner(false)
+            } else {
+                throw new Error('Queued message')
+            }
+
+            return msg
+        }),
+        retry: 4,
+        enabled: runData !== null
     }, [])
-
-    useEffect(() => {
-        const pollingCallback = async () => {
-            await getRunStatus(runData)
-                .then((message: { code: string, body: string | null }) => {
-                    if (message.code === "SUCCESS" && message.body !== null) {
-                        setPollCounter(0)
-                        setRunData(null)
-                        setMessage(message.body)
-                    } else if (message.code === "NOT_FOUND" || message.code === "NOT_TEXT") {
-                        setPollCounter(0)
-                        setRunData(null)
-                        setIsPollingEnabled(false)
-                    } else {
-
-                    }
-                }).catch(err => {
-                    //setMessage('')
-                }).finally(() => {
-                    setPollCounter(pollCounter + 1)
-                    if (pollCounter > 5) {
-                        setRunData(null)
-                        setIsPollingEnabled(false)
-                    }
-                })
-        };
-
-        const startPolling = () => {
-            timerIdRef.current = setInterval(pollingCallback, 1500);
-        };
-
-        const stopPolling = () => {
-            setIsLoading(false)
-            clearInterval(timerIdRef.current);
-        };
-
-        if (runData !== null && (message === null || message === '')) {
-            startPolling();
-        } else {
-            stopPolling();
-        }
-
-        return () => {
-            stopPolling();
-        };
-    }, [runData, isPollingEnabled])
 
     useEffect(() => {
         if (message === '') return;    
@@ -111,11 +98,11 @@ export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
 
     return (
         <Box marginRight="space30">
-            <Button variant="secondary" size="circle" onClick={handleIAGenerate}>
-                {isLoading &&
+            <Button variant="secondary" size="circle" disabled={isInitialLoading || showSpinner} onClick={handleIAGenerate}>
+                {(isInitialLoading || showSpinner) &&
                     <Spinner decorative={false} title="Loading" />}
                 
-                {!isLoading &&
+                {(!isInitialLoading && !showSpinner) &&
                     <NewIcon decorative={false} title="Generar respuesta con IA" />}
             </Button>
         </Box>

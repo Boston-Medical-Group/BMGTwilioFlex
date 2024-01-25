@@ -1,5 +1,15 @@
 # Changelog
 
+# 25/01/2024
+* Corrige variables de entorno
+* Corrige polling
+* Implementa ReactQuery
+* Corrige env var
+
+# 24/01/2024
+* Agrega funcion IA
+* Modifica comportamiento IA
+
 # 23/01/2024
 * Agrega log a fetchCallerId
 

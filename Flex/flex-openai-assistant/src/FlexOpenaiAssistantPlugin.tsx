@@ -23,7 +23,7 @@ export default class FlexOpenaiAssistantPlugin extends FlexPlugin {
             sortOrder: -1,
             if: () => {
                 const roles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles
-                return (roles.indexOf('ia_trainer') >= 0 || roles.indexOf('admin') >= 0) && process.env.OPEN_API_KEY !== undefined && process.env.OPEN_API_KEY !== '';
+                return roles.indexOf('admin') >= 0;
             }
         };
 

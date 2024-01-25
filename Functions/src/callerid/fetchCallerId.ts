@@ -113,7 +113,7 @@ exports.handler = FunctionTokenValidator(async function (
       if (count >= callerIdsResponse.meta.page.total) {
         count = 0;
       }
-      console.log(count, callerIdsResponse.meta.page.total, callerIdsResponse.data)
+      console.log('FETCHINGCALLERID', JSON.stringify(callerIdsResponse.data.at(count)))
       callerId = callerIdsResponse.data.at(count)?.attributes.ddi || null;
 
       count++
