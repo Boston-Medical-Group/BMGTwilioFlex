@@ -7,6 +7,7 @@
 * Corrige env var
 * Agrega funciones para insights de IVR
 * Update de variables de despliegue
+* Corrige el size de paginacion de pools de callerid de 15 a 150
 
 # 24/01/2024
 * Agrega funcion IA
