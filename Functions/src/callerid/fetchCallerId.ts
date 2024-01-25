@@ -89,7 +89,6 @@ exports.handler = FunctionTokenValidator(async function (
         }
       })
         .then(async (res) => {
-          console.log(res)
           return await res.json()
         })
       
@@ -107,7 +106,7 @@ exports.handler = FunctionTokenValidator(async function (
           return await res.json()
         })
       
-      console.log(callerIdsResponse)
+      console.log(JSON.stringify(callerIdsResponse.data))
       
       count = await utils.getRRCounter(queryQueue, context) || 0;
       if (count >= callerIdsResponse.meta.page.total) {
