@@ -1,12 +1,5 @@
 name: Twilio Functions - ESPAÑA
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Functions/*'
-      - 'CHANGELOG.md'
-      - 'CHANGELOG_ESP.md'
   pull_request:
     branches:
       - main

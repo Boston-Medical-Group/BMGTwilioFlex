@@ -1,12 +1,5 @@
 name: Twilio Functions - MEXICO
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Functions/*'
-      - 'CHANGELOG.md'
-      - 'CHANGELOG_MEX.md'
   pull_request:
     branches:
       - main

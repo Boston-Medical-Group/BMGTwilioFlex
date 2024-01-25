@@ -1,12 +1,5 @@
 name: Twilio Functions - CANADA
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Functions/*'
-      - 'CHANGELOG.md'
-      - 'CHANGELOG_CAN.md'
   pull_request:
     branches:
       - main

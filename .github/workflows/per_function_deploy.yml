@@ -1,12 +1,5 @@
 name: Twilio Functions - PERU
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'Functions/*'
-      - 'CHANGELOG.md'
-      - 'CHANGELOG_PER.md'
   pull_request:
     branches:
       - main
