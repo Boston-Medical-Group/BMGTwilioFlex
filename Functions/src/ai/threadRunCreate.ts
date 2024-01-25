@@ -27,7 +27,7 @@ export const handler = functionValidator(async (
     response.appendHeader("Access-Control-Allow-Origin", "*");
     response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
     response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
-    response.setStatusCode(200)
+    response.appendHeader("Content-Type", "application/json");
 
     if (!event.conversation_sid) {
         response.setStatusCode(404)
@@ -79,6 +79,7 @@ export const handler = functionValidator(async (
         response.setBody({})
         callback(null, response)
     } else {
+        response.setStatusCode(200)
         response.setBody(result)
         callback(null, response)
     }

@@ -40,6 +40,9 @@ export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
                     run_id: run.run_id
                 })
             }
+        }).catch((err) => {
+            console.error(err)
+            setIsLoading(false)
         })
     }, [])
 
