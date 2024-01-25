@@ -30,7 +30,7 @@ const QuickScheduleButton = ({ manager, task }: MyProps) => {
   const [calendarUrl, setCalendarUrl] = useState('')
   const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
   const [isPollingEnabled, setIsPollingEnabled] = useState(true);
-  const [runPoll, setRunPoll] = useState(true)
+  const [runPoll, setRunPoll] = useState(task?.attributes?.hubspot_contact_id !== '' || task?.attributes?.hubspot_deal_id !== '')
 
   const { isLoading, isError, data, error } = useQuery({
     //@ts-ignore
