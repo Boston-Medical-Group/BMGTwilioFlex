@@ -1,6 +1,6 @@
 import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types";
 import OpenAI from "openai";
-import { MessageInstance } from "twilio/lib/rest/conversations/v1/conversation/message";
+import { functionValidator } from "twilio-flex-token-validator";
 
 type MyContext = {
     OPENAI_API_KEY: string
@@ -17,7 +17,8 @@ type ConversationAttributes = {
     [key: string]: any
 }
 
-export const handler = async (
+//@ts-ignore
+export const handler = functionValidator(async (
     context: Context<MyContext>,
     event: MyEvent,
     callback: ServerlessCallback
@@ -68,6 +69,7 @@ export const handler = async (
             run_id: run?.id
         }
     }).catch((error) => {
+        console.error(error)
         return null
     })
 
@@ -80,4 +82,4 @@ export const handler = async (
         response.setBody(result)
         callback(null, response)
     }
-}
+})
