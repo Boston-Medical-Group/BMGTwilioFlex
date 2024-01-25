@@ -5,6 +5,8 @@
 * Corrige polling
 * Implementa ReactQuery
 * Corrige env var
+* Agrega funciones para insights de IVR
+* Update de variables de despliegue
 
 # 24/01/2024
 * Agrega funcion IA
