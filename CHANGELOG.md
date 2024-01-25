@@ -4,6 +4,7 @@
 * Corrige variables de entorno
 * Corrige polling
 * Implementa ReactQuery
+* Corrige env var
 
 # 24/01/2024
 * Agrega funcion IA
