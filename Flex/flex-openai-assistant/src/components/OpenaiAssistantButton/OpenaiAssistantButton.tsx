@@ -39,7 +39,7 @@ const AssitantButton = ({ task, manager }: MyProps) => {
 
     const [runPoll, setRunPoll] = useState(false)
 
-    const handleIAGenerate = useCallback(async () => {
+    const handleIAGenerate = async () => {
         setShowSpinner(true)
         await createRun({
             conversation_sid: conversationSid
@@ -54,7 +54,7 @@ const AssitantButton = ({ task, manager }: MyProps) => {
             console.error(err)
             setShowSpinner(false)
         })
-    }, [])
+    }
 
     const { isLoading, isError, data } = useQuery({
         //@ts-ignore
