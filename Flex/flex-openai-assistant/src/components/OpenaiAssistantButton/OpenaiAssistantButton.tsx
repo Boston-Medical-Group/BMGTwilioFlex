@@ -3,6 +3,9 @@ import { Button, Spinner, Box } from "@twilio-paste/core"
 import { NewIcon } from "@twilio-paste/icons/esm/NewIcon"
 import { useCallback, useState, useEffect, useRef } from "react"
 import useApi from "../../hooks/useApi"
+import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 type MyProps = {
     task: Flex.ITask
@@ -15,22 +18,29 @@ type RunData = {
 }
 type RunResult = null | RunData
 
-export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
+
+export const OpenaiAssistantButton = ({ manager, task }: MyProps) => {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <AssitantButton manager={manager} task={task} />
+        </QueryClientProvider>
+    )
+}
+
+const AssitantButton = ({ task, manager }: MyProps) => {
 
     const { createRun, getRunStatus } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [pollCounter, setPollCounter] = useState(0)
-    const timerIdRef = useRef<string | number | undefined | NodeJS.Timeout>();
-    const [isPollingEnabled, setIsPollingEnabled] = useState(true);
+    const [showSpinner, setShowSpinner] = useState(false)
     const [runData, setRunData] = useState<null | RunData>(null)
     const [message, setMessage] = useState('')
     const conversationSid = task.attributes.conversationSid ?? task.attributes.channelSid;
     const inputState = Flex.useFlexSelector((state) => state.flex.chat.conversationInput[conversationSid]?.inputText);
 
-    const handleIAGenerate = useCallback(async () => {
-        setIsLoading(true);
+    const [runPoll, setRunPoll] = useState(false)
 
+    const handleIAGenerate = useCallback(async () => {
+        setShowSpinner(true)
         await createRun({
             conversation_sid: conversationSid
         }).then(async (run: RunResult) => {
@@ -42,56 +52,31 @@ export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
             }
         }).catch((err) => {
             console.error(err)
-            setIsLoading(false)
+            setShowSpinner(false)
         })
     }, [])
 
-    useEffect(() => {
-        const pollingCallback = async () => {
-            await getRunStatus(runData)
-                .then((message: { code: string, body: string | null }) => {
-                    if (message.code === "SUCCESS" && message.body !== null) {
-                        setPollCounter(0)
-                        setRunData(null)
-                        setMessage(message.body)
-                    } else if (message.code === "NOT_FOUND" || message.code === "NOT_TEXT") {
-                        setPollCounter(0)
-                        setRunData(null)
-                        setIsPollingEnabled(false)
-                    } else {
+    const { isLoading, isError, data } = useQuery({
+        //@ts-ignore
+        queryKey: ['iaMessage'],
+        queryFn: async () => getRunStatus(runData).then((msg: { code: string, body: string | null }) => {
+            if (msg.code === "SUCCESS" && msg.body !== null) {
+                setRunData(null)
+                setMessage(msg.body)
+                setShowSpinner(false)
+            } else if (msg.code === "NOT_FOUND" || msg.code === "NOT_TEXT") {
+                setRunData(null)
+                setMessage('')
+                setShowSpinner(false)
+            } else {
+                throw new Error('Queued message')
+            }
 
-                    }
-                }).catch(err => {
-                    //setMessage('')
-                }).finally(() => {
-                    setPollCounter(pollCounter + 1)
-                    if (pollCounter > 5) {
-                        setPollCounter(0)
-                        setRunData(null)
-                        setIsPollingEnabled(false)
-                    }
-                })
-        };
-
-        const startPolling = () => {
-            timerIdRef.current = setInterval(pollingCallback, 1500);
-        };
-
-        const stopPolling = () => {
-            setIsLoading(false)
-            clearInterval(timerIdRef.current);
-        };
-
-        if (runData !== null && (message === null || message === '')) {
-            startPolling();
-        } else {
-            stopPolling();
-        }
-
-        return () => {
-            stopPolling();
-        };
-    }, [runData, isPollingEnabled])
+            return msg
+        }),
+        retry: 4,
+        enabled: runData !== null
+    }, [])
 
     useEffect(() => {
         if (message === '') return;    
@@ -114,11 +99,11 @@ export const OpenaiAssistantButton = ({ task, manager }: MyProps) => {
 
     return (
         <Box marginRight="space30">
-            <Button variant="secondary" size="circle" disabled={isLoading} onClick={handleIAGenerate}>
-                {isLoading &&
+            <Button variant="secondary" size="circle" disabled={isLoading || showSpinner} onClick={handleIAGenerate}>
+                {(isLoading || showSpinner) &&
                     <Spinner decorative={false} title="Loading" />}
                 
-                {!isLoading &&
+                {(!isLoading && !showSpinner) &&
                     <NewIcon decorative={false} title="Generar respuesta con IA" />}
             </Button>
         </Box>
