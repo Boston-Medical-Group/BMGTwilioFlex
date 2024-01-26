@@ -21,8 +21,9 @@ type Props = {
 const CallCard = ({ manager, contact, deal } : Props) => {
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [queues, setQueues] = useState<Array<TaskQueue>>([]);
-  const [defaultQueue] = useState<string>(FLEX_APP_OUTBOUND_QUEUE_SID as string);
+  const [defaultQueue] = useState<string>(manager.workerClient?.attributes?.last_used_queue ?? FLEX_APP_OUTBOUND_QUEUE_SID as string);
   const [selectedQueue, setSelectedQueue] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false)
 
   const afterSetActivityListener = useCallback((payload) => {
     if (payload.activityAvailable) {
@@ -55,7 +56,14 @@ const CallCard = ({ manager, contact, deal } : Props) => {
     setSelectedQueue(event.target.value);
   }, [])
 
-  const initiateCallHandler = useCallback(() => {
+  const initiateCallHandler = useCallback(async () => {
+    setIsLoading(true)
+    const workerAttributes = manager.workerClient?.attributes
+    if (workerAttributes) {
+      workerAttributes.last_used_queue = selectedQueue
+      await manager.workerClient.setAttributes(workerAttributes)
+    }
+
     Flex.Actions.invokeAction("StartOutboundCall", {
       destination: contact.phone,
       queueSid: selectedQueue,
@@ -70,7 +78,7 @@ const CallCard = ({ manager, contact, deal } : Props) => {
           email: contact.email
         }
       }
-    });
+    }).finally(() => setIsLoading(false));
   }, [selectedQueue]);
 
   return (
@@ -88,7 +96,7 @@ const CallCard = ({ manager, contact, deal } : Props) => {
               </Select>
           </Box>
           <Stack orientation="horizontal" spacing="space30">
-            <Button variant="primary" title={actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call"} disabled={actionDisabled} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Iniciar llamada</Button>
+            <Button loading={isLoading} variant="primary" title={actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call"} disabled={actionDisabled} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Iniciar llamada</Button>
           </Stack>
           </Card>
         </Box>
