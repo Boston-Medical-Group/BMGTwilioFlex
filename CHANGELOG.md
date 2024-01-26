@@ -1,5 +1,8 @@
 # Changelog
 
+# 26/01/2024
+* Force deploy
+
 # 25/01/2024
 * Corrige variables de entorno
 * Corrige polling
