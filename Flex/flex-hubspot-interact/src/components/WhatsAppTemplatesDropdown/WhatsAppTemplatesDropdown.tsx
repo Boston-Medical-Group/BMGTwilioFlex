@@ -95,7 +95,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
             flex: {
                 agent: {
                     full_name: workerAttributes?.full_name ?? 'Agente',
-                    firstname: workerAttributes?.full_name ?? 'Agente',
+                    firstname: workerAttributes?.firstname ? workerAttributes?.firstname : (workerAttributes?.full_name ? workerAttributes?.full_name : 'Agente'),
                 }
             }
         })
