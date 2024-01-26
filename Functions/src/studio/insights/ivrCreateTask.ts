@@ -30,7 +30,8 @@ export const handler = (
     conversations.virtual = "Yes";
     conversations.abandoned = "Yes";
     conversations.abandoned_phase = "IVR";
-    conversations.communication_channel = "IVR";
+    conversations.kind = "IVR";
+    conversations.communication_channel = "Call";
     conversations.IVR_time_start = timestamp.getTime();
     client.taskrouter.v1
         .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
