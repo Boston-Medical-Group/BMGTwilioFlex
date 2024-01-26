@@ -9,6 +9,7 @@ type MyContext = {
 type MyEvent = {
     from: string
     callSid: string
+    flowSid: string
 }
 
 type ConversationsObject = {
@@ -22,7 +23,7 @@ export const handler = (
 ) => {
     
     let timestamp = new Date()
-    const { from, callSid } = event
+    const { from, callSid, flowSid } = event
 
     const client = context.getTwilioClient()
     const conversations: ConversationsObject = {}
@@ -31,12 +32,16 @@ export const handler = (
     conversations.abandoned = "Yes";
     conversations.abandoned_phase = "IVR";
     conversations.kind = "IVR";
-    conversations.communication_channel = "Call";
+    conversations.communication_channel = "voice";
     conversations.IVR_time_start = timestamp.getTime();
+    conversations.conversation_attribute_1 = callSid;
+    conversations.conversation_label_1 = "Call Sid";
+    conversations.conversation_attribute_3 = flowSid;
+    conversations.conversation_label_3 = "Flow Sid";
     client.taskrouter.v1
         .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
         .tasks.create({
-            attributes: JSON.stringify({ "from": from, conversations }),
+            attributes: JSON.stringify({ "from": from, twilio_call_sid: callSid, conversations }),
             workflowSid: context.TASK_ROUTER_NOBODY_WORKFLOW_SID,
             timeout: 300
         }).then(() => {
