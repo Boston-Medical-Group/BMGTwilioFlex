@@ -2,6 +2,7 @@
 
 # 30/01/2024
 * Actualiza log de IVR
+* Corrige bug
 
 # 26/01/2024
 * Force deploy
