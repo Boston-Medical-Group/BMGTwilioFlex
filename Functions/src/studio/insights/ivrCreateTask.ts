@@ -43,11 +43,13 @@ export const handler = (
     conversations.IVR_time_start = timestamp.getTime();
     conversations.conversation_attribute_1 = callSid;
     conversations.conversation_label_1 = "Call Sid";
-    const customers: CustomersObject = {}
-    customers.customer_label_1 = "Lead or Patient"
-    customers.customer_attribute_1 = leadOrPatient
-    customers.customer_label_2 = "URL Hubspot"
-    customers.customer_attribute_2 = `https://app-eu1.hubspot.com/contacts/${hubspot_account_id}/record/0-1/${contact_id}`
+    conversations.conversation_label_2 = "Flow Sid";
+    conversations.conversation_attribute_2 = flowSid;
+    const customers: CustomersObject = {};
+    customers.customer_label_1 = "Lead or Patient";
+    customers.customer_attribute_1 = leadOrPatient;
+    customers.customer_label_2 = "URL Hubspot";
+    customers.customer_attribute_2 = `https://app-eu1.hubspot.com/contacts/${hubspot_account_id}/record/0-1/${contact_id}`;
     client.taskrouter.v1
         .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
         .tasks.create({
