@@ -49,44 +49,49 @@ export const handler = async (
 
     const client = context.getTwilioClient()
 
-    const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
-    const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
-    const timestamp = (new Date).getTime();
-    await client.conversations.v1.conversations.create({
-        friendlyName: `IATrainer -> ${event.phone} (${timestamp})`,
-        attributes: JSON.stringify({
-            customerName: event.fullname,
-            name: event.fullname,
-            crmid: event.contact_id,
-            hubspot_contact_id: event.contact_id
-        })
-    }).then(async (conversation) => {
-        return await client.conversations.v1.conversations(conversation.sid).participants.create({
-            messagingBinding: {
-                address: whatsappAddressTo,
-                proxyAddress: whatsappAddressFrom
-            }
-        }).then(async (participant) => {
-            return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
-                target: 'studio',
-                configuration: {
-                    flowSid: context.TWILIO_WA_IA_WORKFLOW
+    try {
+        const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
+        const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
+        const timestamp = (new Date).getTime();
+        await client.conversations.v1.conversations.create({
+            friendlyName: `IATrainer -> ${event.phone} (${timestamp})`,
+            attributes: JSON.stringify({
+                customerName: event.fullname,
+                name: event.fullname,
+                crmid: event.contact_id,
+                hubspot_contact_id: event.contact_id
+            })
+        }).then(async (conversation) => {
+            return await client.conversations.v1.conversations(conversation.sid).participants.create({
+                messagingBinding: {
+                    address: whatsappAddressTo,
+                    proxyAddress: whatsappAddressFrom
                 }
-            }).then(async (webhook) => {
-                if (event.message) {
-                    return await client.conversations.v1.conversations(conversation.sid).messages.create({
-                        body: event.message
-                    })
-                } else if (event.template) {
-                    return await client.conversations.v1.conversations(conversation.sid).messages.create({
-                        contentSid: event.template
-                    })
-                }
+            }).then(async (participant) => {
+                return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
+                    target: 'studio',
+                    configuration: {
+                        flowSid: context.TWILIO_WA_IA_WORKFLOW
+                    }
+                }).then(async (webhook) => {
+                    if (event.message) {
+                        return await client.conversations.v1.conversations(conversation.sid).messages.create({
+                            body: event.message
+                        })
+                    } else if (event.template) {
+                        return await client.conversations.v1.conversations(conversation.sid).messages.create({
+                            contentSid: event.template
+                        })
+                    }
+                })
             })
         })
-    })
 
-    callback(null, 'OK')
+        callback(null, 'OK')
+    } catch (error) {
+        console.log(error)
+        callback(null, 'ERROR')
+    }
 
 }
 
