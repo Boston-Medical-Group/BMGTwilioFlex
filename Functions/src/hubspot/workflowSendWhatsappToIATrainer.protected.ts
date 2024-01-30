@@ -18,6 +18,8 @@ type MyEvent = {
     contact_id: string
     message?: string
     template?: string
+    agentfirstname?: string
+    agentlastname?: string
 }
 
 export const handler = async (
@@ -80,7 +82,13 @@ export const handler = async (
                         })
                     } else if (event.template) {
                         return await client.conversations.v1.conversations(conversation.sid).messages.create({
-                            contentSid: event.template
+                            contentSid: event.template,
+                            contentVariables: JSON.stringify({
+                                agentfirstname: event.agentfirstname,
+                                agentlastname: event.agentlastname,
+                                contactfirstname: event.firstname,
+                                contactlastname: event.lastname
+                            })
                         })
                     }
                 })
