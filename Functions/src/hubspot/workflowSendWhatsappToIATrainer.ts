@@ -65,10 +65,7 @@ export const handler = async (
             })
         }).then(async (conversation) => {
             return await client.conversations.v1.conversations(conversation.sid).participants.create({
-                messagingBinding: {
-                    address: whatsappAddressTo,
-                    proxyAddress: whatsappAddressFrom
-                }
+                identity: whatsappAddressTo
             }).then(async (participant) => {
                 return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
                     target: 'studio',

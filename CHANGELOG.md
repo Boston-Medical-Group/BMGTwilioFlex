@@ -5,6 +5,7 @@
 * Corrige bug
 * Agrega funcion de mensaje directo workflow hubspot
 * Force deploy
+* Corrige creación de participante
 
 # 26/01/2024
 * Force deploy
