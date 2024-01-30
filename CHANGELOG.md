@@ -4,6 +4,7 @@
 * Actualiza log de IVR
 * Corrige bug
 * Agrega funcion de mensaje directo workflow hubspot
+* Force deploy
 
 # 26/01/2024
 * Force deploy
