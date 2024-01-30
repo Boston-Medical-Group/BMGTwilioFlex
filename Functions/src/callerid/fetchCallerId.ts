@@ -112,6 +112,7 @@ exports.handler = FunctionTokenValidator(async function (
         count = 0;
       }
       callerId = callerIdsResponse.data.at(count)?.attributes.ddi || null;
+      console.log(`CALLERID COUNTER: ${count}, TOTAL: ${callerIdsResponse.data.length}`)
 
       count++
       utils.updateRRCounter(queueSid, count, context)

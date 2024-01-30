@@ -8,6 +8,7 @@
 * Corrige creación de participante
 * Corrige flujo de studio
 * Force deploy
+* Logs callerid COL
 
 # 26/01/2024
 * Force deploy
