@@ -1,5 +1,8 @@
 # Changelog
 
+# 30/01/2024
+* Actualiza log de IVR
+
 # 26/01/2024
 * Force deploy
 
