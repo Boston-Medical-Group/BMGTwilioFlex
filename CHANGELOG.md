@@ -10,6 +10,7 @@
 * Force deploy
 * Logs callerid COL
 * Mas log
+* Corrige caller ids
 
 # 26/01/2024
 * Force deploy

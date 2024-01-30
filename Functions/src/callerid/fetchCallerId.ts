@@ -80,7 +80,7 @@ exports.handler = FunctionTokenValidator(async function (
   try {
     const country = utils.countryToIso2(context.COUNTRY);
 
-    context.COUNTRY = 'esp';
+    //context.COUNTRY = 'esp';
     try {
       const countryResponse: CountryResponse = await fetch(`${context.FLEXMANAGER_API_URL}/countries/${context.COUNTRY}`, {
         method: "GET",
@@ -112,7 +112,7 @@ exports.handler = FunctionTokenValidator(async function (
         count = 0;
       }
       callerId = callerIdsResponse.data.at(count)?.attributes.ddi || null;
-      console.log(`CALLERID COUNTER: ${count}, TOTAL: ${callerIdsResponse.data.length}, FROM: ${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${queryQueue}&page[size]=${PAGE_SIZE}`)
+      //console.log(`CALLERID COUNTER: ${count}, TOTAL: ${callerIdsResponse.data.length}, FROM: ${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${queryQueue}&page[size]=${PAGE_SIZE}`)
 
       count++
       utils.updateRRCounter(queueSid, count, context)
