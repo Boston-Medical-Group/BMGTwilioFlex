@@ -4,7 +4,7 @@ type MyContext = {
     ACCOUNT_SID: string
     AUTH_TOKEN: string
     TWILIO_WA_PHONE_NUMBER: string
-    TWILIO_WA_IA_WORKFLOW: string
+    TWILIO_WA_IA_STUDIO_FLOW: string
 }
 
 type MyEvent = {
@@ -70,7 +70,7 @@ export const handler = async (
                 return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
                     target: 'studio',
                     configuration: {
-                        flowSid: context.TWILIO_WA_IA_WORKFLOW
+                        flowSid: context.TWILIO_WA_IA_STUDIO_FLOW
                     }
                 }).then(async (webhook) => {
                     if (event.message) {
