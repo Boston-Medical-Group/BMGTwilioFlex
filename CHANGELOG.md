@@ -6,6 +6,8 @@
 * Agrega funcion de mensaje directo workflow hubspot
 * Force deploy
 * Corrige creación de participante
+* Corrige flujo de studio
+* Force deploy
 
 # 26/01/2024
 * Force deploy
