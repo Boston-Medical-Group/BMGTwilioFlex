@@ -9,6 +9,7 @@
 * Corrige flujo de studio
 * Force deploy
 * Logs callerid COL
+* Mas log
 
 # 26/01/2024
 * Force deploy

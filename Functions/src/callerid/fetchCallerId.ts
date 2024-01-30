@@ -112,7 +112,7 @@ exports.handler = FunctionTokenValidator(async function (
         count = 0;
       }
       callerId = callerIdsResponse.data.at(count)?.attributes.ddi || null;
-      console.log(`CALLERID COUNTER: ${count}, TOTAL: ${callerIdsResponse.data.length}`)
+      console.log(`CALLERID COUNTER: ${count}, TOTAL: ${callerIdsResponse.data.length}, FROM: ${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${queryQueue}&page[size]=${PAGE_SIZE}`)
 
       count++
       utils.updateRRCounter(queueSid, count, context)
