@@ -75,7 +75,7 @@ export const handler = async (
                 "messagingBinding.proxyAddress": whatsappAddressFrom
             }).then(async (participant) => {
                 return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
-                    target: 'webhook',
+                    target: 'studio',
                     //@ts-ignore
                     "configuration.flowSid": context.TWILIO_WA_IA_STUDIO_FLOW
                 }).then(async (webhook) => {
