@@ -5,6 +5,7 @@ type MyContext = {
     AUTH_TOKEN: string
     TWILIO_WA_PHONE_NUMBER: string
     TWILIO_WA_IA_STUDIO_FLOW: string
+    TWILIO_WA_IA_STUDIO_URL?: string
 }
 
 type MyEvent = {
@@ -62,16 +63,21 @@ export const handler = async (
                 name: event.fullname,
                 crmid: event.contact_id,
                 hubspot_contact_id: event.contact_id
-            })
+            }),
+            timers: {
+                inactive: 'PT10M',
+                closed: 'PT1H'
+            }
         }).then(async (conversation) => {
             return await client.conversations.v1.conversations(conversation.sid).participants.create({
-                identity: whatsappAddressTo
+                //@ts-ignore
+                "messagingBinding.address": whatsappAddressTo,
+                "messagingBinding.proxyAddress": whatsappAddressFrom
             }).then(async (participant) => {
                 return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
-                    target: 'studio',
-                    configuration: {
-                        flowSid: context.TWILIO_WA_IA_STUDIO_FLOW
-                    }
+                    target: 'webhook',
+                    //@ts-ignore
+                    "configuration.flowSid": context.TWILIO_WA_IA_STUDIO_FLOW
                 }).then(async (webhook) => {
                     if (event.message) {
                         return await client.conversations.v1.conversations(conversation.sid).messages.create({
