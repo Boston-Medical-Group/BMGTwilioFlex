@@ -4,6 +4,7 @@
 * Prueba webhook por url
 * Reemplaza parametros ts
 * Corrige bug
+* Expira conversaciones en 24H
 
 # 30/01/2024
 * Actualiza log de IVR
