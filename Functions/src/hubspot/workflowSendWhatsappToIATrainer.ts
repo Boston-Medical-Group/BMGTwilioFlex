@@ -70,14 +70,14 @@ export const handler = async (
             }
         }).then(async (conversation) => {
             return await client.conversations.v1.conversations(conversation.sid).participants.create({
-                identity: whatsappAddressTo
+                //@ts-ignore
+                "messagingBinding.address": whatsappAddressTo,
+                "messagingBinding.proxyAddress": whatsappAddressFrom
             }).then(async (participant) => {
                 return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
                     target: 'webhook',
-                    configuration: {
-                        //flowSid: context.TWILIO_WA_IA_STUDIO_FLOW
-                        url: context.TWILIO_WA_IA_STUDIO_URL
-                    }
+                    //@ts-ignore
+                    "configuration.flowSid": context.TWILIO_WA_IA_STUDIO_FLOW
                 }).then(async (webhook) => {
                     if (event.message) {
                         return await client.conversations.v1.conversations(conversation.sid).messages.create({
