@@ -1,5 +1,8 @@
 # Changelog
 
+# 31/01/2024
+* Prueba webhook por url
+
 # 30/01/2024
 * Actualiza log de IVR
 * Corrige bug
