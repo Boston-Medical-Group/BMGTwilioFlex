@@ -65,8 +65,8 @@ export const handler = async (
                 hubspot_contact_id: event.contact_id
             }),
             timers: {
-                inactive: 'PT10M',
-                closed: 'PT1H'
+                inactive: 'PT1H',
+                closed: 'PT24H'
             }
         }).then(async (conversation) => {
             return await client.conversations.v1.conversations(conversation.sid).participants.create({
