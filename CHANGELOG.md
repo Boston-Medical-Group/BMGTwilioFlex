@@ -1,12 +1,15 @@
 # Changelog
 
-# 31/01/2024
+## 01/02/2024
+* Fuerza deploy
+
+## 31/01/2024
 * Prueba webhook por url
 * Reemplaza parametros ts
 * Corrige bug
 * Expira conversaciones en 24H
 
-# 30/01/2024
+## 30/01/2024
 * Actualiza log de IVR
 * Corrige bug
 * Agrega funcion de mensaje directo workflow hubspot
@@ -18,10 +21,10 @@
 * Mas log
 * Corrige caller ids
 
-# 26/01/2024
+## 26/01/2024
 * Force deploy
 
-# 25/01/2024
+## 25/01/2024
 * Corrige variables de entorno
 * Corrige polling
 * Implementa ReactQuery
@@ -30,14 +33,14 @@
 * Update de variables de despliegue
 * Corrige el size de paginacion de pools de callerid de 15 a 150
 
-# 24/01/2024
+## 24/01/2024
 * Agrega funcion IA
 * Modifica comportamiento IA
 
-# 23/01/2024
+## 23/01/2024
 * Agrega log a fetchCallerId
 
-# 22/01/2024
+## 22/01/2024
 * Modifica comportamiento de tarjeta de interacción
 * Corrige problema de CRMID en log
 
