@@ -78,7 +78,7 @@ const getTemplatesFromManager = async function (
   context: Context<MyContext>,
   parameters: {}
 ) {
-  countryCode = 'esp';
+  //countryCode = 'esp';
 
   type TemplateObject = {
     message: string
