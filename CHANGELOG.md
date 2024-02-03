@@ -1,5 +1,8 @@
 # Changelog
 
+## 02/02/2024
+* Agrega quick call desde chat
+
 ## 01/02/2024
 * Fuerza deploy
 
