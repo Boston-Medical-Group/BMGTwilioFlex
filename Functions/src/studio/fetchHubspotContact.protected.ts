@@ -29,13 +29,37 @@ exports.handler = async function (
 
     //if the string from contains a whatsapp prefix we need to remove it
     from = from.replace('whatsapp:', '');
+    from = from.replace(' ', '+');
+    let fromWithoutPrefix = removePrefix(from, ['+593', '+52', '+34', '+1', '+51', '+54', '+56', '+57'])
 
     const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
     await hubspotClient.crm.contacts.searchApi.doSearch({
-        query: from,
-        filterGroups: [],
-        sorts: ['phone'],
-        properties: ['firstname', 'lastname', 'lifecyclestage'],
+        //query: from,
+        filterGroups: [
+            {
+                filters: [
+                    {
+                        propertyName: 'phone',
+                        operator: 'EQ',
+                        value: from
+                    }
+                ]
+            }, {
+                filters: [
+                    {
+                        propertyName: 'phone',
+                        operator: 'CONTAINS_TOKEN',
+                        value: `*${fromWithoutPrefix}`
+                    }
+                ]
+            }
+        ],
+        //@ts-ignore
+        sorts: [{
+            propertyName: 'phone',
+            direction: 'ASCENDING'
+        }],
+        properties: ['firstname', 'lastname', 'lifecyclestage', 'phone'],
         limit: 1,
         after: 0
     }).then((contacts: CollectionResponseWithTotalSimplePublicObjectForwardPaging) => {
@@ -64,3 +88,13 @@ exports.handler = async function (
         callback(null, error);
     });
 };
+
+const removePrefix = (phone: string , prefixes: string[]) => {
+    for (let prefix of prefixes) {
+        if (phone.startsWith(prefix)) {
+            phone = phone.slice(prefix.length);
+            break;
+        }
+    }
+    return phone;
+}
