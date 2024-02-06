@@ -1,5 +1,8 @@
 # Changelog
 
+## 06/02/2024
+* Agrega log y ajusta token hubspot ECU
+
 ## 05/02/2024
 * Busca contactos por telefono sin código país
 
