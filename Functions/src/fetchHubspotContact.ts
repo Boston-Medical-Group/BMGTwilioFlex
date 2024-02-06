@@ -13,7 +13,7 @@ const fetchByContact = async (contact_id: string, context: Context<MyContext>, d
   const contact: ContactSimplePublicObjectWithAssociations = await hubspotClient.crm.contacts.basicApi.getById(contact_id, ['email', 'firstname', 'lastname', 'phone', 'hs_object_id', 'reservar_cita'])
     .then((hubpostContact: ContactSimplePublicObjectWithAssociations) => hubpostContact)
     .catch((error) => {
-      throw new Error('Error while retrieving data from hubspot');
+      throw new Error('Error while retrieving data from hubspot (CONTACT)');
     })
   
   return {
@@ -31,7 +31,7 @@ const fetchByDeal = async (deal_id: string, context: Context<MyContext>) => {
     ['contact']
   ).then((hubspotDeal: DealSimplePublicObjectWithAssociations) => hubspotDeal)
   .catch((error) => {
-    throw new Error('Error while retrieving data from hubspot');
+    throw new Error('Error while retrieving data from hubspot (DEAL)');
   })
 
   const contacts = deal.associations?.contacts ? deal.associations.contacts.results : [];
@@ -40,7 +40,7 @@ const fetchByDeal = async (deal_id: string, context: Context<MyContext>) => {
     const contactAssociation = contacts[0];
     return await fetchByContact(contactAssociation.id, context, deal);
   } else {
-    throw new Error('Error while retrieving data from hubspot');
+    throw new Error('Error while retrieving data from hubspot (DEALCONTACT)');
   }
 }
 
