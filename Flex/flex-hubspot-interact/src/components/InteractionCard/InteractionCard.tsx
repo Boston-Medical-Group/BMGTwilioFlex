@@ -59,6 +59,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
   */
 
   const sendWAHandler = useCallback((contact: HubspotContact, deal?: HubspotDeal) => {
+    // @todo corregir telefono e164
     startOutboundConversation({
         To: `whatsapp:${ contact.phone }`,
         customerName: `${contact.firstname || ''} ${contact.lastname || ''}`.trim(),
