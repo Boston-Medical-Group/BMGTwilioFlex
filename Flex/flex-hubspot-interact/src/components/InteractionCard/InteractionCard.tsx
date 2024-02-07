@@ -80,7 +80,6 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
         }
       }
     }
-    
 
     // @todo corregir telefono e164
     startOutboundConversation({

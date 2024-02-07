@@ -6,7 +6,7 @@ module.exports = (config, { isProd, isDev, isTest }) => {
    * Consult https://webpack.js.org/configuration for more information
    */
 
-  config.optimization.minimize = false
+  config.optimization.minimizer = [new TerserPlugin()]
   
   return config;
 }
