@@ -3,6 +3,7 @@
 ## 07/02/2024
 * Autoriza IA
 * Corrige bindingAddress
+* Fuerza deploy
 
 ## 06/02/2024
 * Agrega log y ajusta token hubspot ECU
