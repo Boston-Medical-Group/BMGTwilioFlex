@@ -42,7 +42,7 @@ jobs:
           COUNTRY: ${{vars.COUNTRY}}
           FLEX_APP_OUTBOUND_WHATSAPP_QUEUE_SID: ${{vars.FLEX_APP_OUTBOUND_WHATSAPP_QUEUE_SID}}
           OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
-          OPENAI_ASSITANT_ID: ${{vars.OPENAI_ASSITANT_ID}}
+          OPENAI_ASSISTANT_ID: ${{vars.OPENAI_ASSISTANT_ID}}
           TWILIO_WA_IA_STUDIO_FLOW: ${{vars.TWILIO_WA_IA_STUDIO_FLOW}}
           TWILIO_WA_IA_STUDIO_URL: ${{vars.TWILIO_WA_IA_STUDIO_URL}}
         run: twilio serverless:deploy --env .env.example --load-system-env --environment=dev --force -n bmg-elexial-cc-stack --override-existing-project -l=debug
