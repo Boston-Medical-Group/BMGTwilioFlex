@@ -42,7 +42,7 @@ jobs:
       - name: NodeJSPrep
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
       - name: GlobalPackages
         run: npm install twilio-cli -g 
       - run: twilio plugins:install @twilio-labs/plugin-flex 

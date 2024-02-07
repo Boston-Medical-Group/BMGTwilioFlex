@@ -72,7 +72,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
         EC: '+593',
       }
 
-      if (countryMap.hasOwnProperty(contact.country)) {
+      if (contact.phone && !contact.phone.startsWith('+') && countryMap.hasOwnProperty(contact.country)) {
         const currentCode: string = countryMap[contact.country];
         // if contact.phone doesn't have country code, add it
         if (contact.phone && !contact.phone.startsWith(currentCode)) {
