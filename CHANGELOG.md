@@ -5,6 +5,7 @@
 * Corrige bindingAddress
 * Fuerza deploy
 * Deploy de functions
+* Fuerza redeploy
 
 ## 06/02/2024
 * Agrega log y ajusta token hubspot ECU
