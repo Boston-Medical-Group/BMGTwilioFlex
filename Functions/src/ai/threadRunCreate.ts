@@ -42,7 +42,7 @@ export const handler = functionValidator(async (
         limit: 20,
         order: 'desc'
     }).then(async (messages) => {
-        messages.map((message) => {
+        messages.reverse().map((message) => {
             threadMessages.push({
                 role: "user",
                 content: message.body
