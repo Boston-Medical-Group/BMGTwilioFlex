@@ -10,7 +10,10 @@ type MyContext = {
 
 const fetchByContact = async (contact_id: string, context: Context<MyContext>, deal?: DealSimplePublicObjectWithAssociations) => {
   const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
-  const contact: ContactSimplePublicObjectWithAssociations = await hubspotClient.crm.contacts.basicApi.getById(contact_id, ['email', 'firstname', 'lastname', 'phone', 'hs_object_id', 'reservar_cita'])
+  const contact: ContactSimplePublicObjectWithAssociations = await hubspotClient.crm.contacts.basicApi.getById(
+    contact_id,
+    ['email', 'firstname', 'lastname', 'phone', 'hs_object_id', 'reservar_cita', 'country'],
+  )
     .then((hubpostContact: ContactSimplePublicObjectWithAssociations) => hubpostContact)
     .catch((error) => {
       throw new Error('Error while retrieving data from hubspot (CONTACT)');
