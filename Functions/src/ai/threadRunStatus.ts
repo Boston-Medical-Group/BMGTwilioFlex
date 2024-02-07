@@ -3,7 +3,7 @@ import OpenAI from 'openai'
 
 type MyContext = {
     OPENAI_API_KEY: string
-    OPENAI_ASSITANT_ID: string
+    OPENAI_ASSISTANT_ID: string
 }
 
 type MyEvent = {

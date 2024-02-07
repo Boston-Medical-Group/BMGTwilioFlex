@@ -4,7 +4,7 @@ import { functionValidator } from "twilio-flex-token-validator";
 
 type MyContext = {
     OPENAI_API_KEY: string
-    OPENAI_ASSITANT_ID: string
+    OPENAI_ASSISTANT_ID: string
 }
 
 type MyEvent = {
@@ -56,7 +56,7 @@ export const handler = functionValidator(async (
         messages: threadMessages
     }).then(async thread => {
         const run = await openai.beta.threads.runs.create(thread.id, {
-            assistant_id: context.OPENAI_ASSITANT_ID
+            assistant_id: context.OPENAI_ASSISTANT_ID
         })
             .then((run) => (run))
             .catch((error) => {
