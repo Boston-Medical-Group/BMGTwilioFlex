@@ -58,7 +58,29 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
   }, []);
   */
 
+  type CountryMap = {
+    [key: string]: string
+  }
   const sendWAHandler = useCallback((contact: HubspotContact, deal?: HubspotDeal) => {
+    if (contact.country) {
+      const countryMap: CountryMap = {
+        CO: '+57',
+        PE: '+51',
+        AR: '+54',
+        ES: '+34',
+        MX: '+52',
+        EC: '+593',
+      }
+
+      if (countryMap.hasOwnProperty(contact.country)) {
+        const currentCode: string = countryMap[contact.country];
+        // if contact.phone doesn't have country code, add it
+        if (contact.phone && !contact.phone.startsWith(currentCode)) {
+          contact.phone = `${currentCode}${contact.phone}`;
+        }
+      }
+    }
+
     // @todo corregir telefono e164
     startOutboundConversation({
         To: `whatsapp:${ contact.phone }`,
