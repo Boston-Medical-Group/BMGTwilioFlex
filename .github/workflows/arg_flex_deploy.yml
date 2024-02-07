@@ -45,7 +45,7 @@ jobs:
           node-version: '18'
       - name: GlobalPackages
         run: npm install twilio-cli -g 
-      - run: twilio plugins:install @twilio-labs/plugin-flex 
+      - run: twilio plugins:install @twilio-labs/plugin-flex@6.2.3
       - name: Preparing 
         working-directory: Flex/${{matrix.folder}}
         run: npm install
