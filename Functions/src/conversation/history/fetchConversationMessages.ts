@@ -17,6 +17,7 @@ const getConversationMessages = async (client: twilio.Twilio, conversationSid: s
 
         let media = JSON.stringify(message.media);
 
+        console.log('ADDINGMESSaGESID', message.sid)
         try {
             let msg = JSON.parse(`{
                 "index": "${message.index}",
@@ -27,6 +28,7 @@ const getConversationMessages = async (client: twilio.Twilio, conversationSid: s
                 }`);
             result.push(msg);
         } catch (e) {
+            console.log('ADDINGMESSAGEERROR', e)
         }
     }
     return result;
