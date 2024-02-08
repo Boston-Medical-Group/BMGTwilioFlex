@@ -1,5 +1,8 @@
 # Changelog
 
+## 08/02/2024
+* Log chat history
+
 ## 07/02/2024
 * Autoriza IA
 * Corrige bindingAddress
