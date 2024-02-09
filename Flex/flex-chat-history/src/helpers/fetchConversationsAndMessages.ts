@@ -37,7 +37,7 @@ export async function fetchConversationsByParticipant(manager: Flex.Manager, pho
     };
 
     return new Promise((resolve, reject) => {
-        fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/conversation/history/fetchAllConversationsByParticipant?phoneNumber=${encodeURIComponent(phoneNumber)}`, options)
+        fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/conversation/history/fetchConversationsByParticipant?phoneNumber=${encodeURIComponent(phoneNumber)}`, options)
             .then(data => {
                 resolve(data.json());
             })
