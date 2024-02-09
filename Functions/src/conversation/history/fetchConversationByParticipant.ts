@@ -7,8 +7,8 @@ import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-typ
 import { functionValidator as TokenValidator } from "twilio-flex-token-validator";
 import * as twilio from 'twilio';
 
-const MAX_CONVERSATIONS_TO_FETCH = 100;
-const MAX_CONVERSATIONS_TO_PRESENT = 20;
+const MAX_CONVERSATIONS_TO_FETCH = 5;
+const MAX_CONVERSATIONS_TO_PRESENT = 5;
 const MAX_PERIOD = 12;
 
 /* Returns the conversations list in order. 

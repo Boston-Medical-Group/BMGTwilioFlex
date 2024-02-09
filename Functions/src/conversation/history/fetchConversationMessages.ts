@@ -3,7 +3,7 @@ import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-typ
 import { functionValidator as TokenValidator } from "twilio-flex-token-validator";
 import { MessageInstance } from "twilio/lib/rest/conversations/v1/conversation/message";
 import * as twilio from 'twilio';
-const MAX_MESSAGES_TO_FETCH = 100;
+const MAX_MESSAGES_TO_FETCH = 20;
 
 /* Returns the messages within a given conversation */
 const getConversationMessages = async (client: twilio.Twilio, conversationSid: string) : Promise<Array<any>> => {
@@ -29,7 +29,7 @@ const getConversationMessages = async (client: twilio.Twilio, conversationSid: s
             result.push(msg);
         } catch (e) {
             console.log('ADDINGMESSAGEERROR', e)
-        }
+            }
     }
     return result;
 }

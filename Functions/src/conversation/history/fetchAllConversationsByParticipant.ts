@@ -8,8 +8,8 @@ import * as twilio from 'twilio';
 * If the participant is a chat participant, the chat is being tied to a from address //TODO MODIFIED FROM?
 */
 
-const MAX_CONVERSATIONS_TO_FETCH = 100;
-const MAX_CONVERSATIONS_TO_PRESENT = 20;
+const MAX_CONVERSATIONS_TO_FETCH = 5;
+const MAX_CONVERSATIONS_TO_PRESENT = 5;
 const MAX_PERIOD = 12;
 
 /* Returns previous date */
