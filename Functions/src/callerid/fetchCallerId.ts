@@ -12,6 +12,7 @@ type MyContext = {
 type MyEvent = {
   Token: string
   queueSid?: string
+  toNumber?: string
 }
 
 type CountryAttributes = {
@@ -25,6 +26,8 @@ type CountryAttributes = {
   timezone: string
   offlineMessage: string|null
   defaultQueue: string|null
+  useAreaCode: boolean
+  prefix: string|null //@ts-ignore
 }
 
 type CallerIdAttributes = {
@@ -94,20 +97,52 @@ exports.handler = FunctionTokenValidator(async function (
         })
       
       const defaultQueue = countryResponse.data.attributes.defaultQueue
+      const prefix: string | RegExp = countryResponse.data.attributes.prefix as string
+      const useAreaDDI = countryResponse.data.attributes.useAreaCode
       const queryQueue = event.queueSid || defaultQueue
-      const callerIdsResponse: CallerIdsResponse = await fetch(`${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${queryQueue}&page[size]=${PAGE_SIZE}`, {
-        method: "GET",
-        headers: {
-          'Content-Type': 'application/vnd.api+json',
-          'Authorization': `Bearer ${context.FLEXMANAGER_API_KEY}`
+      let callerIdsResponse = null 
+
+      if (useAreaDDI && event.toNumber) {
+        const toNumberWOPrefix = event.toNumber.replace(prefix, '')
+
+        for (let i = 3; i > 1; i--) {
+          let probableAreaCode = toNumberWOPrefix.substring(0, i);
+
+          callerIdsResponse = await fetch(`${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${probableAreaCode}&page[size]=${PAGE_SIZE}`, {
+            method: "GET",
+            headers: {
+              'Content-Type': 'application/vnd.api+json',
+              'Authorization': `Bearer ${context.FLEXMANAGER_API_KEY}`
+            }
+          })
+          .then(async (res) => {
+            return await res.json()
+          })
+
+          if (callerIdsResponse !== null && callerIdsResponse.meta.page.total) {
+            count = await utils.getRRCounter(probableAreaCode, context) || 0;
+            break;
+          }
         }
-      })
+
+      }
+
+      if (callerIdsResponse === null || !callerIdsResponse.meta.page.total) {
+
+        callerIdsResponse = await fetch(`${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${queryQueue}&page[size]=${PAGE_SIZE}`, {
+          method: "GET",
+          headers: {
+            'Content-Type': 'application/vnd.api+json',
+            'Authorization': `Bearer ${context.FLEXMANAGER_API_KEY}`
+          }
+        })
         .then(async (res) => {
           return await res.json()
         })
+        count = await utils.getRRCounter(queryQueue, context) || 0;
       
+      }
       
-      count = await utils.getRRCounter(queryQueue, context) || 0;
       if (count >= callerIdsResponse.meta.page.total) {
         count = 0;
       }
