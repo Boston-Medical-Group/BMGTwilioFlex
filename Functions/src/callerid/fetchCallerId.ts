@@ -81,9 +81,9 @@ exports.handler = FunctionTokenValidator(async function (
   let callerId, count = 0;
   let queueSid = event.queueSid ?? undefined;
   try {
-    const country = utils.countryToIso2(context.COUNTRY);
 
-    //context.COUNTRY = 'esp';
+ //   context.COUNTRY = 'mex';
+    const country = utils.countryToIso2(context.COUNTRY);
     try {
       const countryResponse: CountryResponse = await fetch(`${context.FLEXMANAGER_API_URL}/countries/${context.COUNTRY}`, {
         method: "GET",
@@ -107,21 +107,24 @@ exports.handler = FunctionTokenValidator(async function (
 
         for (let i = 3; i > 1; i--) {
           let probableAreaCode = toNumberWOPrefix.substring(0, i);
+          let areaCodeQueue = utils.areaCodeQueue(country, probableAreaCode);
 
-          callerIdsResponse = await fetch(`${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${probableAreaCode}&page[size]=${PAGE_SIZE}`, {
-            method: "GET",
-            headers: {
-              'Content-Type': 'application/vnd.api+json',
-              'Authorization': `Bearer ${context.FLEXMANAGER_API_KEY}`
+          if (areaCodeQueue) {
+            callerIdsResponse = await fetch(`${context.FLEXMANAGER_API_URL}/caller-id-pools?filter[country]=${context.COUNTRY}&filter[queue]=${areaCodeQueue}&page[size]=${PAGE_SIZE}`, {
+              method: "GET",
+              headers: {
+                'Content-Type': 'application/vnd.api+json',
+                'Authorization': `Bearer ${context.FLEXMANAGER_API_KEY}`
+              }
+            })
+            .then(async (res) => {
+              return await res.json()
+            })
+
+            if (callerIdsResponse !== null && callerIdsResponse.meta.page.total) {
+              count = await utils.getRRCounter(probableAreaCode, context) || 0;
+              break;
             }
-          })
-          .then(async (res) => {
-            return await res.json()
-          })
-
-          if (callerIdsResponse !== null && callerIdsResponse.meta.page.total) {
-            count = await utils.getRRCounter(probableAreaCode, context) || 0;
-            break;
           }
         }
 

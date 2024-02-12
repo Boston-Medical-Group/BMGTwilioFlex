@@ -6,6 +6,7 @@ export const initializeCustomCallSids = (flex, manager) => {
         if (payload.callerId) {
             original(payload);
         } else {
+
             fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/callerid/fetchCallerId`, {
                 method: "POST",
                 headers: {
@@ -13,7 +14,7 @@ export const initializeCustomCallSids = (flex, manager) => {
                 },
                 body: JSON.stringify({
                     queueSid: payload.queueSid ?? null,
-                    toNumber: payload.task.attributes.to ?? null,
+                    toNumber: payload.destination ?? null,
                     Token: manager.store.getState().flex.session.ssoTokenPayload.token
                 })
             })
