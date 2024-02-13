@@ -59,7 +59,8 @@ const createRRCounter = async (queue, context) => {
         }).catch(function (err) {
             return false;
         });
-    } catch (error) {
+    } catch (err) {
+        console.log(err);
         return false;
     }
 }
@@ -86,6 +87,7 @@ const getRRCounter = async (queue, context) => {
             return await createRRCounter(queue, context);
         });
     } catch (error) {
+        console.log(err);
         return false;
     }
 }
@@ -123,7 +125,94 @@ const updateRRCounter = async (queue, count, context) => {
             console.log(err);
             return false;
         });
-    } catch (error) {
+    } catch (err) {
+        console.log(err);
+        return false;
+    }
+}
+
+/**
+ * Return the queue of the given area code
+ *
+ * @param {string} country - Country ISO 2
+ * @param {string} areaCode - The area code of the destination phone number
+ */
+exports.areaCodeQueue = (country, areaCode) => {
+    try {
+        const areaCodesByCountry = {
+            "MX": {
+                "449": {
+                    "areaCodes": ["449", "458", "465", "495", "496"],
+                    "queue": "Aguascalientes"
+                },
+                "664": {
+                    "areaCodes": ["615", "616", "646", "653", "658", "661", "664", "665", "686"],
+                    "queue": "Tijuana"
+                },
+                "614": {
+                    "areaCodes": ["614", "621", "625", "626", "627", "628", "629", "635", "636", "639", "648", "649", " 652", "656", "659"],
+                    "queue": "Chihuahua"
+                },
+                "477": {
+                    "areaCodes": ["352", "411", "412", "413", "415", "417", "418", "419", "421", "428", "429", "432", "438", "445", "456", "461", "462", "464", "466", "469", "472", "476", "477"],
+                    "queue": "Leon"
+                },
+                "33": {
+                    "areaCodes": ["33", "312", "315", "316", "317", "321", "322", "326", "341", "342", "343", "344", "345", "346", "347", "348", "349", "357", "358", "371", "372", "373", "374", "375", "376", "377", "378", "382", "384", "385", "386", "387", "388", "391", "392", "393", "395", "437", "474", "475", "496", "499"],
+                    "queue": "Guadalajara"
+                },
+                "81": {
+                    "areaCodes": ["81", "821", "823", "824", "825", "826", "828", "829", "867", "873", "892"],
+                    "queue": "Monterrey"
+                },
+                "443": {
+                    "areaCodes": ["313", "328", "351", "352", "353", "354", "355", "356", "359", "381", "383", "393", "394", "422", "423", "424", "425", "426", "434", "435", "436", "438", "443", "447", "451", "452", "453", "454", "455", "459", "471", "715", "753", "786"],
+                    "queue": "Morelia"
+                },
+                "222": {
+                    "areaCodes": ["222", "223", "224", "227", "231", "233", "236", "237", "238", "243", "244", "245", "248", "249", "275", "276", "746", "764", "776", "797", "953", ""],
+                    "queue": "Puebla"
+                },
+                "442": {
+                    "areaCodes": ["414", "427", "441", "442", "448", "487", "761"],
+                    "queue": "Queretaro"
+                },
+                "993": {
+                    "areaCodes": ["913", "914", "917", "923", "932", "933", "934", "936", "937", "993"],
+                    "queue": "Villahermosa"
+                },
+                "999": {
+                    "areaCodes": ["969", "985", "986", "988", "991", "999"],
+                    "queue": "Merida"
+                },
+                "771": {
+                    "areaCodes": ["736", "738", "743", "748", "759", "761", "763", "771", "772", "773", "774", "775", "776", "778", "779", "789", "791"],
+                    "queue": "Pachuca"
+                },
+                "998": {
+                    "areaCodes": ["983", "984", "997", "998"],
+                    "queue": "Cancun"
+                }
+            }
+        }
+
+        if (areaCodesByCountry.hasOwnProperty(country)) {
+            
+            let queue = null;
+            for (const key in areaCodesByCountry[country]) {
+                if (areaCodesByCountry[country][key].hasOwnProperty('areaCodes')) {
+                    if (areaCodesByCountry[country][key].areaCodes.find(element => element == areaCode)) {
+                        queue = areaCodesByCountry[country][key].queue;
+                        break;
+                    }
+                }
+            }
+            return queue;
+
+        } else {
+            return false;
+        }
+    } catch (err) {
         console.log(err);
         return false;
     }

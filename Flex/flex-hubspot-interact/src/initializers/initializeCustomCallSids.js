@@ -6,6 +6,7 @@ export const initializeCustomCallSids = (flex, manager) => {
         if (payload.callerId) {
             original(payload);
         } else {
+
             fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/callerid/fetchCallerId`, {
                 method: "POST",
                 headers: {
@@ -13,22 +14,23 @@ export const initializeCustomCallSids = (flex, manager) => {
                 },
                 body: JSON.stringify({
                     queueSid: payload.queueSid ?? null,
+                    toNumber: payload.destination ?? null,
                     Token: manager.store.getState().flex.session.ssoTokenPayload.token
                 })
             })
-            .then((response) => response.json())
-            .then((data) => {
-                // Obtener el número de teléfono dinámico
-                const dynamicNumber = data.callerId;
+                .then((response) => response.json())
+                .then((data) => {
+                    // Obtener el número de teléfono dinámico
+                    const dynamicNumber = data.callerId;
 
-                // Actualizar el destino de la llamada saliente con el número de teléfono dinámico
-                payload.callerId = dynamicNumber;
-                // Invocar la acción original con el payload actualizado
-                original(payload);
-            })
-            .catch((error) => {
-                original(payload);
-            });
+                    // Actualizar el destino de la llamada saliente con el número de teléfono dinámico
+                    payload.callerId = dynamicNumber;
+                    // Invocar la acción original con el payload actualizado
+                    original(payload);
+                })
+                .catch((error) => {
+                    original(payload);
+                });
         }
     });
 }
