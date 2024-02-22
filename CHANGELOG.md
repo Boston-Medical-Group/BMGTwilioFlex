@@ -2,6 +2,7 @@
 
 ## 22/02/2024
 * Correcciones en historial de chat
+* Agrega códigos de error
 
 ## 08/02/2024
 * Log chat history

@@ -71,9 +71,15 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
         });
     };
 
-    const errorMessageString = (code : number) => {
+    const errorMessageString = (code: number) => {
         if (code === 63016) {
             return 'Fuera de la ventana de 24 horas. Inicie la conversación utilizando una plantilla de WhatsApp'
+        } else if (code === 63051) {
+            return 'La cuenta de WhatsApp Business se encuentra bloqueada'
+        } else if (code === 63032) {
+            return 'No podemos enviar el mensaje debido a una limitación de Whatsapp'
+        } else if (code === 63024) {
+            return 'Destinatario inválido'
         } else {
             return 'Error no catalogado'
         }
