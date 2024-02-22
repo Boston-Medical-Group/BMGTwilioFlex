@@ -1,5 +1,8 @@
 # Changelog
 
+## 22/02/2024
+* Correcciones en historial de chat
+
 ## 08/02/2024
 * Log chat history
 
