@@ -24,6 +24,7 @@ const CallCard = ({ manager, contact, deal } : Props) => {
   const [defaultQueue] = useState<string>(manager.workerClient?.attributes?.last_used_queue ?? FLEX_APP_OUTBOUND_QUEUE_SID as string);
   const [selectedQueue, setSelectedQueue] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false)
+  const [doNotCall, setDoNotCall] = useState(true);
 
   const afterSetActivityListener = useCallback((payload) => {
     if (payload.activityAvailable) {
@@ -32,6 +33,18 @@ const CallCard = ({ manager, contact, deal } : Props) => {
       setActionDisabled(true)
     }
   }, []);
+
+  /** DO NOT CALL */
+  useEffect(() => {
+    const parseBool = (val: string | boolean) => val === true || val === "true"
+    let dnc = typeof contact.donotcall === 'string' ? parseBool(contact.donotcall.toLowerCase()) : contact.donotcall;
+    if (dnc) {
+      setDoNotCall(true)
+      console.log('DO NOT CALL THIS CONTACT')
+    } else {
+      setDoNotCall(false)
+    }
+  }, [contact])
 
   useEffect(() => {
     setSelectedQueue(defaultQueue);
@@ -96,7 +109,7 @@ const CallCard = ({ manager, contact, deal } : Props) => {
               </Select>
           </Box>
           <Stack orientation="horizontal" spacing="space30">
-            <Button loading={isLoading} variant="primary" title={actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call"} disabled={actionDisabled} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Iniciar llamada</Button>
+            <Button loading={isLoading} variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Iniciar llamada</Button>
           </Stack>
           </Card>
         </Box>

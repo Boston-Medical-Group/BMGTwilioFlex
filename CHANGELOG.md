@@ -1,5 +1,8 @@
 # Changelog
 
+## 29/02/2024
+* Optout de llamada
+
 ## 22/02/2024
 * Correcciones en historial de chat
 * Agrega códigos de error

@@ -27,6 +27,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [selectedSmsContact, setSelectedSmsContact] = useState<HubspotContact>();
   const [selectedWAContact, setSelectedWAContact] = useState<HubspotContact>();
+  const [doNotCall, setDoNotCall] = useState(true);
 
   const afterSetActivityListener = useCallback((payload) => {
     if (payload.activityAvailable) {
@@ -35,6 +36,18 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
       setActionDisabled(true)
     }
   }, []);
+
+  /** DO NOT CALL */
+  useEffect(() => {
+    const parseBool = (val : string | boolean) => val === true || val === "true"
+    let dnc = typeof contact.donotcall === 'string' ? parseBool(contact.donotcall.toLowerCase()) : contact.donotcall;
+    if (dnc) { 
+      setDoNotCall(true)
+      console.log('DO NOT CALL THIS CONTACT')
+    } else {
+      setDoNotCall(false)
+    }
+  }, [contact])
 
   useEffect(() => {
     Flex.Actions.addListener("afterSetActivity", afterSetActivityListener);
@@ -70,6 +83,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
         ES: '+34',
         MX: '+52',
         EC: '+593',
+        BR: '+55',
       }
 
       if (contact.phone && !contact.phone.startsWith('+') && countryMap.hasOwnProperty(contact.country)) {
@@ -135,8 +149,13 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
           <Paragraph>
             Seleccione el método de interacción con el contacto seleccionado.
             </Paragraph>
+            {doNotCall && (
+              <Paragraph>
+                El contacto está marcado como "No Llamar".
+              </Paragraph>
+            )}
           <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
-            <Button variant="primary" disabled={actionDisabled} onClick={callHandler}><FaPhoneAlt /> Call</Button>
+              <Button variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={callHandler}><FaPhoneAlt /> Call</Button>
             <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact, deal)}><FaSms /> SMS</Button>
             <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact, deal)}><FaWhatsapp /> WhatsApp</Button>
             {calendar() !== '' && <Button disabled={actionDisabled} variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
