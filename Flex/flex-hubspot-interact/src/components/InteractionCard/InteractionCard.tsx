@@ -169,7 +169,12 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
                 El contacto está marcado como "No Llamar".
               </Paragraph>
             )}
-            <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
+            <Box display="flex"
+              rowGap="space60"
+              flexWrap="wrap"
+              justifyContent="space-between"
+              flexDirection="column"
+            >
               <Button variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={callHandler}><FaPhoneAlt /> Call</Button>
               <CustomizationProvider
                 elements={{
@@ -186,7 +191,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
                   },
                 }}
               >
-                <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact, deal)}><FaSms /> SMS</Button>
+                <Button variant="primary" disabled={actionDisabled} fullWidth onClick={() => sendSmsHandler(contact, deal)}><FaSms /> SMS</Button>
               </CustomizationProvider>
               <CustomizationProvider
                 elements={{
@@ -203,9 +208,10 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
                   },
                 }}
               >
-              <Button variant="primary"
-                disabled={actionDisabled}
-                onClick={() => sendWAHandler(contact, deal)}
+                <Button variant="primary"
+                  fullWidth
+                  disabled={actionDisabled}
+                  onClick={() => sendWAHandler(contact, deal)}
                 ><FaWhatsapp /> WhatsApp</Button>
               </CustomizationProvider>
               {calendar() !== '' && (
@@ -224,7 +230,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
                     },
                   }}
                 >
-                  <Button disabled={actionDisabled} variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>
+                  <Button disabled={actionDisabled} variant="primary" onClick={sendCalendarHandler} fullWidth><FaCalendar /> Cita</Button>
                 </CustomizationProvider>
               )}
           </Box>
