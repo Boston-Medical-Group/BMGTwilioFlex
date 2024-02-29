@@ -12,7 +12,7 @@ const fetchByContact = async (contact_id: string, context: Context<MyContext>, d
   const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
   const contact: ContactSimplePublicObjectWithAssociations = await hubspotClient.crm.contacts.basicApi.getById(
     contact_id,
-    ['email', 'firstname', 'lastname', 'phone', 'hs_object_id', 'reservar_cita', 'country'],
+    ['email', 'firstname', 'lastname', 'phone', 'hs_object_id', 'reservar_cita', 'country', 'donotcall'],
   )
     .then((hubpostContact: ContactSimplePublicObjectWithAssociations) => hubpostContact)
     .catch((error) => {
