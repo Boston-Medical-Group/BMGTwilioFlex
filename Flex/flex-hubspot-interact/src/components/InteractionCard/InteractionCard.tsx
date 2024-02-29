@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import * as Flex from "@twilio/flex-ui";
+import { CustomizationProvider } from '@twilio-paste/core/customization';
 import { Theme } from '@twilio-paste/core/theme';
 import { Box, Card, Heading, Paragraph, Button } from '@twilio-paste/core';
 import { FaCalendar, FaPhoneAlt, FaSms, FaWhatsapp } from 'react-icons/fa';
@@ -16,6 +17,20 @@ type Props = {
   contact: HubspotContact
   deal?: HubspotDeal
   callHandler: (event: any) => void
+}
+
+const disabledButtonStyles = {
+  ':disabled': {
+    backgroundColor: 'colorBackgroundStrong',
+    borderColor: 'colorBorder',
+    boxShadow: 'none',
+  },
+  ':hover:disabled': {
+    color: 'colorTextInverse',
+    backgroundColor: 'colorBackgroundStrong',
+    borderColor: 'colorBorder',
+    boxShadow: 'none',
+  }
 }
 
 /**
@@ -154,11 +169,64 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
                 El contacto está marcado como "No Llamar".
               </Paragraph>
             )}
-          <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
+            <Box display="flex" columnGap="space30" rowGap="space30" flexWrap="wrap">
               <Button variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={callHandler}><FaPhoneAlt /> Call</Button>
-            <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact, deal)}><FaSms /> SMS</Button>
-            <Button variant="primary" disabled={actionDisabled} onClick={() => sendWAHandler(contact, deal)}><FaWhatsapp /> WhatsApp</Button>
-            {calendar() !== '' && <Button disabled={actionDisabled} variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>}
+              <CustomizationProvider
+                elements={{
+                  BUTTON: {
+                    backgroundColor: 'colorBackgroundInverse',
+                    boxShadow: 'shadowBorderInverseWeakest',
+                    ...disabledButtonStyles,
+                    ':hover': {
+                      color: 'colorTextPrimaryStrongest',
+                      borderColor: 'colorBorderInverse',
+                      boxShadow: 'shadowBorderInverseWeakest',
+                    },
+                    
+                  },
+                }}
+              >
+                <Button variant="primary" disabled={actionDisabled} onClick={() => sendSmsHandler(contact, deal)}><FaSms /> SMS</Button>
+              </CustomizationProvider>
+              <CustomizationProvider
+                elements={{
+                  BUTTON: {
+                    backgroundColor: 'colorBackgroundSuccess',
+                    borderColor: 'colorBorderSuccess',
+                    boxShadow: 'none',
+                    ...disabledButtonStyles,
+                    ':hover': {
+                      borderColor: 'colorBorderSuccess',
+                      color: 'colorTextSuccess',
+                      boxShadow: 'shadowBorderSuccessWeaker',
+                    }
+                  },
+                }}
+              >
+              <Button variant="primary"
+                disabled={actionDisabled}
+                onClick={() => sendWAHandler(contact, deal)}
+                ><FaWhatsapp /> WhatsApp</Button>
+              </CustomizationProvider>
+              {calendar() !== '' && (
+                <CustomizationProvider
+                  elements={{
+                    BUTTON: {
+                      backgroundColor: 'colorBackgroundWarning',
+                      borderColor: 'colorBorderWarning',
+                      boxShadow: 'shadowBorderWarningWeaker',
+                      ...disabledButtonStyles,
+                      ':hover': {
+                        borderColor: 'colorBorderWarning',
+                        color: 'colorTextWarning',
+                        boxShadow: 'shadowBorderWarningWeaker',
+                      }
+                    },
+                  }}
+                >
+                  <Button disabled={actionDisabled} variant="primary" onClick={sendCalendarHandler}><FaCalendar /> Cita</Button>
+                </CustomizationProvider>
+              )}
           </Box>
           </Card>
         </Box>
