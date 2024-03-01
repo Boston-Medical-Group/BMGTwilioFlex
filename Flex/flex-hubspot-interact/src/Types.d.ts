@@ -5,7 +5,8 @@ export type HubspotContact = {
     hs_object_id?: string
     email?: string
     reservar_cita?: string
-    donotcall?: boolean|string
+    donotcall?: boolean | string
+    numero_de_telefono_adicional_?: string
     [key: string]: any
 }
 
