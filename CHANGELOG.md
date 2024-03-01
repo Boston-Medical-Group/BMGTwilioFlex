@@ -1,5 +1,8 @@
 # Changelog
 
+## 01/02/2024
+* Seleccion de telefono a llamar
+
 ## 29/02/2024
 * Optout de llamada
 
