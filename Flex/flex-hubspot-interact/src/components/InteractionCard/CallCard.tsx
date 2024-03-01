@@ -15,6 +15,11 @@ type Props = {
   manager: Flex.Manager
 }
 
+type PhonesList = Array<{
+  phone: string
+  obfuscated: string
+}>
+
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
@@ -23,8 +28,10 @@ const CallCard = ({ manager, contact, deal } : Props) => {
   const [queues, setQueues] = useState<Array<TaskQueue>>([]);
   const [defaultQueue] = useState<string>(manager.workerClient?.attributes?.last_used_queue ?? FLEX_APP_OUTBOUND_QUEUE_SID as string);
   const [selectedQueue, setSelectedQueue] = useState<string>('');
+  const [selectedPhone, setSelectedPhone] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false)
   const [doNotCall, setDoNotCall] = useState(true);
+  const [phonesList, setPhonesList] = useState<PhonesList>([]);
 
   const afterSetActivityListener = useCallback((payload) => {
     if (payload.activityAvailable) {
@@ -48,6 +55,7 @@ const CallCard = ({ manager, contact, deal } : Props) => {
 
   useEffect(() => {
     setSelectedQueue(defaultQueue);
+    setSelectedPhone(contact.phone as string);
     const workspaceClient = manager.workspaceClient as Workspace
     workspaceClient.fetchTaskQueues()
       .then((queues) => {
@@ -69,6 +77,10 @@ const CallCard = ({ manager, contact, deal } : Props) => {
     setSelectedQueue(event.target.value);
   }, [])
 
+  const handlePhoneChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedPhone(event.target.value);
+  }, [])
+
   const initiateCallHandler = useCallback(async () => {
     setIsLoading(true)
     const workerAttributes = manager.workerClient?.attributes
@@ -78,7 +90,7 @@ const CallCard = ({ manager, contact, deal } : Props) => {
     }
 
     Flex.Actions.invokeAction("StartOutboundCall", {
-      destination: contact.phone,
+      destination: selectedPhone,
       queueSid: selectedQueue,
       taskAttributes: {
         customerName: `${contact.firstname || ''} ${contact?.lastname || ''}`.trim(),
@@ -87,12 +99,36 @@ const CallCard = ({ manager, contact, deal } : Props) => {
         hubspot_deal_id: deal?.hs_object_id,
         customers: {
           external_id: contact.hs_object_id,
-          phone: contact.phone,
+          phone: contact.phone, // El customer sigue teniendo el telefono de su cuenta pero el destino puede ser un telefono secundario
           email: contact.email
         }
       }
     }).finally(() => setIsLoading(false));
-  }, [selectedQueue]);
+  }, [selectedQueue, selectedPhone]);
+
+  useEffect(() => {
+    const obfuscate = (phone: string) => {
+      const firstPart = phone.slice(0, -4)
+      const lastDigits = phone.slice(-4)
+      
+      return firstPart.replace(/\d/g, '*') + lastDigits
+    }
+
+    if (contact.phone) {
+      phonesList.push({
+        phone: contact.phone as string,
+        obfuscated: obfuscate(contact.phone as string)
+      })
+
+      if (contact.numero_de_telefono_adicional_ || contact.numero_de_telefono_adicional) {
+        const secondaryPhone = contact.numero_de_telefono_adicional_ ?? contact.numero_de_telefono_adicional
+        phonesList.push({
+          phone: secondaryPhone as string,
+          obfuscated: obfuscate(secondaryPhone as string)
+        })
+      }
+    }
+  }, [contact])
 
   return (
     <Theme.Provider theme="default">
@@ -107,7 +143,16 @@ const CallCard = ({ manager, contact, deal } : Props) => {
                   <Option value={queue.queueSid} key={queue.queueSid}>{queue.queueName}</Option>
                 )) }
               </Select>
-          </Box>
+            </Box>
+            
+            <Box justifyContent="center" alignItems="center" rowGap="space10" marginBottom="space80">
+              <Label htmlFor="to">Seleccione télefono a llamar</Label>
+              <Select id="to" value={selectedPhone ?? phonesList.at(0)?.phone} onChange={handlePhoneChange}>
+                {phonesList.map((phone) => (
+                  <Option value={phone.phone} key={phone.phone}>{phone.obfuscated}</Option>
+                ))}
+              </Select>
+            </Box>
           <Stack orientation="horizontal" spacing="space30">
             <Button loading={isLoading} variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Iniciar llamada</Button>
           </Stack>

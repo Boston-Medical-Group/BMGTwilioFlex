@@ -12,7 +12,7 @@ const fetchByContact = async (contact_id: string, context: Context<MyContext>, d
   const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
   const contact: ContactSimplePublicObjectWithAssociations = await hubspotClient.crm.contacts.basicApi.getById(
     contact_id,
-    ['email', 'firstname', 'lastname', 'phone', 'hs_object_id', 'reservar_cita', 'country', 'donotcall'],
+    ['email', 'firstname', 'lastname', 'phone', 'hs_object_id', 'reservar_cita', 'country', 'donotcall', 'numero_de_telefono_adicional', 'numero_de_telefono_adicional_'],
   )
     .then((hubpostContact: ContactSimplePublicObjectWithAssociations) => hubpostContact)
     .catch((error) => {
@@ -53,7 +53,7 @@ type MyEvent = {
 }
 
 //@ts-ignore
-exports.handler = FunctionTokenValidator(async function (
+exports.handler = async function (
   context: Context<MyContext>,
   event: MyEvent,
   callback: ServerlessCallback
@@ -99,4 +99,4 @@ exports.handler = FunctionTokenValidator(async function (
     }
 
   }
-})
+}
