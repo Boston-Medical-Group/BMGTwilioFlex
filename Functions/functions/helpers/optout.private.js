@@ -1,6 +1,6 @@
 "use strict"
 
-export const optoutSettings = {
+exports.optoutSettings = {
     'default': {
         'OPT_OUT_TEXT': [
             'darme de baja',

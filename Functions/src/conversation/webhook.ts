@@ -1,12 +1,14 @@
 import { functionValidator as FunctionTokenValidator } from "twilio-flex-token-validator";
 import { Client as HubspotClient } from "@hubspot/api-client";
 import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types";
-import { SimplePublicObjectInputForCreate } from "@hubspot/api-client/lib/codegen/crm/objects/communications";
+import { CollectionResponseWithTotalSimplePublicObjectForwardPaging as ContactsCollection } from "@hubspot/api-client/lib/codegen/crm/contacts";
 import { SimplePublicObject, CollectionResponseWithTotalSimplePublicObjectForwardPaging } from '@hubspot/api-client/lib/codegen/crm/contacts';
-const optoputSettings = require(Runtime.getFunctions()['helpers/optout'].path);
+
+const optoput = require(Runtime.getFunctions()['helpers/optout'].path);
 
 type MyContext = {
     HUBSPOT_TOKEN: string,
+    COUNTRY?: string
 }
 
 type MyEvent = {
@@ -20,17 +22,116 @@ type MyEvent = {
     }
 }
 
-const checkOptOut = () => {
+
+const doOptInOrOut = async (context: Context<MyContext>, event : MyEvent, author: string, optIn: boolean) => {
+    // OptOut
+    const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
+    await hubspotClient.crm.contacts.searchApi.doSearch({
+        query: author,
+        filterGroups: [],
+        sorts: ['phone'],
+        properties: ['firstname', 'lastname', 'hubspot_owner_id'],
+        limit: 5,
+        after: 0
+    }).then(async (contacts: ContactsCollection) => {
+        if (contacts.total > 0) {
+            await hubspotClient.crm.contacts.batchApi.update({
+                inputs: contacts.results.map((contact) => {
+                    return {
+                        id: contact.id,
+                        properties: {
+                            'whatsappoptout': optIn ? 'false' : 'true'
+                        }
+                    }
+                })
+            }).then(() => {
+                console.log('Success')
+            }).catch((err) => {
+                console.log(err)
+            })
+        }
+
+        return null
+    }).catch((err) => {
+        console.log(err)
+        return null
+    })
+}
+
+/**
+ * Comprueba si el mensaje es un opt-out de WhatsApp y lo excluye
+ */
+const checkOptOut = async (context: Context<MyContext>, event: MyEvent) => {
+
+    if (!event.Source || event.Source.toUpperCase() !== "WHATSAPP" || !event.Body || event.Body === '') {
+        return
+    }
+
+    const defaultSettings = optoput.optoutSettings.default
+    const countrySettings = optoput.optoutSettings[context.COUNTRY ?? ''] ?? {}
+    const optoutWords = defaultSettings.OPT_OUT_TEXT.concat(countrySettings.OPT_OUT_TEXT ?? [])
+    const body = event.Body.toLowerCase().trim()
+    if (!optoutWords.includes(body)) {
+        return
+    }
+
+    // Phone
+    let author = event.Author
+    if (author.startsWith('whatsapp:')) {
+        author = author.slice(9);
+    }
+
+    await doOptInOrOut(context, event, author, false).then(async () => {
+        await context.getTwilioClient().conversations.v1.conversations(event.ConversationSid).messages.create({
+            author: 'System',
+            body: countrySettings['OPT_OUT_MESSAGE'] ?? defaultSettings['OPT_OUT_MESSAGE'],
+        })
+    })
+}
+
+/**
+ * Comprueba si el mensaje es un opt-in de whatsapp y lo inscribe en hubspot
+ * @param context 
+ * @param event 
+ */
+const checkOptIn = async (context: Context<MyContext>, event: MyEvent) => {
+    if (!event.Source || event.Source.toUpperCase() !== "WHATSAPP" || !event.Body || event.Body === '') {
+        return
+    }
+
+    const defaultSettings = optoput.optoutSettings.default
+    const countrySettings = optoput.optoutSettings[context.COUNTRY ?? ''] ?? {}
+    const optoutWords = defaultSettings.OPT_IN_TEXT.concat(countrySettings.OPT_IN_TEXT ?? [])
+    const body = event.Body.toLowerCase().trim()
+    if (!optoutWords.includes(body)) {
+        return
+    }
+
+    // Phone
+    let author = event.Author
+    if (author.startsWith('whatsapp:')) {
+        author = author.slice(9);
+    }
+
+    await doOptInOrOut(context, event, author, true).then(async () => {
+        await context.getTwilioClient().conversations.v1.conversations(event.ConversationSid).messages.create({
+            author: 'System',
+            body: countrySettings['OPT_IN_MESSAGE'] ?? defaultSettings['OPT_IN_MESSAGE'],
+        })
+    })
 
 }
 
 //@ts-ignore
-export const handler = FunctionTokenValidator(async function (
+export const handler = async function (
     context: Context<MyContext>,
     event: MyEvent,
     callback: ServerlessCallback
 ) {
 
-    checkOptOut()
+    await checkOptOut(context, event)
+    await checkOptIn(context, event)
 
-})
+    callback(null);
+
+}
