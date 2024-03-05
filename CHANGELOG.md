@@ -1,5 +1,8 @@
 # Changelog
 
+## 05/03/2024
+* Agrega optout/in whatsapp
+
 ## 01/02/2024
 * Seleccion de telefono a llamar
 * Correccion seguridad
