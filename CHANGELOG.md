@@ -1,5 +1,8 @@
 # Changelog
 
+## 06/03/2023
+* Ajustes de optout y agrega keywords
+
 ## 05/03/2024
 * Agrega optout/in whatsapp
 

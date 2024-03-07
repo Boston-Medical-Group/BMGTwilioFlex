@@ -6,7 +6,9 @@ exports.optoutSettings = {
             'darme de baja',
             'baja',
             'stop',
-            'detener promociones'
+            'detener promociones',
+            'anular suscripcion'
+
         ],
 
         'OPT_IN_TEXT': [
