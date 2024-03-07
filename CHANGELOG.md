@@ -1,5 +1,8 @@
 # Changelog
 
+## 07/03/2023
+* Agrega symmary gpt
+
 ## 06/03/2023
 * Ajustes de optout y agrega keywords
 
