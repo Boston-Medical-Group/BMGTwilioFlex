@@ -129,8 +129,10 @@ export const handler = async function (
     callback: ServerlessCallback
 ) {
 
-    await checkOptOut(context, event)
-    await checkOptIn(context, event)
+    if (event.EventType === "onMessageAdded") {
+        await checkOptOut(context, event)
+        await checkOptIn(context, event)
+    }
 
     callback(null);
 
