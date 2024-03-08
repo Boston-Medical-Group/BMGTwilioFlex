@@ -11,17 +11,13 @@ const fetch = require("node-fetch");
  * @param {string} conversationSid 
  * @returns 
  */
-const getHtmlMessage = async (twilioClient, conversationSid) => {
+const getHtmlMessage = async (messages) => {
   let resultHtml = '<ul style="list-style:none;padding:0;">';
 
   try {
 
-    const resp = await twilioClient.conversations.v1.conversations(conversationSid)
-      .messages
-      .list({ limit: 500 });
-
     let bgColor = 'transparent';
-    resp.forEach(message => {
+    messages.forEach(message => {
       bgColor = bgColor === 'transparent' ? '#0091ae12' : 'transparent'; 
       resultHtml += `<li style="background-color: ${bgColor};border: 1px solid #cfdae1;padding: 5px;margin-bottom: 4px;"><div style="color: #5d7185;font-weight: bold;margin-bottom:5px;"><span class="">${message.author}</span> - <span style="color: #738ba3;font-size: 9px;">${message.dateCreated.toLocaleString()}</span></div><div style="padding: 6px;color: #333f4d;"><p>${message.body}</p></div></li>`
     })
@@ -35,8 +31,36 @@ const getHtmlMessage = async (twilioClient, conversationSid) => {
   return resultHtml;
 }
 
+const getMessages = async (twilioClient, conversationSid) => {
+  let messages = [];
+  try {
+    messages = await twilioClient.conversations.v1.conversations(conversationSid)
+      .messages
+      .list({ limit: 500 });
+  } catch (err) {
+    console.error(`Oeps, something is wrong ${err}`);
+  }
+
+  return messages;
+}
+
+const getParseConversationForAI = async (messages) => {
+  /** @type array */
+  let historyDelivered = messages.filter((h) => h.delivery === null || h.delivery?.delivered === 'all')
+  let messagesParsed = [];
+  historyDelivered.forEach((h) => {
+    let author = 'Agente'
+    if (h.author.startsWith('whatsapp:')) {
+      author = 'Cliente'
+    }
+    messagesParsed.push(`${h.dateCreated} @ ${author} : ${h.body}`)
+  })
+
+  return messagesParsed
+}
+
 // @ts-ignore
-exports.handler = FunctionTokenValidator(async function (  _,  event,  callback) {
+exports.handler = FunctionTokenValidator(async function (  context,  event,  callback) {
 
   const {
     conversationSid,
@@ -56,7 +80,42 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
 
     let logBody = hs_communication_body;
     logBody += '<br /><br />';
-    logBody += await getHtmlMessage(_.getTwilioClient(), conversationSid);
+    const conversationMessages = await getMessages(context.getTwilioClient(), conversationSid);
+    const parsedConversationForAI = await getParseConversationForAI(conversationMessages)
+
+    // Importing required modules
+    const OpenAI = require("openai");
+
+    // Getting the API key from Twilio environment variables
+    const API_KEY = context.OPENAI_GPT_API_KEY;
+    const API_MODEL = context.API_MODEL;
+
+    const openai = new OpenAI({
+      apiKey: API_KEY,
+    });
+
+    let prompt = `escribe un corto resumen , max 7 lineas del siguiente historial de conversación, no incluyas las fechas en las respuestas: ${parsedConversationForAI.concat('\n\n')}`;
+    let summary = '';
+    if (!API_MODEL) {
+      //const summary = completion.choices[0].message.content;
+      summary = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }],
+      })
+    } else if (API_MODEL.startsWith('gpt-')) {
+      summary = openai.chat.completions.create(({
+        model: API_MODEL,
+        messages: [{ role: "user", content: prompt }],
+      }))
+    } else {
+      summary = ''
+    }
+
+    if (summary !== '') {
+      logBody += 'Resumen AI: ' + summary.choices[0].message.content;
+      logBody += '<br /><br />';
+    }
+    logBody += await getHtmlMessage(conversationMessages);
 
     let toHubspot = {
       properties: {
@@ -99,7 +158,7 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${_.HUBSPOT_TOKEN}`
+        'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
       },
       body: JSON.stringify(toHubspot)
     });
