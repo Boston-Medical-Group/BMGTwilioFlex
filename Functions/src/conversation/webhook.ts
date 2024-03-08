@@ -82,9 +82,14 @@ const checkOptOut = async (context: Context<MyContext>, event: MyEvent) => {
     }
 
     await doOptInOrOut(context, event, author, false).then(async () => {
-        await context.getTwilioClient().conversations.v1.conversations(event.ConversationSid).messages.create({
+        const conversation = context.getTwilioClient().conversations.v1.conversations(event.ConversationSid)
+        await conversation.messages.create({
             author: 'System',
             body: countrySettings['OPT_OUT_MESSAGE'] ?? defaultSettings['OPT_OUT_MESSAGE'],
+        }).then(async () => {
+            await conversation.update({
+                state: 'closed'
+            })
         })
     })
 }
@@ -114,7 +119,8 @@ const checkOptIn = async (context: Context<MyContext>, event: MyEvent) => {
     }
 
     await doOptInOrOut(context, event, author, true).then(async () => {
-        await context.getTwilioClient().conversations.v1.conversations(event.ConversationSid).messages.create({
+        const conversation = context.getTwilioClient().conversations.v1.conversations(event.ConversationSid)
+        await conversation.messages.create({
             author: 'System',
             body: countrySettings['OPT_IN_MESSAGE'] ?? defaultSettings['OPT_IN_MESSAGE'],
         })

@@ -1,7 +1,10 @@
 # Changelog
 
+## 08/03/2023
+* Agrega summary a log de chat en hubspot
+
 ## 07/03/2023
-* Agrega symmary gpt
+* Agrega summary gpt
 
 ## 06/03/2023
 * Ajustes de optout y agrega keywords
