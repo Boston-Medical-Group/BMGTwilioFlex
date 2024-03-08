@@ -58,7 +58,7 @@ const getParseConversationForAI = async (messages) => {
 }
 
 // @ts-ignore
-exports.handler = FunctionTokenValidator(async function (  _,  event,  callback) {
+exports.handler = FunctionTokenValidator(async function (  context,  event,  callback) {
 
   const {
     conversationSid,
@@ -78,7 +78,7 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
 
     let logBody = hs_communication_body;
     logBody += '<br /><br />';
-    const conversationMessages = await getMessages(_.getTwilioClient(), conversationSid);
+    const conversationMessages = await getMessages(context.getTwilioClient(), conversationSid);
     const parsedConversationForAI = await getParseConversationForAI(conversationMessages)
 
     // Importing required modules
@@ -156,7 +156,7 @@ exports.handler = FunctionTokenValidator(async function (  _,  event,  callback)
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${_.HUBSPOT_TOKEN}`
+        'Authorization': `Bearer ${context.HUBSPOT_TOKEN}`
       },
       body: JSON.stringify(toHubspot)
     });
