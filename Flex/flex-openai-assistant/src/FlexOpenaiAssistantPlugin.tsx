@@ -44,6 +44,12 @@ export default class FlexOpenaiAssistantPlugin extends FlexPlugin {
         flex.MessageInputActions.Content.add(<OpenaiAsistantButton manager={manager} key="openai-assistant-button" />, options);
         flex.MessageInputActions.Content.add(<OpenaiSummaryButton manager={manager} key="openai-summary-button" />, options);
 
-        flex.MessageInputV2.Content.add(<OpenaiSummaryContainer key="summary-container" manager={manager} />)
+        flex.MessageInputV2.Content.add(<OpenaiSummaryContainer key="summary-container" manager={manager} />, {
+            if: () => {
+                const roles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles
+                const skills = manager.workerClient?.attributes?.routing?.skills as Array<string> || []
+                return roles.indexOf('admin') >= 0 || skills?.indexOf('IA_Summary') >= 0;
+            }
+        })
     }
 }
