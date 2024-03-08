@@ -1,5 +1,14 @@
 # Changelog
 
+## 07/03/2023
+* Agrega symmary gpt
+
+## 06/03/2023
+* Ajustes de optout y agrega keywords
+
+## 05/03/2024
+* Agrega optout/in whatsapp
+
 ## 01/02/2024
 * Seleccion de telefono a llamar
 * Correccion seguridad
