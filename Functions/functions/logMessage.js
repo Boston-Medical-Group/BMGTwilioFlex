@@ -55,6 +55,8 @@ const getParseConversationForAI = async (messages) => {
     }
     messagesParsed.push(`${h.dateCreated} @ ${author} : ${h.body}`)
   })
+
+  return messagesParsed
 }
 
 // @ts-ignore
