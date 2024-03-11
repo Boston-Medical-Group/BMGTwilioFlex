@@ -57,7 +57,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
   useEffect(() => {
     const parseBool = (val : string | boolean) => val === true || val === "true"
     let dnc = typeof contact.donotcall === 'string' ? parseBool(contact.donotcall.toLowerCase()) : contact.donotcall;
-    console.log('DONOTCALL', dnw)
+    console.log('DONOTCALL', dnc)
     setDoNotCall(dnc ? true : false)
     
     let dnw = typeof contact.whatsappoptout === 'string' ? parseBool(contact.whatsappoptout.toLowerCase()) : contact.whatsappoptout;
