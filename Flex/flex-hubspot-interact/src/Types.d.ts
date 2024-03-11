@@ -7,6 +7,7 @@ export type HubspotContact = {
     reservar_cita?: string
     donotcall?: boolean | string
     numero_de_telefono_adicional_?: string
+    whatsappoptout?: boolean | string
     [key: string]: any
 }
 
