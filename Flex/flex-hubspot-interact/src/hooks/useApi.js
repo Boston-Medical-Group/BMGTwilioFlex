@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 const useApi = ({ token }) => {
 
-  async function loadHubspotData(data) {
+  async function loadHubspotData(data, newToken) {
     let bodytoSend = {};
     if (data.contact_id) {
       bodytoSend = {
@@ -12,7 +12,7 @@ const useApi = ({ token }) => {
     } else if (data.deal_id) {
       bodytoSend = {
         deal_id: data.deal_id,
-        Token: token
+        Token: newToken ?? token
       }
     } else {
       return;
@@ -29,7 +29,7 @@ const useApi = ({ token }) => {
     return await request.json();
   }
 
-  const getDataByContactId = useCallback(async ({ contact_id }) => {
+  const getDataByContactId = useCallback(async ({ contact_id, newToken }) => {
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchHubspotContact`, {
       method: "POST",
       headers: {
@@ -37,7 +37,7 @@ const useApi = ({ token }) => {
       },
       body: JSON.stringify({
         contact_id : contact_id,
-        Token: token
+        Token: newToken ?? token
       })
     });
 
@@ -45,7 +45,7 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
-  const getDataByDealId = useCallback(async ({ deal_id }) => {
+  const getDataByDealId = useCallback(async ({ deal_id, newToken }) => {
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchHubspotContact`, {
       method: "POST",
       headers: {
@@ -53,7 +53,7 @@ const useApi = ({ token }) => {
       },
       body: JSON.stringify({
         deal_id: deal_id,
-        Token: token
+        Token: newToken ?? token
       })
     });
 
@@ -61,7 +61,7 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
-  const getTemplates = useCallback(async (data) => {
+  const getTemplates = useCallback(async (data, newToken) => {
 
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchTemplate`, {
       method: "POST",
@@ -70,7 +70,7 @@ const useApi = ({ token }) => {
       },
       body: JSON.stringify({
         data,
-        Token: token
+        Token: newToken ?? token
       })
     });
 
@@ -78,7 +78,7 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
-  const getTemplate = useCallback(async (data) => {
+  const getTemplate = useCallback(async (data, newToken) => {
 
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchTemplate`, {
       method: "POST",
@@ -87,7 +87,7 @@ const useApi = ({ token }) => {
       },
       body: JSON.stringify({
         data,
-        Token: token
+        Token: newToken ?? token
       })
     });
 
