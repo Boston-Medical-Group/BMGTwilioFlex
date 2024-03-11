@@ -1,5 +1,10 @@
 # Changelog
 
+## 09/03/2023
+* Agrega funciones para optout
+* Modifica funcion de studio para optin
+* Actualiza plugin de interacciones para optout de whatsapp
+
 ## 08/03/2023
 * Agrega summary a log de chat en hubspot
 
