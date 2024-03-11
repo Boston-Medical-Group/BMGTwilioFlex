@@ -57,11 +57,9 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
   useEffect(() => {
     const parseBool = (val : string | boolean) => val === true || val === "true"
     let dnc = typeof contact.donotcall === 'string' ? parseBool(contact.donotcall.toLowerCase()) : contact.donotcall;
-    console.log('DONOTCALL', dnc)
     setDoNotCall(dnc ? true : false)
     
     let dnw = typeof contact.whatsappoptout === 'string' ? parseBool(contact.whatsappoptout.toLowerCase()) : contact.whatsappoptout;
-    console.log('DONOTWHATSAPP', dnw)
     setDoNotWhatsapp(dnw ? true : false)
 
   }, [contact])
@@ -212,7 +210,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
               >
                 <Button variant="primary"
                   fullWidth
-                  title={doNotWhatsapp ? 'No Llamar' : (actionDisabled ? "Para enviar mensajes de WhatsApp, por favor cambie su estado distinto de 'Offline'" : "Iniciar conversación de WhatsApp")}
+                  title={doNotWhatsapp ? 'No enviar WhatsApp' : (actionDisabled ? "Para enviar mensajes de WhatsApp, por favor cambie su estado distinto de 'Offline'" : "Iniciar conversación de WhatsApp")}
                   disabled={actionDisabled || doNotWhatsapp}
                   onClick={() => sendWAHandler(contact, deal)}
                 ><FaWhatsapp /> WhatsApp</Button>
