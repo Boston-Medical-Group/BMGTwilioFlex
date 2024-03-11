@@ -162,6 +162,37 @@ const LogHubspotMessage = async (task: ITask, manager: Flex.Manager) => {
     .finally(() => console.log('Done log'));
 }
 
+const LogHubspotSummaryNote = async (task: ITask, manager: Flex.Manager) => {
+  //console.log('JRUMEAU sending', task.attributes);
+  if (!task.attributes.hubspot_contact_id) {
+    return;
+  }
+
+  const ownerId = manager.workerClient?.attributes?.hubspot_owner_id ?? null;
+
+  const params = {
+    conversationSid: task.attributes.conversationSid,
+    hubspot_contact_id: task.attributes.hubspot_contact_id ?? null,
+    hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
+    hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
+    hubspot_owner_id: ownerId,
+  }
+
+  const token = manager.store.getState().flex.session.ssoTokenPayload.token;
+  await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/logSummaryNote`, {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      ...params,
+      Token: token
+    })
+  }).then(() => console.log('Log Sent'))
+    .catch(() => console.log('Error while sending the log'))
+    .finally(() => console.log('Done log'));
+}
+
 export default class FlexLogHubspotPlugin extends FlexPlugin {
   constructor() {
     super(PLUGIN_NAME);
@@ -190,6 +221,7 @@ export default class FlexLogHubspotPlugin extends FlexPlugin {
         LogHubspotCall(task, manager);
       } else if (task.taskChannelUniqueName == 'chat' || task.taskChannelUniqueName == 'sms') {
         LogHubspotMessage(task, manager);
+        LogHubspotSummaryNote(task, manager);
       }
     });
   }
