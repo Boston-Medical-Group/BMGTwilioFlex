@@ -93,14 +93,12 @@ export const handler = async function (
     callback: ServerlessCallback
 ) {
 
-    if (event.EventType === "onMessageAdded") {
-        // Procesa Opt-Out/In
-        if (event.OptOutType) {
-            if (event.OptOutType.toLowerCase() === 'stop') {
-                await checkOptOut(context, event)
-            } else if (event.OptOutType.toLowerCase() === 'start') {
-                await checkOptIn(context, event)
-            }
+    // Procesa Opt-Out/In
+    if (event.OptOutType) {
+        if (event.OptOutType.toLowerCase() === 'stop') {
+            await checkOptOut(context, event)
+        } else if (event.OptOutType.toLowerCase() === 'start') {
+            await checkOptIn(context, event)
         }
     }
 
