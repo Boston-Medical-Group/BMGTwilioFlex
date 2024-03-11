@@ -57,9 +57,11 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
   useEffect(() => {
     const parseBool = (val : string | boolean) => val === true || val === "true"
     let dnc = typeof contact.donotcall === 'string' ? parseBool(contact.donotcall.toLowerCase()) : contact.donotcall;
+    console.log('DONOTCALL', dnw)
     setDoNotCall(dnc ? true : false)
     
     let dnw = typeof contact.whatsappoptout === 'string' ? parseBool(contact.whatsappoptout.toLowerCase()) : contact.whatsappoptout;
+    console.log('DONOTWHATSAPP', dnw)
     setDoNotWhatsapp(dnw ? true : false)
 
   }, [contact])
@@ -215,7 +217,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
                   onClick={() => sendWAHandler(contact, deal)}
                 ><FaWhatsapp /> WhatsApp</Button>
               </CustomizationProvider>
-              
+
               {calendar() !== '' && (
                 <CustomizationProvider
                   elements={{
