@@ -48,11 +48,11 @@ exports.handler = TokenValidator(async (context, event, callback) => {
         historyDelivered.forEach((h) => {
             let author = 'Agente'
             if (h.author.startsWith('whatsapp:')) {
-                author = 'Cliente'
+                author = 'Paciente'
             }
             messages.push(`${h.dateCreated} @ ${author} : ${h.body}`)
         })
-        prompt = `escribe un corto resumen , max 5 lineas del siguiente historial de conversación, da relevancia a los mensajes más recientes, no incluyas las fechas en las respuestas y da una sugerencia de como continuar la conversación: ${messages.concat('\n\n')}`;
+        prompt = `Escribe un resumen de un máximo de 500 caracteres del siguiente historial de conversación. No incluyas las fechas en las respuestas. Has referencia al cliente como "paciente". De tener el dato, menciona la ciudad desde la que nos contacta y la clínica a la cuál quiere asistir: ${messages.concat('\n\n')}`;
     }
     if (requestType === "suggest" && eventcontext) {
         prompt = `play a role game imagine that you are a customer service agent , I will ask you a question  if you think you can respond and it is a good response, then please respond with a short suggested response, DO NOT use a prefix with colon i.e suggested response,  here is my question : ${spokenInput} if relevant take into account the following information but only use it if is related to the question :  ${eventcontext}  `;
