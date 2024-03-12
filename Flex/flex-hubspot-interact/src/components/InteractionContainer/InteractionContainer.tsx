@@ -68,14 +68,14 @@ const InteractionContainer = ({ flex, manager } : MyProps) => {
 
         setIsLoading(true)
         if (contactId) {
-            getDataByContactId({ contact_id: contactId })
+            getDataByContactId({ contact_id: contactId, newToken: manager.store.getState().flex.session.ssoTokenPayload.token })
                 .then(data => {
                     setContact(data.properties)
                 })
                 .catch(() => console.log("Error while fetching data from Hubspot"))
                 .finally(() => (setIsLoading(false)))
         } else if (dealId) {
-            getDataByDealId({ deal_id: dealId })
+            getDataByDealId({ deal_id: dealId, newToken: manager.store.getState().flex.session.ssoTokenPayload.token })
                 .then((data) => {
                     setContact(data.properties)
                     if (data.deal !== undefined && data.deal !== null) {

@@ -43,6 +43,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
   const [selectedSmsContact, setSelectedSmsContact] = useState<HubspotContact>();
   const [selectedWAContact, setSelectedWAContact] = useState<HubspotContact>();
   const [doNotCall, setDoNotCall] = useState(true);
+  const [doNotWhatsapp, setDoNotWhatsapp] = useState(true);
 
   const afterSetActivityListener = useCallback((payload) => {
     if (payload.activityAvailable) {
@@ -52,16 +53,15 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
     }
   }, []);
 
-  /** DO NOT CALL */
+  /** DO NOT CALL & DO NOT WHATSAPP */
   useEffect(() => {
     const parseBool = (val : string | boolean) => val === true || val === "true"
     let dnc = typeof contact.donotcall === 'string' ? parseBool(contact.donotcall.toLowerCase()) : contact.donotcall;
-    if (dnc) { 
-      setDoNotCall(true)
-      console.log('DO NOT CALL THIS CONTACT')
-    } else {
-      setDoNotCall(false)
-    }
+    setDoNotCall(dnc ? true : false)
+    
+    let dnw = typeof contact.whatsappoptout === 'string' ? parseBool(contact.whatsappoptout.toLowerCase()) : contact.whatsappoptout;
+    setDoNotWhatsapp(dnw ? true : false)
+
   }, [contact])
 
   useEffect(() => {
@@ -210,10 +210,12 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
               >
                 <Button variant="primary"
                   fullWidth
-                  disabled={actionDisabled}
+                  title={doNotWhatsapp ? 'No enviar WhatsApp' : (actionDisabled ? "Para enviar mensajes de WhatsApp, por favor cambie su estado distinto de 'Offline'" : "Iniciar conversación de WhatsApp")}
+                  disabled={actionDisabled || doNotWhatsapp}
                   onClick={() => sendWAHandler(contact, deal)}
                 ><FaWhatsapp /> WhatsApp</Button>
               </CustomizationProvider>
+
               {calendar() !== '' && (
                 <CustomizationProvider
                   elements={{
