@@ -126,7 +126,7 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
       })
     }
 
-    const request = await fetch(`https://api.hubapi.com/crm/v3/objects/communications`, {
+    const request = await fetch(`https://api.hubapi.com/crm/v3/objects/notes`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
