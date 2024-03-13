@@ -1,5 +1,8 @@
 # Changelog
 
+## 13/03/2023
+* Corrige nota resumen
+
 ## 09/03/2023
 * Agrega funciones para optout
 * Modifica funcion de studio para optin
