@@ -11,9 +11,9 @@ const getConversationLog = async (sid, manager) => {
     return fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversationMessages`, {
         method: "POST",
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            'Content-Type': 'application/json'
         },
-        body: new URLSearchParams({
+        body: JSON.stringify({
             conversationSid: sid,
             Token: manager.store.getState().flex.session.ssoTokenPayload.token
         })
@@ -112,7 +112,7 @@ const ConversationHistoryEntry = ({ conversation, manager }) => {
                             <strong>No hay mensajes en la conversación</strong>
                         </ChatEvent>
                     )}
-
+                    
                     {conversationLog.length > 0 && (
                         <ChatEvent>
                             <strong>Inicio de la conversación</strong>

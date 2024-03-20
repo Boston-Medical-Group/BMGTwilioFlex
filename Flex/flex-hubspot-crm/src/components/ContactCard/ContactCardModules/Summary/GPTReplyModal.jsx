@@ -12,9 +12,9 @@ const createThreadAndRun = async (manager, conversationSid, instruction) => {
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/createAssistantThread`, {
         method: "POST",
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            'Content-Type': 'application/json'
         },
-        body: new URLSearchParams({
+        body: JSON.stringify({
             conversationSid,
             instruction,
             Token: manager.store.getState().flex.session.ssoTokenPayload.token
@@ -28,9 +28,9 @@ const getRunStatus = async (manager, data) => {
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getAssistantRunResult`, {
         method: "POST",
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            'Content-Type': 'application/json'
         },
-        body: new URLSearchParams({
+        body: JSON.stringify({
             thread_id: data.thread_id,
             run_id: data.run_id,
             Token: manager.store.getState().flex.session.ssoTokenPayload.token
