@@ -1,5 +1,11 @@
 # Changelog
 
+## 20/03/2023
+* Agrega nueva tarjeta de contacto
+* Agrega nuevos resumenes AI de conversaciones
+* Agrega nueva sugerencia de respuesta AI a conversacions
+* Corrige nota hubspot
+
 ## 13/03/2023
 * Corrige nota resumen
 

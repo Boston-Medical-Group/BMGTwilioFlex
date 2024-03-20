@@ -18,10 +18,23 @@ const getMessages = async (twilioClient, conversationSid) => {
   return messages;
 }
 
+const hasEnoughMessages = (messages) => {
+  let historyDelivered = messages.filter((h) => h.delivery === null && h.author.startsWith('whatsapp:'))
+
+  if (historyDelivered.length > 0) {
+    return true
+  }
+  
+  return false
+}
+
 const getParseConversationForAI = async (messages) => {
   /** @type array */
   let historyDelivered = messages.filter((h) => h.delivery === null || h.delivery?.delivered === 'all')
   let messagesParsed = [];
+
+  // TODO Si el contacto no ha respondido. Guardar una nota generica y no usar GPT
+  
   historyDelivered.forEach((h) => {
     let author = 'Agente'
     if (h.author.startsWith('whatsapp:')) {
@@ -59,34 +72,39 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
 
     //Obtiene mensajes de la conversación y genera log
     const conversationMessages = await getMessages(context.getTwilioClient(), conversationSid);
-    const parsedConversationForAI = await getParseConversationForAI(conversationMessages)
-
-    // Importing required modules
-    const OpenAI = require("openai");
-
-    // Getting the API key from Twilio environment variables
-    const API_KEY = context.OPENAI_GPT_API_KEY;
-    const API_MODEL = context.API_MODEL;
-
-    const openai = new OpenAI({
-      apiKey: API_KEY,
-    });
-
-    let prompt = `Escribe un resumen de un máximo de 500 caracteres del siguiente historial de conversación. No incluyas las fechas en las respuestas. Has referencia al cliente como "paciente". De tener el dato, menciona la ciudad desde la que nos contacta y la clínica a la cuál quiere asistir: ${parsedConversationForAI.concat('\n\n')}`;
+    
     let summary = '';
-    if (!API_MODEL) {
-      //const summary = completion.choices[0].message.content;
-      summary = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: prompt }],
-      })
-    } else if (API_MODEL.startsWith('gpt-')) {
-      summary = openai.chat.completions.create(({
-        model: API_MODEL,
-        messages: [{ role: "user", content: prompt }],
-      }))
+    if (!hasEnoughMessages(conversationMessages)) {
+      summary = 'El usuario aún no ha contestó ningún mensaje de la conversación (mensaje genérico)'
     } else {
-      summary = ''
+      const parsedConversationForAI = await getParseConversationForAI(conversationMessages)
+
+      // Importing required modules
+      const OpenAI = require("openai");
+
+      // Getting the API key from Twilio environment variables
+      const API_KEY = context.OPENAI_GPT_API_KEY;
+      const API_MODEL = context.API_MODEL;
+
+      const openai = new OpenAI({
+        apiKey: API_KEY,
+      });
+
+      let prompt = `Escribe un resumen de un máximo de 500 caracteres del siguiente historial de conversación. No incluyas las fechas en las respuestas. Has referencia al cliente como "paciente". De tener el dato, menciona la ciudad desde la que nos contacta y la clínica a la cuál quiere asistir: ${parsedConversationForAI.concat('\n\n')}`;
+      if (!API_MODEL) {
+        //const summary = completion.choices[0].message.content;
+        summary = await openai.chat.completions.create({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: prompt }],
+        })
+      } else if (API_MODEL.startsWith('gpt-')) {
+        summary = openai.chat.completions.create(({
+          model: API_MODEL,
+          messages: [{ role: "user", content: prompt }],
+        }))
+      } else {
+        summary = ''
+      }
     }
 
     let hs_note_body = 'Resumen AI: ' + summary.choices[0].message.content;

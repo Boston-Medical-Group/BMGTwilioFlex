@@ -1,6 +1,7 @@
 import React from 'react';
 import { FlexPlugin } from '@twilio/flex-plugin';
 import SyncHubspotUser from './components/SyncHubspotUser';
+import ContactCard from './components/ContactCard';
 
 const PLUGIN_NAME = 'HubspotCrmPlugin';
 
@@ -23,7 +24,36 @@ export default class HubspotCrmPlugin extends FlexPlugin {
       if (payload.task.attributes.direction.toLowerCase() === 'inbound' && payload.task.attributes.crmid) {
         window.open(`https://app-eu1.hubspot.com/contacts/${process.env.FLEX_APP_HUBSPOT_CRMID}/contact/${payload.task.attributes.crmid}`, '_blank');
       }
+
+      if (payload.task && payload.task?.attributes?.hubspot_contact_id !== '' || payload.task?.attributes?.hubspotContact) {
+        flex.AgentDesktopView.Panel2.Content.replace(
+          <ContactCard key="HubspotCrmPlugin-component-ContactCard"
+            manager={manager}
+            contact={payload.task.attributes?.hubspotContact}
+            contactId={payload.task.attributes?.hubspot_contact_id}
+          />, {
+            if: () => payload.task
+          }
+        )
+      }
     });
+
+    flex.Actions.addListener("afterSelectTask", (payload) => {
+      if (payload.task && payload.task?.attributes?.hubspot_contact_id !== '' || payload.task?.attributes?.hubspotContact) {
+        flex.AgentDesktopView.Panel2.Content.replace(
+          <ContactCard key="HubspotCrmPlugin-component-ContactCard"
+            manager={manager}
+            contact={payload.task.attributes?.hubspotContact}
+            contactId={payload.task.attributes?.hubspot_contact_id}
+          />
+        )
+      }
+    })
+
+    flex.Actions.addListener("afterTaskComplete", (payload) => {
+      flex.AgentDesktopView.Panel2.Content.remove('HubspotCrmPlugin-component-ContactCard')
+    })
+
 
     /**
     let currentCrmId = null;
