@@ -5,6 +5,7 @@
 * Agrega nuevos resumenes AI de conversaciones
 * Agrega nueva sugerencia de respuesta AI a conversacions
 * Corrige nota hubspot
+* Agrega terser a plugin
 
 ## 13/03/2023
 * Corrige nota resumen
