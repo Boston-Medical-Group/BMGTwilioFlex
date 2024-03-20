@@ -9,9 +9,9 @@ const loadConversations = (contact, currentConversation, manager) => {
     return fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversations`, {
         method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
         },
-        body: JSON.stringify({
+        body: new URLSearchParams({
             skipSid: currentConversation,
             phone,
             Token: manager.store.getState().flex.session.ssoTokenPayload.token

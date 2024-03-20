@@ -57,9 +57,9 @@ const Summary = ({ manager, task }) => {
         const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversationSummary`, {
             method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
             },
-            body: JSON.stringify({
+            body: new URLSearchParams({
                 conversationSid,
                 force,
                 Token: manager.store.getState().flex.session.ssoTokenPayload.token
