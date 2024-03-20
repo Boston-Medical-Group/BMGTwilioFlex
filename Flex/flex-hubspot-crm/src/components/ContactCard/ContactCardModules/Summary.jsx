@@ -13,6 +13,7 @@ const Summary = ({ manager, task }) => {
     const [summary, setSummary] = useState({});
     const [loaded, setLoaded] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [showButtons, setShowButtons] = useState(false)
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleModalOpen = () => setIsModalOpen(true);
@@ -21,6 +22,11 @@ const Summary = ({ manager, task }) => {
     useEffect(async () => {
         setLoaded(false)
         await reloadSummary(false).finally(() => {
+
+            const roles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles ?? []
+            const skills = manager?.workerClient?.attributes?.routing?.skills ?? []
+
+            setShowButtons(roles.indexOf('admin') >= 0 || skills?.indexOf('IA_Assistant') >= 0)
             setLoaded(true)
         })
     }, [task])
@@ -84,7 +90,7 @@ const Summary = ({ manager, task }) => {
         <>
             <GPTReplyModal manager={manager} isOpen={isModalOpen} handleClose={handleModalClose}
                 conversationSid={task.attributes.conversationSid} messagesCount={summary.messagesCount} />
-            <SummaryContent reloadAction={reloadSummary} suggestAction={suggestReply} summary={summary} loading={loading} manager={manager} />
+            <SummaryContent reloadAction={reloadSummary} suggestAction={suggestReply} summary={summary} loading={loading} manager={manager} withoutButtons={!showButtons} />
         </>
     );
 };
