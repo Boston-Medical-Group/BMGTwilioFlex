@@ -3,7 +3,7 @@ import {
     ChatLog, ChatMessage, ChatBubble, ChatAttachment, ChatAttachmentLink, ChatAttachmentDescription, ChatMessageMeta, ChatMessageMetaItem,
     ChatEvent, ChatBookend, ChatBookendItem
 } from "@twilio-paste/core"
-import { Icon, Notifications, NotificationType } from "@twilio/flex-ui";
+import { Icon, Notifications } from "@twilio/flex-ui";
 import { useEffect, useState } from "react";
 import SummaryContent from "../Summary/SummaryContent";
 
@@ -66,21 +66,12 @@ const ChannelTitle = ({ icon, title }) => {
     )
 }
 
-const registerNotifications = () => {
-    Notifications.registerNotification({
-        id: "errorLoadingConversationMessages",
-        content: "Error al cargar la conversación",
-        type: NotificationType.error
-    });
-}
-
 const ConversationHistoryEntry = ({ conversation, manager }) => {
     const { transitioning, conversationLog, conversationSummary, ...disclosure } = useDelayedDisclosureState({
         conversation,
         manager
     });
     const [channelIcon, setChannelIcon] = useState('Message')
-    const clickableHeading = disclosure.visible ? 'Hide with delay' : 'Show with delay';
 
     useEffect(() => {
         switch (conversation.conversationOriginalChannel) {

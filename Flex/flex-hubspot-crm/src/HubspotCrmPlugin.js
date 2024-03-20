@@ -2,8 +2,30 @@ import React from 'react';
 import { FlexPlugin } from '@twilio/flex-plugin';
 import SyncHubspotUser from './components/SyncHubspotUser';
 import ContactCard from './components/ContactCard';
+import { Notifications, NotificationType } from '@twilio/flex-ui';
 
 const PLUGIN_NAME = 'HubspotCrmPlugin';
+
+
+const registerNotifications = () => {
+  Notifications.registerNotification({
+    id: "errorLoadingConversations",
+    content: "Error al cargar las conversaciones",
+    type: NotificationType.error
+  });
+
+  Notifications.registerNotification({
+    id: "errorNotEnoughMessages",
+    content: "No hay suficiente contexto para generar una sugerencia",
+    type: NotificationType.error
+  });
+
+  Notifications.registerNotification({
+    id: "errorLoadingConversationMessages",
+    content: "Error al cargar la conversación",
+    type: NotificationType.error
+  });
+}
 
 export default class HubspotCrmPlugin extends FlexPlugin {
   constructor() {
@@ -18,6 +40,7 @@ export default class HubspotCrmPlugin extends FlexPlugin {
    */
   async init(flex, manager) {
 
+    registerNotifications()
     flex.AgentDesktopView.Panel1.Content.add(<SyncHubspotUser key="HubspotCrmPlugin-component-SyncHubspotUser" manager={manager} />)
 
     flex.Actions.addListener("afterAcceptTask", (payload) => {
@@ -28,6 +51,7 @@ export default class HubspotCrmPlugin extends FlexPlugin {
       if (payload.task && payload.task?.attributes?.hubspot_contact_id !== '' || payload.task?.attributes?.hubspotContact) {
         flex.AgentDesktopView.Panel2.Content.replace(
           <ContactCard key="HubspotCrmPlugin-component-ContactCard"
+            task={payload.task}
             manager={manager}
             contact={payload.task.attributes?.hubspotContact}
             contactId={payload.task.attributes?.hubspot_contact_id}
@@ -39,12 +63,12 @@ export default class HubspotCrmPlugin extends FlexPlugin {
     });
 
     flex.Actions.addListener("afterSelectTask", (payload) => {
+      console.log(payload)
       if (payload.task && payload.task?.attributes?.hubspot_contact_id !== '' || payload.task?.attributes?.hubspotContact) {
         flex.AgentDesktopView.Panel2.Content.replace(
-          <ContactCard key="HubspotCrmPlugin-component-ContactCard"
+          <ContactCard key={`HubspotCrmPlugin-component-ContactCard-${payload.task.sid}`}
+            task={payload.task}
             manager={manager}
-            contact={payload.task.attributes?.hubspotContact}
-            contactId={payload.task.attributes?.hubspot_contact_id}
           />
         )
       }

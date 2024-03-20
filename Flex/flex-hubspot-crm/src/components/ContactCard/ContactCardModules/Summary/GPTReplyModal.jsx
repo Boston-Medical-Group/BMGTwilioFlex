@@ -1,4 +1,7 @@
-import { Box, Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions, Paragraph, Label, Stack, Button, Input, TextArea, HelpText, SkeletonLoader, Separator } from "@twilio-paste/core"
+import {
+    Box, Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions, Paragraph,
+    Label, Stack, Button, Input, TextArea, HelpText, SkeletonLoader, Separator, Alert
+} from "@twilio-paste/core"
 import { useUID } from "@twilio-paste/core/dist/uid-library"
 import { useEffect, useState, useCallback } from "react";
 import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -41,25 +44,16 @@ const getRunStatus = async (manager, data) => {
 }
 
 
-const GPTReplyModal = ({ manager, isOpen, handleClose, conversationSid, channelSid, messagesCount }) => {
+const GPTReplyModal = ({ manager, isOpen, handleClose, conversationSid, messagesCount }) => {
     return (
         <QueryClientProvider client={queryClient}>
             <GPTReplyModalComponent manager={manager} isOpen={isOpen}
-                handleClose={handleClose} conversationSid={conversationSid} messagesCount={messagesCount}
-                channelSid={channelSid} />
+                handleClose={handleClose} conversationSid={conversationSid} messagesCount={messagesCount} />
         </QueryClientProvider>
     )
 }
 
-const registerNotifications = () => {
-    Notifications.registerNotification({
-        id: "errorNotEnoughMessages",
-        content: "No hay suficiente contexto para generar una sugerencia",
-        type: NotificationType.error
-    });
-}
-
-const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid, channelSid, messagesCount }) => {
+const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid, messagesCount }) => {
     const modalHeadingID = useUID();
 
     const [polling, setPolling] = useState(false);
@@ -68,10 +62,6 @@ const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid,
     const [instruction, setInstruction] = useState("");
     const [runData, setRunData] = useState({})
     const inputState = useFlexSelector((state) => state.flex.chat.conversationInput[conversationSid]?.inputText);
-
-    useEffect(() => {
-        registerNotifications()
-    }, [])
 
     useEffect(() => {
         // Al abrir modal, cargar una sugerencia de respuesta
@@ -158,7 +148,6 @@ const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid,
         Actions.invokeAction("SendMessage", {
             body: message,
             conversationSid
-            /*channelSid: channelSid*/
         });
 
         setMessage("")
@@ -186,7 +175,11 @@ const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid,
                     Hola. Soy el asistente IA. Basándome en la conversación actual y en el contexto generado, te sugiero esta respuesta:
                 </Paragraph>
 
-                {(loading || isLoading) ? (
+                {isError && (
+                    <Alert variant="error">Se ha producido un error al generar una sugerencia o ha tardado más de lo esperado.</Alert>
+                )}
+                
+                {!isError && (loading || isLoading) ? (
                     <Stack orientation="vertical" spacing="space20">
                         <SkeletonLoader />
                         <SkeletonLoader />

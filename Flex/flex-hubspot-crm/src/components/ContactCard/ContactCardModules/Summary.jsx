@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import * as Flex from '@twilio/flex-ui';
-import { Box, Heading, DetailText, ButtonGroup, Button, Stack } from '@twilio-paste/core';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SkeletonLoader } from '@twilio-paste/core/skeleton-loader';
 import SummaryContent from './Summary/SummaryContent';
 import GPTReplyModal from './Summary/GPTReplyModal'
@@ -10,8 +8,8 @@ import GPTReplyModal from './Summary/GPTReplyModal'
  */
 const Summary = ({ manager, task }) => {
     
-    const [conversationSid] = useState(task.attributes?.conversationSid);
-    const [channelSid] = useState(task.attributes?.taskChannelSid)
+    const [conversationSid, setConversationSid] = useState();
+    //const [channelSid] = useState(task.attributes?.taskChannelSid)
     const [summary, setSummary] = useState({});
     const [loaded, setLoaded] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -21,11 +19,11 @@ const Summary = ({ manager, task }) => {
     const handleModalClose = () => setIsModalOpen(false);
 
     useEffect(async () => {
-        if (conversationSid) {
-            await reloadSummary(false)
-        }
-        setLoaded(true)
-    }, [conversationSid])
+        setLoaded(false)
+        await reloadSummary(false).finally(() => {
+            setLoaded(true)
+        })
+    }, [task])
 
     const suggestReply = async () => {
         handleModalOpen();
@@ -52,7 +50,7 @@ const Summary = ({ manager, task }) => {
         });*/
     }
 
-    const reloadSummary = async (force) => {
+    const reloadSummary = useCallback(async (force) => {
         setLoading(true)
         const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversationSummary`, {
             method: "POST",
@@ -60,7 +58,7 @@ const Summary = ({ manager, task }) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                conversationSid,
+                conversationSid: task.attributes.conversationSid,
                 force,
                 Token: manager.store.getState().flex.session.ssoTokenPayload.token
             })
@@ -68,7 +66,7 @@ const Summary = ({ manager, task }) => {
 
         setSummary(await request.json())
         setLoading(false)
-    }
+    }, [conversationSid])
 
     if (!loaded) {
         return (
@@ -85,7 +83,7 @@ const Summary = ({ manager, task }) => {
     return (
         <>
             <GPTReplyModal manager={manager} isOpen={isModalOpen} handleClose={handleModalClose}
-                conversationSid={conversationSid} channelSid={channelSid}  messagesCount={summary.messagesCount} />
+                conversationSid={task.attributes.conversationSid} messagesCount={summary.messagesCount} />
             <SummaryContent reloadAction={reloadSummary} suggestAction={suggestReply} summary={summary} loading={loading} manager={manager} />
         </>
     );

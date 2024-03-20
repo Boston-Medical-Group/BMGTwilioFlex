@@ -48,13 +48,6 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
 }
 
 exports.getGPTThreadRun = async (openai, historyDelivered, instructions, assistant) => {
-    if (instructions !== '') {
-        messages.push({
-            role: 'system',
-            content: instructions
-        })
-    }
-
     let messages = []
     historyDelivered.forEach((h) => {
         messages.push({
@@ -63,12 +56,22 @@ exports.getGPTThreadRun = async (openai, historyDelivered, instructions, assista
         })
     })
 
-    const run = await openai.beta.threads.createAndRun({
-        assistant_id: assistant,
-        thread: {
-            messages
-        },
+    const thread = await openai.beta.threads.create({
+        messages
     });
+
+    let options = {
+        assistant_id: assistant
+    }
+
+    if (instructions !== '') {
+        options = {
+            ...options,
+            additional_instructions: instructions
+        }
+    }
+
+    const run = await openai.beta.threads.runs.create(thread.id, options)
 
     return run
 }

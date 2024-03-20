@@ -20,23 +20,10 @@ const loadConversations = (contact, currentConversation, manager) => {
         .then((resp) => resp.json());
 }
 
-const registerNotifications = () => {
-    Notifications.registerNotification({
-        id: "errorLoadingConversations",
-        content: "Error al cargar las conversaciones",
-        type: NotificationType.error
-    });
-}
-
-
 const ConversationHistory = ({ contact, manager, currentConversation }) => {
     
     const [loaded, setLoaded] = useState(false);
     const [conversations, setConversations] = useState([])
-
-    useEffect(() => {
-        registerNotifications()
-    }, [])
 
     useEffect(async () => {
         await loadConversations(contact, currentConversation, manager)

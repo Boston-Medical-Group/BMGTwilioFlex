@@ -46,7 +46,7 @@ exports.handler = TokenValidator(async (context, event, callback) => {
 
     // Necesito obtener las conversaciones del contacto (SMS o Whatsapp)
     const conversationSid = event.conversationSid ?? false
-    const instructions    = event.instructions ?? ''
+    const instructions    = event.instruction ?? ''
 
     //validate if a number has been provided
     if (!conversationSid) {
