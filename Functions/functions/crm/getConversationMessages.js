@@ -66,6 +66,7 @@ exports.handler = TokenValidator(async (context, event, callback) => {
     response.appendHeader('Access-Control-Allow-Origin', '*');
     response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS POST GET');
     response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
+    response.appendHeader('Content-Type', 'application/json');
 
     // Necesito obtener las conversaciones del contacto (SMS o Whatsapp)
     const conversationSid = event.conversationSid ?? false
@@ -86,7 +87,7 @@ exports.handler = TokenValidator(async (context, event, callback) => {
                 response.setBody(data);
             }
             //handle error
-            else response.setBody(JSON.parse(`{"result": "error"}`));
+            else response.setBody({result: "error"});
             response.setStatusCode(200);
         })
         .catch(function (err) {
