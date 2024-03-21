@@ -10,6 +10,10 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
         role: 'system',
         content: 'La conversación se produce entre nuestro agente y un paciente por Whatsapp.'
     })
+    messages.push({
+        role: 'system',
+        content: 'No incluyas la mencion de costos o valores en tus respuestas y refierete sólo a la información proporcionada.'
+    })
 
     historyDelivered.forEach((h) => {
         let author = 'assistant'
@@ -24,7 +28,7 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
 
     messages.push({
         role: 'assistant',
-        content: 'Crea un resumen de la conversación en máximo 500 caracteres. No incluyas las fechas. De tener el dato, menciona la ciudad desde la que nos contacta y la clínica a la cuál quiere asistir'
+        content: 'Crea un resumen de la conversación en máximo 500 caracteres. No incluyas las fechas. Menciona la ciudad desde la que nos contacta y la clínica a la cuál quiere asistir sólo en caso que esa información esté mencionada en la conversación'
     })
 
     let summary = ''
@@ -32,6 +36,7 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
         await openai.chat.completions.create({
             model: "gpt-3.5-turbo-0125",
             messages,
+            temperature: 0.7
         })
             .then(completion => {
                 // Extracting the summary from the OpenAI API response
