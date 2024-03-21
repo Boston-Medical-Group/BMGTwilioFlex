@@ -30,7 +30,7 @@ export default class HubspotInteractPlugin extends FlexPlugin {
     const options = { sortOrder: 1000 };
 
     //flex.NoTasksCanvas.Content.add(<InteractionCard key="HubspotInteractPlugin-component" manager={manager} />, options);
-    flex.CRMContainer.Content.replace(<InteractionContainer key="InteractionContainer-component" flex={flex} manager={manager} />, options);
+    flex.AgentDesktopView.Panel2.Content.replace(<InteractionContainer key="InteractionContainer-component" flex={flex} manager={manager} />, options);
 
     flex.AgentDesktopView.defaultProps.splitterOptions = {
       initialFirstPanelSize: "800px",
