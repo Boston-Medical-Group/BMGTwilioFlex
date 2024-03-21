@@ -1,5 +1,8 @@
 # Changelog
 
+## 21/03/2023
+* Agrega funcion para envío de SMS desde Hubspot
+
 ## 20/03/2023
 * Agrega nueva tarjeta de contacto
 * Agrega nuevos resumenes AI de conversaciones
