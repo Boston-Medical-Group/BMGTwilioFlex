@@ -26,6 +26,7 @@ exports.handler = TokenValidator(async (context, event, callback) => {
     response.appendHeader('Access-Control-Allow-Origin', '*');
     response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS POST GET');
     response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
+    response.appendHeader('Content-Type', 'application/json');
 
     const conversationSid = event.conversationSid
     let forceSummary      = event.force ?? false
@@ -72,21 +73,15 @@ exports.handler = TokenValidator(async (context, event, callback) => {
             }
         }
 
-        response.appendHeader('Content-Type', 'application/json');
         if (summaryContent != '') {
             response.setBody({ content: summaryContent, messagesCount: historyDelivered.length })
         } else {
             response.setBody({})
         }
-
-        callback(null, response);
-
     } catch (error) {
-        response.appendHeader('Content-Type', 'application/json');
         response.setBody({});
-
-        callback(null, response)
     }
 
+    callback(null, response);
 });
 
