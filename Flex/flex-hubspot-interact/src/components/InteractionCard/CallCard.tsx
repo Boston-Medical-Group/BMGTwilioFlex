@@ -12,7 +12,8 @@ const { FLEX_APP_OUTBOUND_WORKFLOW_SID, FLEX_APP_OUTBOUND_QUEUE_SID } = process.
 type Props = {
   contact: HubspotContact
   deal?: HubspotDeal
-  manager: Flex.Manager
+  manager: Flex.Manager 
+  interactionHandler: () => void
 }
 
 type PhonesList = Array<{
@@ -23,7 +24,7 @@ type PhonesList = Array<{
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
-const CallCard = ({ manager, contact, deal } : Props) => {
+const CallCard = ({ manager, contact, deal, interactionHandler } : Props) => {
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [queues, setQueues] = useState<Array<TaskQueue>>([]);
   const [defaultQueue] = useState<string>(manager.workerClient?.attributes?.last_used_queue ?? FLEX_APP_OUTBOUND_QUEUE_SID as string);
@@ -103,7 +104,10 @@ const CallCard = ({ manager, contact, deal } : Props) => {
           email: contact.email
         }
       }
-    }).finally(() => setIsLoading(false));
+    }).finally(() => {
+      interactionHandler()
+      setIsLoading(false)
+    });
   }, [selectedQueue, selectedPhone]);
 
   useEffect(() => {
@@ -114,28 +118,31 @@ const CallCard = ({ manager, contact, deal } : Props) => {
       return firstPart.replace(/\d/g, '*') + lastDigits
     }
 
+    let phones = []
     if (contact.phone) {
-      phonesList.push({
+      phones.push({
         phone: contact.phone as string,
         obfuscated: obfuscate(contact.phone as string)
       })
 
       if (contact.numero_de_telefono_adicional_ || contact.numero_de_telefono_adicional) {
         const secondaryPhone = contact.numero_de_telefono_adicional_ ?? contact.numero_de_telefono_adicional
-        phonesList.push({
-          phone: secondaryPhone as string,
-          obfuscated: obfuscate(secondaryPhone as string)
-        })
+        if (phones.findIndex((phone) => phone.phone === secondaryPhone) === -1) {
+          phones.push({
+            phone: secondaryPhone as string,
+            obfuscated: obfuscate(secondaryPhone as string)
+          })
+        }
       }
+
+      setPhonesList(phones)
     }
   }, [contact])
 
   return (
-    <Theme.Provider theme="default">
       <>
         <Box paddingTop="space60" marginX="space60">
-        <Card>
-          <Heading as="h2" variant="heading20">Llamar a {fullName(contact)}</Heading>
+          <Heading as="h4" variant="heading40">Llamar a {fullName(contact)}</Heading>
           <Box justifyContent="center" alignItems="center" rowGap="space10" marginBottom="space80">
               <Label htmlFor="queue">Seleccione la cola</Label>
               <Select id="queue" value={selectedQueue ?? queues.at(0)?.queueSid} onChange={handleSelectChange}>
@@ -156,10 +163,8 @@ const CallCard = ({ manager, contact, deal } : Props) => {
           <Stack orientation="horizontal" spacing="space30">
             <Button loading={isLoading} variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Iniciar llamada</Button>
           </Stack>
-          </Card>
         </Box>
       </>
-    </Theme.Provider>
   );
 };
 

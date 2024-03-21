@@ -104,7 +104,7 @@ const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid,
                 .then(async (run) => {
                     if (run.hasOwnProperty('error')) {
                         Notifications.showNotification('errorNotEnoughMessages');
-                        console.log('NOT ENOUGH CLIENT MESSAGES')
+                        console.log('NOT ENOUGH CLIENT MESSAGES', run.error)
                         handleClose()
                         return
                     } else if (run !== null) {
