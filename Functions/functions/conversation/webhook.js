@@ -91,55 +91,20 @@ var doOptInOrOut = function (context, event, author, optIn) { return __awaiter(v
  * Comprueba si el mensaje es un opt-out de WhatsApp y lo excluye
  */
 var checkOptOut = function (context, event) { return __awaiter(void 0, void 0, void 0, function () {
-    var defaultSettings, countrySettings, optoutWords, body, author;
-    var _a, _b, _c;
-    return __generator(this, function (_d) {
-        switch (_d.label) {
+    var author;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                if (!event.Source || event.Source.toUpperCase() !== "WHATSAPP" || !event.Body || event.Body === '') {
+                if (!event.OptOutType) {
                     return [2 /*return*/];
                 }
-                defaultSettings = optoput.optoutSettings.default;
-                countrySettings = (_b = optoput.optoutSettings[(_a = context.COUNTRY) !== null && _a !== void 0 ? _a : '']) !== null && _b !== void 0 ? _b : {};
-                optoutWords = defaultSettings.OPT_OUT_TEXT.concat((_c = countrySettings.OPT_OUT_TEXT) !== null && _c !== void 0 ? _c : []);
-                body = event.Body.toLowerCase().trim();
-                if (!optoutWords.includes(body)) {
-                    return [2 /*return*/];
-                }
-                author = event.Author;
+                author = event.From;
                 if (author.startsWith('whatsapp:')) {
                     author = author.slice(9);
                 }
-                return [4 /*yield*/, doOptInOrOut(context, event, author, false).then(function () { return __awaiter(void 0, void 0, void 0, function () {
-                        var conversation;
-                        var _a;
-                        return __generator(this, function (_b) {
-                            switch (_b.label) {
-                                case 0:
-                                    conversation = context.getTwilioClient().conversations.v1.conversations(event.ConversationSid);
-                                    return [4 /*yield*/, conversation.messages.create({
-                                            author: 'System',
-                                            body: (_a = countrySettings['OPT_OUT_MESSAGE']) !== null && _a !== void 0 ? _a : defaultSettings['OPT_OUT_MESSAGE'],
-                                        }).then(function () { return __awaiter(void 0, void 0, void 0, function () {
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0: return [4 /*yield*/, conversation.update({
-                                                            state: 'closed'
-                                                        })];
-                                                    case 1:
-                                                        _a.sent();
-                                                        return [2 /*return*/];
-                                                }
-                                            });
-                                        }); })];
-                                case 1:
-                                    _b.sent();
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); })];
+                return [4 /*yield*/, doOptInOrOut(context, event, author, false)];
             case 1:
-                _d.sent();
+                _a.sent();
                 return [2 /*return*/];
         }
     });
@@ -150,44 +115,20 @@ var checkOptOut = function (context, event) { return __awaiter(void 0, void 0, v
  * @param event
  */
 var checkOptIn = function (context, event) { return __awaiter(void 0, void 0, void 0, function () {
-    var defaultSettings, countrySettings, optoutWords, body, author;
-    var _a, _b, _c;
-    return __generator(this, function (_d) {
-        switch (_d.label) {
+    var author;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                if (!event.Source || event.Source.toUpperCase() !== "WHATSAPP" || !event.Body || event.Body === '') {
+                if (!event.OptOutType) {
                     return [2 /*return*/];
                 }
-                defaultSettings = optoput.optoutSettings.default;
-                countrySettings = (_b = optoput.optoutSettings[(_a = context.COUNTRY) !== null && _a !== void 0 ? _a : '']) !== null && _b !== void 0 ? _b : {};
-                optoutWords = defaultSettings.OPT_IN_TEXT.concat((_c = countrySettings.OPT_IN_TEXT) !== null && _c !== void 0 ? _c : []);
-                body = event.Body.toLowerCase().trim();
-                if (!optoutWords.includes(body)) {
-                    return [2 /*return*/];
-                }
-                author = event.Author;
+                author = event.From;
                 if (author.startsWith('whatsapp:')) {
                     author = author.slice(9);
                 }
-                return [4 /*yield*/, doOptInOrOut(context, event, author, true).then(function () { return __awaiter(void 0, void 0, void 0, function () {
-                        var conversation;
-                        var _a;
-                        return __generator(this, function (_b) {
-                            switch (_b.label) {
-                                case 0:
-                                    conversation = context.getTwilioClient().conversations.v1.conversations(event.ConversationSid);
-                                    return [4 /*yield*/, conversation.messages.create({
-                                            author: 'System',
-                                            body: (_a = countrySettings['OPT_IN_MESSAGE']) !== null && _a !== void 0 ? _a : defaultSettings['OPT_IN_MESSAGE'],
-                                        })];
-                                case 1:
-                                    _b.sent();
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); })];
+                return [4 /*yield*/, doOptInOrOut(context, event, author, true)];
             case 1:
-                _d.sent();
+                _a.sent();
                 return [2 /*return*/];
         }
     });
@@ -198,20 +139,24 @@ var handler = function (context, event, callback) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!(event.EventType === "onMessageAdded")) return [3 /*break*/, 3];
+                    if (!event.OptOutType) return [3 /*break*/, 4];
+                    if (!(event.OptOutType === 'STOP')) return [3 /*break*/, 2];
                     return [4 /*yield*/, checkOptOut(context, event)];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, checkOptIn(context, event)];
+                    return [3 /*break*/, 4];
                 case 2:
-                    _a.sent();
-                    _a.label = 3;
+                    if (!(event.OptOutType === 'START')) return [3 /*break*/, 4];
+                    return [4 /*yield*/, checkOptIn(context, event)];
                 case 3:
-                    callback(null);
+                    _a.sent();
+                    _a.label = 4;
+                case 4:
+                    callback(null, {});
                     return [2 /*return*/];
             }
         });
     });
 };
 exports.handler = handler;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoid2ViaG9vay5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb252ZXJzYXRpb24vd2ViaG9vay50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFDQSxrREFBOEQ7QUFLOUQsSUFBTSxPQUFPLEdBQUcsT0FBTyxDQUFDLE9BQU8sQ0FBQyxZQUFZLEVBQUUsQ0FBQyxnQkFBZ0IsQ0FBQyxDQUFDLElBQUksQ0FBQyxDQUFDO0FBbUJ2RSxJQUFNLFlBQVksR0FBRyxVQUFPLE9BQTJCLEVBQUUsS0FBZSxFQUFFLE1BQWMsRUFBRSxLQUFjOzs7OztnQkFFOUYsYUFBYSxHQUFHLElBQUksbUJBQWEsQ0FBQyxFQUFFLFdBQVcsRUFBRSxPQUFPLENBQUMsYUFBYSxFQUFFLENBQUMsQ0FBQTtnQkFDL0UscUJBQU0sYUFBYSxDQUFDLEdBQUcsQ0FBQyxRQUFRLENBQUMsU0FBUyxDQUFDLFFBQVEsQ0FBQzt3QkFDaEQsS0FBSyxFQUFFLE1BQU07d0JBQ2IsWUFBWSxFQUFFLEVBQUU7d0JBQ2hCLEtBQUssRUFBRSxDQUFDLE9BQU8sQ0FBQzt3QkFDaEIsVUFBVSxFQUFFLENBQUMsV0FBVyxFQUFFLFVBQVUsRUFBRSxrQkFBa0IsQ0FBQzt3QkFDekQsS0FBSyxFQUFFLENBQUM7d0JBQ1IsS0FBSyxFQUFFLENBQUM7cUJBQ1gsQ0FBQyxDQUFDLElBQUksQ0FBQyxVQUFPLFFBQTRCOzs7O3lDQUNuQyxDQUFBLFFBQVEsQ0FBQyxLQUFLLEdBQUcsQ0FBQyxDQUFBLEVBQWxCLHdCQUFrQjtvQ0FDbEIscUJBQU0sYUFBYSxDQUFDLEdBQUcsQ0FBQyxRQUFRLENBQUMsUUFBUSxDQUFDLE1BQU0sQ0FBQzs0Q0FDN0MsTUFBTSxFQUFFLFFBQVEsQ0FBQyxPQUFPLENBQUMsR0FBRyxDQUFDLFVBQUMsT0FBTztnREFDakMsT0FBTztvREFDSCxFQUFFLEVBQUUsT0FBTyxDQUFDLEVBQUU7b0RB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
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoid2ViaG9vay5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb252ZXJzYXRpb24vd2ViaG9vay50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFDQSxrREFBOEQ7QUFLOUQsSUFBTSxPQUFPLEdBQUcsT0FBTyxDQUFDLE9BQU8sQ0FBQyxZQUFZLEVBQUUsQ0FBQyxnQkFBZ0IsQ0FBQyxDQUFDLElBQUksQ0FBQyxDQUFDO0FBZ0J2RSxJQUFNLFlBQVksR0FBRyxVQUFPLE9BQTJCLEVBQUUsS0FBZSxFQUFFLE1BQWMsRUFBRSxLQUFjOzs7OztnQkFFOUYsYUFBYSxHQUFHLElBQUksbUJBQWEsQ0FBQyxFQUFFLFdBQVcsRUFBRSxPQUFPLENBQUMsYUFBYSxFQUFFLENBQUMsQ0FBQTtnQkFDL0UscUJBQU0sYUFBYSxDQUFDLEdBQUcsQ0FBQyxRQUFRLENBQUMsU0FBUyxDQUFDLFFBQVEsQ0FBQzt3QkFDaEQsS0FBSyxFQUFFLE1BQU07d0JBQ2IsWUFBWSxFQUFFLEVBQUU7d0JBQ2hCLEtBQUssRUFBRSxDQUFDLE9BQU8sQ0FBQzt3QkFDaEIsVUFBVSxFQUFFLENBQUMsV0FBVyxFQUFFLFVBQVUsRUFBRSxrQkFBa0IsQ0FBQzt3QkFDekQsS0FBSyxFQUFFLENBQUM7d0JBQ1IsS0FBSyxFQUFFLENBQUM7cUJBQ1gsQ0FBQyxDQUFDLElBQUksQ0FBQyxVQUFPLFFBQTRCOzs7O3lDQUNuQyxDQUFBLFFBQVEsQ0FBQyxLQUFLLEdBQUcsQ0FBQyxDQUFBLEVBQWxCLHdCQUFrQjtvQ0FDbEIscUJBQU0sYUFBYSxDQUFDLEdBQUcsQ0FBQyxRQUFRLENBQUMsUUFBUSxDQUFDLE1BQU0sQ0FBQzs0Q0FDN0MsTUFBTSxFQUFFLFFBQVEsQ0FBQyxPQUFPLENBQUMsR0FBRyxDQUFDLFVBQUMsT0FBTztnREFDakMsT0FBTztvREFDSCxFQUFFLEVBQUUsT0FBTyxDQUFDLEVBQUU7b0RB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

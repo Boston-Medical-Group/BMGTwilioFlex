@@ -12,14 +12,11 @@ type MyContext = {
 }
 
 type MyEvent = {
-    EventType: string
     Body: string
-    Author: string
-    Source: "WHATSAPP" | "SMS"
-    ConversationSid: string
-    Attributes: {
-        [key: string]: any
-    }
+    From: string
+    To: string
+    OptOutType?: "STOP" | "START"
+    [key: string]: any
 }
 
 
@@ -62,36 +59,17 @@ const doOptInOrOut = async (context: Context<MyContext>, event : MyEvent, author
  * Comprueba si el mensaje es un opt-out de WhatsApp y lo excluye
  */
 const checkOptOut = async (context: Context<MyContext>, event: MyEvent) => {
-
-    if (!event.Source || event.Source.toUpperCase() !== "WHATSAPP" || !event.Body || event.Body === '') {
-        return
-    }
-
-    const defaultSettings = optoput.optoutSettings.default
-    const countrySettings = optoput.optoutSettings[context.COUNTRY ?? ''] ?? {}
-    const optoutWords = defaultSettings.OPT_OUT_TEXT.concat(countrySettings.OPT_OUT_TEXT ?? [])
-    const body = event.Body.toLowerCase().trim()
-    if (!optoutWords.includes(body)) {
+    if (!event.OptOutType) {
         return
     }
 
     // Phone
-    let author = event.Author
+    let author = event.From
     if (author.startsWith('whatsapp:')) {
         author = author.slice(9);
     }
 
-    await doOptInOrOut(context, event, author, false).then(async () => {
-        const conversation = context.getTwilioClient().conversations.v1.conversations(event.ConversationSid)
-        await conversation.messages.create({
-            author: 'System',
-            body: countrySettings['OPT_OUT_MESSAGE'] ?? defaultSettings['OPT_OUT_MESSAGE'],
-        }).then(async () => {
-            await conversation.update({
-                state: 'closed'
-            })
-        })
-    })
+    await doOptInOrOut(context, event, author, false)
 }
 
 /**
@@ -100,31 +78,17 @@ const checkOptOut = async (context: Context<MyContext>, event: MyEvent) => {
  * @param event 
  */
 const checkOptIn = async (context: Context<MyContext>, event: MyEvent) => {
-    if (!event.Source || event.Source.toUpperCase() !== "WHATSAPP" || !event.Body || event.Body === '') {
-        return
-    }
-
-    const defaultSettings = optoput.optoutSettings.default
-    const countrySettings = optoput.optoutSettings[context.COUNTRY ?? ''] ?? {}
-    const optoutWords = defaultSettings.OPT_IN_TEXT.concat(countrySettings.OPT_IN_TEXT ?? [])
-    const body = event.Body.toLowerCase().trim()
-    if (!optoutWords.includes(body)) {
+    if (!event.OptOutType) {
         return
     }
 
     // Phone
-    let author = event.Author
+    let author = event.From
     if (author.startsWith('whatsapp:')) {
         author = author.slice(9);
     }
 
-    await doOptInOrOut(context, event, author, true).then(async () => {
-        const conversation = context.getTwilioClient().conversations.v1.conversations(event.ConversationSid)
-        await conversation.messages.create({
-            author: 'System',
-            body: countrySettings['OPT_IN_MESSAGE'] ?? defaultSettings['OPT_IN_MESSAGE'],
-        })
-    })
+    await doOptInOrOut(context, event, author, true)
 
 }
 
@@ -135,11 +99,14 @@ export const handler = async function (
     callback: ServerlessCallback
 ) {
 
-    if (event.EventType === "onMessageAdded") {
-        await checkOptOut(context, event)
-        await checkOptIn(context, event)
+    if (event.OptOutType) {
+        if (event.OptOutType === 'STOP') {
+            await checkOptOut(context, event)
+        } else if (event.OptOutType === 'START') {
+            await checkOptIn(context, event)
+        }
     }
 
-    callback(null);
+    callback(null, {});
 
 }
