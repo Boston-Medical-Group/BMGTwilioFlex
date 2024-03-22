@@ -4,6 +4,7 @@
 * Limpieza
 * Optimiza prompt resumen
 * Fuerza despliegue
+* Update versiones
 
 ## 21/03/2023
 * Agrega funcion para envío de SMS desde Hubspot
