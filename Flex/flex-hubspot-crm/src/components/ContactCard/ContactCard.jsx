@@ -25,9 +25,11 @@ const ContactCard = ({ manager, task }) => {
 
     /** DO NOT CALL & DO NOT WHATSAPP */
     useEffect(() => {
-        // Check if object property exists and is a non empty string
-        if (contact && contact.hasOwnProperty('email') && contact.email !== '') {
-            setAvatar(gravatarUrl(contact.email))
+        if (contact && contact.hasOwnProperty('email')) {
+            let email = `${contact.email}`
+            if (email.length > 0) {
+                setAvatar(gravatarUrl(contact.email))
+            }
         }
     }, [contact])
 
