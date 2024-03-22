@@ -29,7 +29,6 @@ const SyncHubspotUser = ({ manager }) => {
                                 manager.workerClient.attributes.hubspot_owner_id = user.id;
                             }
                             
-                            console.log(manager.workerClient.attributes);
                             await manager.workerClient.setAttributes(manager.workerClient.attributes);
                         }
                     }

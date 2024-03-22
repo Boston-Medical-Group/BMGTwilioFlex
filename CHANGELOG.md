@@ -1,5 +1,19 @@
 # Changelog
 
+## 22/03/2023
+* Limpieza
+* Optimiza prompt resumen
+
+## 21/03/2023
+* Agrega funcion para envío de SMS desde Hubspot
+
+## 20/03/2023
+* Agrega nueva tarjeta de contacto
+* Agrega nuevos resumenes AI de conversaciones
+* Agrega nueva sugerencia de respuesta AI a conversacions
+* Corrige nota hubspot
+* Agrega terser a plugin
+
 ## 13/03/2023
 * Corrige nota resumen
 

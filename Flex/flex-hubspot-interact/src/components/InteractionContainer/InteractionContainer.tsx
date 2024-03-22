@@ -1,6 +1,6 @@
 import * as FlexInstance from '@twilio/flex-ui';
 import InteractionCard from '../InteractionCard'
-import { Box, Heading, Flex, Paragraph, SkeletonLoader } from '@twilio-paste/core';
+import { Box, Heading, Flex, Paragraph, SkeletonLoader, Modal, ModalBody, ModalHeader, ModalHeading, Stack } from '@twilio-paste/core';
 import { useEffect, useState, useCallback } from 'react';
 import useApi from '../../hooks/useApi';
 import CallCard from '../InteractionCard/CallCard';
@@ -17,10 +17,12 @@ const InteractionContainer = ({ flex, manager } : MyProps) => {
     const [ showCallCard, setShowCallCard ] = useState(false)
     const [ showInteractionCard, setShowInteractionCard ] = useState(false)
     const [ contact, setContact ] = useState({})
-    const [ deal, setDeal ] = useState({})
+    const [deal, setDeal] = useState({})
+    const [isOpen, setIsOpen] = useState(false)
 
     const callHandlerCallback = useCallback((event) => {
         console.log('EXTERNAL CALL')
+        setIsOpen(true)
         setInteraction('call')
     }, [])
 
@@ -29,6 +31,7 @@ const InteractionContainer = ({ flex, manager } : MyProps) => {
         const { data } = event;
         if (data.from === 'FLEX_SCRIPT') {
             resetContactOrDeal()
+            setIsOpen(true)
             setIsLoading(true)
 
             if (data.actionType === 'gotoInteraction') {
@@ -101,24 +104,29 @@ const InteractionContainer = ({ flex, manager } : MyProps) => {
 
     return (
         <>
-            <Flex height="100vh" vAlignContent="center" hAlignContent="center" vertical={true} >
-                <Box maxWidth={["100%", "80%", "60%"]} alignItems="center">
-                    <Heading as="h3" variant="heading20">Boston Medical/Elexial</Heading>
-                    <Paragraph>Seleccione un contacto o negocio desde Hubspot para iniciar una interacción</Paragraph>
+            <Modal isOpen={isOpen} size="default" onDismiss={() => setIsOpen(false)} ariaLabelledby='interaction-modal'>
+                <ModalHeader>
+                    <ModalHeading>Boston Medical/Elexial
+                    </ModalHeading>
+                </ModalHeader>
 
-                    {isLoading && (
-                        <SkeletonLoader height="150px" />
-                    )}
+                <ModalBody>
+                    <Stack orientation="vertical" spacing="space60">
+                        
+                        {isLoading && (
+                            <SkeletonLoader height="150px" />
+                        )}
 
-                    {!isLoading && showCallCard && (
-                        <CallCard manager={manager} contact={contact} deal={deal} />
-                    )}
+                        {!isLoading && showCallCard && (
+                            <CallCard manager={manager} contact={contact} deal={deal} interactionHandler={() => setIsOpen(false)} />
+                        )}
 
-                    {!isLoading && showInteractionCard && (
-                        <InteractionCard manager={manager} contact={contact} deal={deal} callHandler={callHandlerCallback} />
-                    )}
-                </Box>
-            </Flex>
+                        {!isLoading && showInteractionCard && (
+                            <InteractionCard manager={manager} contact={contact} deal={deal} callHandler={callHandlerCallback} interactionHandler={() => setIsOpen(false)} />
+                        )}
+                    </Stack>
+                </ModalBody>
+            </Modal>
             
         </>
     );

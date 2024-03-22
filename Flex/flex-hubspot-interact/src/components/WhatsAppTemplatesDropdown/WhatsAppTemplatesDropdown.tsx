@@ -80,6 +80,8 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
             return 'No podemos enviar el mensaje debido a una limitación de Whatsapp'
         } else if (code === 63024) {
             return 'Destinatario inválido'
+        } else if (code === 21610) {
+            return 'Usuario ha solicitado no ser contactado (OptOut)'
         } else {
             return 'Error no catalogado'
         }

@@ -17,6 +17,7 @@ type Props = {
   contact: HubspotContact
   deal?: HubspotDeal
   callHandler: (event: any) => void
+  interactionHandler: any
 }
 
 const disabledButtonStyles = {
@@ -36,7 +37,7 @@ const disabledButtonStyles = {
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
-const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
+const InteractionCard = ({manager, contact, deal, callHandler, interactionHandler} : Props) => {
   const { startOutboundConversation } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
@@ -74,6 +75,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
 
   const sendSmsHandler = useCallback((contact: HubspotContact, deal?: HubspotDeal) => {
     setSelectedSmsContact(contact);
+    interactionHandler()
   }, []);
 
   /*
@@ -121,7 +123,9 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
         hubspotContact: contact,
         hubspot_contact_id: contact.hs_object_id,
         hubspot_deal_id: deal?.hs_object_id ?? null
-      })
+    })
+    
+    interactionHandler()
   }, []);
 
   const handleCloseModel = React.useCallback(() => {
@@ -130,6 +134,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
   }, []);
 
   const sendCalendarHandler = useCallback(() => {
+    interactionHandler()
     window.open(calendar(), '_blank');
   }, [])
 
@@ -159,8 +164,7 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
         <SendSmsModal selectedContact={selectedSmsContact} dealId={deal?.hs_object_id} manager={manager} handleClose={handleCloseModel} />
         <SendWAModal selectedContact={selectedWAContact} dealId={deal?.hs_object_id} manager={manager} handleClose={handleCloseModel} />
         <Box paddingTop="space60">
-        <Card>
-          <Heading as="h2" variant="heading20">Interactuar con {fullName(contact)}</Heading>
+          <Heading as="h4" variant="heading40">Interactuar con {fullName(contact)}</Heading>
           <Paragraph>
             Seleccione el método de interacción con el contacto seleccionado.
             </Paragraph>
@@ -173,7 +177,9 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
               rowGap="space60"
               flexWrap="wrap"
               justifyContent="space-between"
-              flexDirection="column"
+            flexDirection="column"
+            margin="auto"
+            maxWidth="300px"
             >
               <Button variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={callHandler}><FaPhoneAlt /> Call</Button>
               <CustomizationProvider
@@ -236,7 +242,6 @@ const InteractionCard = ({manager, contact, deal, callHandler} : Props) => {
                 </CustomizationProvider>
               )}
           </Box>
-          </Card>
         </Box>
       </>
     </Theme.Provider>
