@@ -27,8 +27,8 @@ const ContactCard = ({ manager, task }) => {
     useEffect(() => {
         if (contact && contact.hasOwnProperty('email')) {
             let email = `${contact.email}`
-            if (email.length > 0) {
-                setAvatar(gravatarUrl(contact.email))
+            if (email.length > 0 && contact.email !== null && contact.email !== '') {
+                setAvatar(gravatarUrl(email))
             }
         }
     }, [contact])
