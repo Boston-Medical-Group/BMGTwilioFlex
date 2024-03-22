@@ -3,6 +3,7 @@
 ## 22/03/2023
 * Limpieza
 * Optimiza prompt resumen
+* Fuerza despliegue
 
 ## 21/03/2023
 * Agrega funcion para envío de SMS desde Hubspot
