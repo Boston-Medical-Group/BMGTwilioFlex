@@ -21,13 +21,11 @@ const ContactCard = ({ manager, task }) => {
     useEffect(() => {
         setContact(task.attributes?.hubspotContact)
         setContactId(task.attributes?.hubspot_contact_id)
-        console.log('CONTACTCARD', task)
     }, [task])
 
     /** DO NOT CALL & DO NOT WHATSAPP */
     useEffect(() => {
         if (contact && contact?.email !== '') {
-            console.log('CONTACTAVATAR', contact)
             setAvatar(gravatarUrl(contact?.email))
         }
     }, [contact])

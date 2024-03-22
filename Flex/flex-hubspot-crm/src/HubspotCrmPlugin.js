@@ -63,7 +63,6 @@ export default class HubspotCrmPlugin extends FlexPlugin {
     });
 
     flex.Actions.addListener("afterSelectTask", (payload) => {
-      console.log(payload)
       if (payload.task && payload.task?.attributes?.hubspot_contact_id !== '' || payload.task?.attributes?.hubspotContact) {
         flex.AgentDesktopView.Panel2.Content.replace(
           <ContactCard key={`HubspotCrmPlugin-component-ContactCard-${payload.task.sid}`}

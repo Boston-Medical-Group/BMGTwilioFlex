@@ -149,7 +149,6 @@ const ConversationHistoryEntry = ({ conversation, manager }) => {
                             if (author === conversation.conversationSid) {
                                 author = "Virtual Agent";
                             }
-                            //console.log("outbound message?", message)
                             return (
                                 <ChatMessage variant="outbound" key={message.index}>
                                     <ChatBubble >{message.body}</ChatBubble>

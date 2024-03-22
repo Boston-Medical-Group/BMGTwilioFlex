@@ -1,5 +1,8 @@
 # Changelog
 
+## 22/03/2023
+* Limpieza
+
 ## 21/03/2023
 * Agrega funcion para envío de SMS desde Hubspot
 
