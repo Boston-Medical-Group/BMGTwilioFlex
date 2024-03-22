@@ -8,6 +8,22 @@ import { fullName } from '../../utils/helpers';
 import gravatarUrl from 'gravatar-url';
 import { Summary, ConversationHistory } from './ContactCardModules'
 
+
+const getDataByContactId = async (contact_id, manager) => {
+    const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchHubspotContact`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            contact_id: contact_id,
+            Token: manager.store.getState().flex.session.ssoTokenPayload.token
+        })
+    });
+
+    return await request.json();
+}
+
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
@@ -18,8 +34,15 @@ const ContactCard = ({ manager, task }) => {
 
     const [avatar, setAvatar] = useState();
 
-    useEffect(() => {
-        setContact(task.attributes?.hubspotContact)
+    useEffect(async () => {
+        if (task.attributes?.hubspotContact) {
+            await getDataByContactId(task.attributes?.hubspotContact)
+                .then((data) => {
+                    setContact(data)
+                })
+        } else {
+            setContact(task.attributes?.hubspotContact)
+        }
         setContactId(task.attributes?.hubspot_contact_id)
     }, [task])
 
