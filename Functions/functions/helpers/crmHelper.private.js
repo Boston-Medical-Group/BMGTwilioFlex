@@ -4,15 +4,19 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
     // System messages
     messages.push({
         role: 'system',
-        content: 'Eres el asistente de resúmenes de conversaciones de Boston Medical, la clínica de salud sexual masculina.'
+        content: 'Eres un asistente, encargado de generar el resumen o "summary" de una conversación entre un paciente y uno o varios agentes.'
     })
     messages.push({
         role: 'system',
-        content: 'La conversación se produce entre nuestro agente y un paciente por Whatsapp.'
+        content: 'No debes incluir costos de servicios ni productos en tus resúmenes.'
     })
     messages.push({
         role: 'system',
-        content: 'No incluyas la mencion de costos o valores en tus respuestas y refierete sólo a la información proporcionada.'
+        content: 'No debes inventar o inferir información, solo debes incluir información relevante de la conversación si es que ha sido proporcionada.'
+    })
+    messages.push({
+        role: 'system',
+        content: 'Debes incluir la ciudad del paciente solo en caso de que el paciente la haya proporcionado en algún momento de la conversación.'
     })
 
     historyDelivered.forEach((h) => {
@@ -28,7 +32,7 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
 
     messages.push({
         role: 'assistant',
-        content: 'Crea un resumen de la conversación en máximo 500 caracteres. No incluyas las fechas. Menciona la ciudad desde la que nos contacta y la clínica a la cuál quiere asistir sólo en caso que esa información esté mencionada en la conversación'
+        content: 'Crea un resumen de la conversación en máximo 500 caracteres ahora.'
     })
 
     let summary = ''
