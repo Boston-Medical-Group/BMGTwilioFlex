@@ -1,5 +1,22 @@
 const FunctionTokenValidator = require('twilio-flex-token-validator').functionValidator;
 const fetch = require("node-fetch");
+const OpenAI = require("openai");
+const { getGPTSummary } = require(Runtime.getFunctions()['helpers/crmHelper'].path);
+
+const createSummary = async (historyDelivered, context) => {
+  if (historyDelivered.length <= 3) {
+    return false
+  }
+
+  const API_KEY = context.OPENAI_GPT_API_KEY;
+  const apiModel = context.API_MODEL;
+
+  const openai = new OpenAI({
+    apiKey: API_KEY,
+  });
+
+  return await getGPTSummary(openai, historyDelivered, apiModel)
+}
 
 /**
  * @typedef {import('twilio').Twilio} TwilioClient
@@ -57,93 +74,82 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
     hubspot_owner_id
   } = event
 
+  const response = new Twilio.Response();
+  response.appendHeader("Access-Control-Allow-Origin", "*");
+  response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
+  response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+  response.appendHeader("Content-Type", "application/json");
+
+  if (!hubspot_contact_id) {
+    console.log('CRMID Inválido');
+    response.setBody({ error: 'hubspot_contact_id Inválido al crear resumen' });
+    response.setStatusCode(404);
+    callback(null, response);
+    return
+  }
+
+  
+  let summaryContent;
   try {
-    const response = new Twilio.Response();
-    response.appendHeader("Access-Control-Allow-Origin", "*");
-    response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
-    response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+    const conversationSid = event.conversationSid
+    const conversationContext = context.getTwilioClient().conversations.v1.conversations(conversationSid)
+    const history = await conversationContext.messages.list()
 
-    if (!hubspot_contact_id) {
-      console.log('CRMID Inválido');
-      response.appendHeader("Content-Type", "application/json");
-      response.setStatusCode(404);
-      callback(null, response);
-    }
+    let historyDelivered = history.filter((h) => h.delivery === null || h.delivery?.delivered === 'all')
 
-    //Obtiene mensajes de la conversación y genera log
-    const conversationMessages = await getMessages(context.getTwilioClient(), conversationSid);
-    
-    let summary = '';
-    if (!hasEnoughMessages(conversationMessages)) {
-      summary = 'El usuario aún no ha contestó ningún mensaje de la conversación (mensaje genérico)'
+    let clientMessages = historyDelivered.filter((m) => m.author.startsWith('whatsapp:'))
+    let agentMessages = historyDelivered.filter((m) => !m.author.startsWith('whatsapp:'))
+    if (clientMessages.length === 0 && agentMessages.length > 0) {
+      summaryContent = 'Se ha contactado al paciente, pero aún no se obtuvo una respuesta'
+    } else if (historyDelivered.length < 4) {
+      summaryContent = 'Aún no se ha generado resumen ya que la conversación es muy breve'
     } else {
-      const parsedConversationForAI = await getParseConversationForAI(conversationMessages)
-
-      // Importing required modules
-      const OpenAI = require("openai");
-
-      // Getting the API key from Twilio environment variables
-      const API_KEY = context.OPENAI_GPT_API_KEY;
-      const API_MODEL = context.API_MODEL;
-
-      const openai = new OpenAI({
-        apiKey: API_KEY,
-      });
-
-      let prompt = `Escribe un resumen de un máximo de 500 caracteres del siguiente historial de conversación. No incluyas las fechas en las respuestas. Has referencia al cliente como "paciente". De tener el dato, menciona la ciudad desde la que nos contacta y la clínica a la cuál quiere asistir: ${parsedConversationForAI.concat('\n\n')}`;
-      if (!API_MODEL) {
-        //const summary = completion.choices[0].message.content;
-        summary = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: prompt }],
-        })
-      } else if (API_MODEL.startsWith('gpt-')) {
-        summary = openai.chat.completions.create(({
-          model: API_MODEL,
-          messages: [{ role: "user", content: prompt }],
-        }))
-      } else {
-        summary = ''
-      }
+      summaryContent = await createSummary(historyDelivered, context)
     }
+  } catch (err) {
+    console.log(err)
+    response.setBody({ error: err });
+    return callback(null, response);
+  }
 
-    let hs_note_body = 'Resumen AI: ' + summary.choices[0].message.content;
+  let hs_note_body = 'Resumen AI: ' + summaryContent;
 
-    let toHubspot = {
-      properties: {
-        hs_timestamp,
-        hs_note_body,
-        hubspot_owner_id
-      },
-      associations: [
-        {
-          to: {
-            id: hubspot_contact_id
-          },
-          types: [
-            {
-              associationCategory: "HUBSPOT_DEFINED",
-              associationTypeId: 202
-            }
-          ]
-        }
-      ]
-    };
-
-    if (hubspot_deal_id !== undefined && hubspot_deal_id !== null) {
-      toHubspot.associations.push({
+  let toHubspot = {
+    properties: {
+      hs_timestamp,
+      hs_note_body,
+      hubspot_owner_id
+    },
+    associations: [
+      {
         to: {
-          id: hubspot_deal_id
+          id: hubspot_contact_id
         },
         types: [
           {
             associationCategory: "HUBSPOT_DEFINED",
-            associationTypeId: 214
+            associationTypeId: 202
           }
         ]
-      })
-    }
+      }
+    ]
+  };
 
+  if (hubspot_deal_id !== undefined && hubspot_deal_id !== null) {
+    toHubspot.associations.push({
+      to: {
+        id: hubspot_deal_id
+      },
+      types: [
+        {
+          associationCategory: "HUBSPOT_DEFINED",
+          associationTypeId: 214
+        }
+      ]
+    })
+  }
+
+  try {
     const request = await fetch(`https://api.hubapi.com/crm/v3/objects/notes`, {
       method: "POST",
       headers: {
@@ -152,32 +158,19 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
       },
       body: JSON.stringify(toHubspot)
     });
-
+    
     if (!request.ok) {
+      console.log(err)
       throw new Error('Error while retrieving data from hubspot');
-    }
-
-    const data = await request.json();
-
-    response.appendHeader("Content-Type", "application/json");
-    response.setBody(data);
-    // Return a success response using the callback function.
-    callback(null, response);
-
-  } catch (err) {
-
-    if (err instanceof Error) {
-      const response = new Twilio.Response();
-      response.appendHeader("Content-Type", "plain/text");
-      response.setBody(err.message);
-      response.setStatusCode(500);
-      // If there's an error, send an error response
-      // Keep using the response object for CORS purposes
-      console.error(err);
-      callback(null, response);
     } else {
-      callback(null, {});
-    }
+      const data = await request.json();
 
+      response.setBody(data);
+    }
+  } catch (err) {
+    console.log(err)
+    response.setBody({ error: err });
   }
+
+  return callback(null, response);
 })
