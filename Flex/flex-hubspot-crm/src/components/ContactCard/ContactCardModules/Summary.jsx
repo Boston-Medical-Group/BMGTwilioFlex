@@ -21,14 +21,18 @@ const Summary = ({ manager, task }) => {
 
     useEffect(async () => {
         setLoaded(false)
-        await reloadSummary(false).finally(() => {
+        let csid = task.attributes?.conversationSid ?? false
+        if (csid) {
+            setConversationSid(csid)
+            await reloadSummary(false).finally(() => {
 
-            const roles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles ?? []
-            const skills = manager?.workerClient?.attributes?.routing?.skills ?? []
+                const roles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles ?? []
+                const skills = manager?.workerClient?.attributes?.routing?.skills ?? []
 
-            setShowButtons(roles.indexOf('admin') >= 0 || skills?.indexOf('IA_Assistant') >= 0)
-            setLoaded(true)
-        })
+                setShowButtons(roles.indexOf('admin') >= 0 || skills?.indexOf('IA_Assistant') >= 0)
+                setLoaded(true)
+            })
+        }
     }, [task])
 
     const suggestReply = async () => {
@@ -64,7 +68,7 @@ const Summary = ({ manager, task }) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                conversationSid: task.attributes.conversationSid,
+                conversationSid,
                 force,
                 Token: manager.store.getState().flex.session.ssoTokenPayload.token
             })
