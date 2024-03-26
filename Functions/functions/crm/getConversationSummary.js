@@ -41,7 +41,11 @@ exports.handler = TokenValidator(async (context, event, callback) => {
         let summaryContent;
         let summaryTimestamp;
 
-        if (historyDelivered.length < 4) {
+        let clientMessages = historyDelivered.filter((m) => m.author.startsWith('whatsapp:'))
+        let agentMessages = historyDelivered.filter((m) => !m.author.startsWith('whatsapp:'))
+        if (clientMessages.length === 0 && agentMessages.length > 0) {
+            summaryContent = 'Se ha contactado al paciente, pero aún no se obtuvo una respuesta'
+        } else if (historyDelivered.length < 4) {
             summaryContent = 'Aún no se ha generado resumen ya que la conversación es muy breve'
         } else {
             // Si la conversación se ha actualizado o ha pasado mucho tiempo, forzamos un nuevo resument

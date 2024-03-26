@@ -35,7 +35,8 @@ const ContactCard = ({ manager, task }) => {
     const [avatar, setAvatar] = useState();
 
     useEffect(async () => {
-        if (!task.attributes?.hubspotContact) {
+        let hcid = task.attributes?.hubspotContact ?? false
+        if (!hcid) {
             await getDataByContactId(task.attributes?.hubspot_contact_id, manager)
                 .then((data) => {
                     setContact(data.properties)
