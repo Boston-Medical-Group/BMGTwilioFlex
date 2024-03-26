@@ -8,7 +8,7 @@ import GPTReplyModal from './Summary/GPTReplyModal'
  */
 const Summary = ({ manager, task }) => {
     
-    const [conversationSid, setConversationSid] = useState();
+    //const [conversationSid, setConversationSid] = useState();
     //const [channelSid] = useState(task.attributes?.taskChannelSid)
     const [summary, setSummary] = useState({});
     const [loaded, setLoaded] = useState(false)
@@ -22,9 +22,9 @@ const Summary = ({ manager, task }) => {
     useEffect(async () => {
         setLoaded(false)
         let csid = task.attributes?.conversationSid ?? false
+        console.log('CSID', csid)
         if (csid) {
-            setConversationSid(csid)
-            await reloadSummary(false).finally(() => {
+            await reloadSummary(csid, false).finally(() => {
 
                 const roles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles ?? []
                 const skills = manager?.workerClient?.attributes?.routing?.skills ?? []
@@ -60,7 +60,7 @@ const Summary = ({ manager, task }) => {
         });*/
     }
 
-    const reloadSummary = useCallback(async (force) => {
+    const reloadSummary = useCallback(async (conversationSid, force) => {
         setLoading(true)
         const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversationSummary`, {
             method: "POST",
@@ -76,7 +76,7 @@ const Summary = ({ manager, task }) => {
 
         setSummary(await request.json())
         setLoading(false)
-    }, [conversationSid])
+    }, [])
 
     if (!loaded) {
         return (
@@ -94,7 +94,7 @@ const Summary = ({ manager, task }) => {
         <>
             <GPTReplyModal manager={manager} isOpen={isModalOpen} handleClose={handleModalClose}
                 conversationSid={task.attributes.conversationSid} messagesCount={summary.messagesCount} />
-            <SummaryContent reloadAction={reloadSummary} suggestAction={suggestReply} summary={summary} loading={loading} manager={manager} withoutButtons={!showButtons} />
+            <SummaryContent conversationSid={task.attributes.conversationSid} reloadAction={reloadSummary} suggestAction={suggestReply} summary={summary} loading={loading} manager={manager} withoutButtons={!showButtons} />
         </>
     );
 };
