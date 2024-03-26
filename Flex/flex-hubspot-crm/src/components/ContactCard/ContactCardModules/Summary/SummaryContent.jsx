@@ -3,7 +3,7 @@ import { RefreshIcon } from "@twilio-paste/icons/esm/RefreshIcon"
 import { NewIcon } from "@twilio-paste/icons/esm/NewIcon"
 import { useState, useCallback } from "react"
 
-const SummaryContent = ({ withoutButtons, summary, reloadAction, suggestAction, loading, manager }) => {
+const SummaryContent = ({ withoutButtons, conversationSid, summary, reloadAction, suggestAction, loading, manager }) => {
     
 
     return (
@@ -16,7 +16,7 @@ const SummaryContent = ({ withoutButtons, summary, reloadAction, suggestAction, 
                 
                     <Box>
                         <ButtonGroup>
-                            <Button variant="primary" size="small" onClick={async () => reloadAction(true)} disabled={loading}>
+                            <Button variant="primary" size="small" onClick={async () => reloadAction(conversationSid, true)} disabled={loading}>
                                 <RefreshIcon decorative={false} title="Refrescar resumen (IA)" />
                                 Refrescar resumen (IA)
                             </Button>
