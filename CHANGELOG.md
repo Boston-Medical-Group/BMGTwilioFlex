@@ -1,5 +1,8 @@
 # Changelog
 
+## 01/04/2023
+* Fuerza deploy
+
 ## 22/03/2023
 * Limpieza
 * Optimiza prompt resumen
