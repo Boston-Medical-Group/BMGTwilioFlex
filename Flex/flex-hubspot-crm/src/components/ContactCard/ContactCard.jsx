@@ -1,8 +1,6 @@
-import React, { useEffect, useCallback, useState } from 'react';
-import * as Flex from "@twilio/flex-ui";
+import React, { useEffect, useState } from 'react';
 import { Theme } from '@twilio-paste/core/theme';
-import { Box, Card, Heading, Paragraph, Button, Flex as FlexBox, Stack, Avatar, DescriptionList, DescriptionListSet, DescriptionListTerm, DescriptionListDetails, Tabs, TabList, Tab, TabPanels, TabPanel, Truncate } from '@twilio-paste/core';
-import useApi from '../../hooks/useApi';
+import { Box, Card, Heading, Flex as FlexBox, Stack, Avatar, DescriptionList, DescriptionListSet, DescriptionListTerm, DescriptionListDetails, Tabs, TabList, Tab, TabPanels, TabPanel, Truncate } from '@twilio-paste/core';
 // @ts-ignore
 import { fullName } from '../../utils/helpers';
 import gravatarUrl from 'gravatar-url';
@@ -37,6 +35,10 @@ const ContactCard = ({ manager, task }) => {
     useEffect(async () => {
         let hcid = task.attributes?.hubspotContact ?? false
         if (!hcid) {
+            if (!task.attributes?.hubspot_contact_id) {
+                console.log('CONTACTID NOT FOUND: components/ContactCard/ContactCard.jsx@41')
+            }
+
             await getDataByContactId(task.attributes?.hubspot_contact_id, manager)
                 .then((data) => {
                     setContact(data.properties)
