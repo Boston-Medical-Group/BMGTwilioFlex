@@ -37,18 +37,18 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
 
     let summary = ''
     if (!apiModel) {
-        await openai.chat.completions.create({
+        let completion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo-0125",
             messages,
             temperature: 0.7
         })
-            .then(completion => {
-                // Extracting the summary from the OpenAI API response
-                summary = completion.choices[0].message.content;
-            })
-            .catch(error => {
-                console.log(error)
-            });
+            
+        if (completion.hasOwnProperty('choices') && completion.choices.length > 0) {
+            summary = completion.choices[0].message.content;
+        } else {
+            console.error('COMPLETION ERROR')
+            console.error(completion)
+        }
     } else {
         console.log('Invalid model parameter only gpt and text models supported');
     }
