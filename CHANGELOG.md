@@ -1,5 +1,9 @@
 # Changelog
 
+## 15/04/2023
+* Agrega variables PER y ARG
+* Fuerza deploy
+
 ## 01/04/2023
 * Fuerza deploy
 
