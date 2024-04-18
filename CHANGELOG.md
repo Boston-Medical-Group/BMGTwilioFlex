@@ -1,5 +1,10 @@
 # Changelog
 
+## 18/04/2024
+* Corrige nota call
+* Ajusta UI Interacción
+* Agrega log SMS
+
 ## 15/04/2023
 * Agrega variables PER y ARG
 * Fuerza deploy

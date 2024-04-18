@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Theme } from '@twilio-paste/core/theme';
-import { Box, Card, Heading, Flex as FlexBox, Stack, Avatar, DescriptionList, DescriptionListSet, DescriptionListTerm, DescriptionListDetails, Tabs, TabList, Tab, TabPanels, TabPanel, Truncate } from '@twilio-paste/core';
+import {
+    Box, Card, Heading, Stack, Avatar, DescriptionList, DescriptionListSet,
+    DescriptionListTerm, DescriptionListDetails, Tabs, TabList, Tab, TabPanels, TabPanel, Truncate
+} from '@twilio-paste/core';
 // @ts-ignore
 import { fullName } from '../../utils/helpers';
 import gravatarUrl from 'gravatar-url';
@@ -68,42 +71,38 @@ const ContactCard = ({ manager, task }) => {
             <>
                 <Box padding="space40" width="100%">
                     <Card padding="space20">
-                        <FlexBox direction={['row', 'column', 'column']}>
-                            <FlexBox minWidth={['100%', '200px', '300px']} maxWidth="300px">
-                                <Box padding="space40" maxWidth="100%">
-                                    <Stack spacing="space50" orientation="vertical">
-                                        <Avatar size="sizeIcon110" name={fullName(contact)} variant="entity" src={avatar} />
-                                        <Heading as="h3" variant="heading30">
-                                            <Truncate>{fullName(contact)}</Truncate>
-                                        </Heading>
-                                        <DescriptionList>
-                                            <DescriptionListSet>
-                                                <DescriptionListTerm>Fecha Creación</DescriptionListTerm>
-                                                <DescriptionListDetails>{contact.createdate}</DescriptionListDetails>
-                                            </DescriptionListSet>
-                                        </DescriptionList>
-                                    </Stack>
+                        <Box padding="space40" maxWidth="100%">
+                            <Stack spacing="space50" orientation="horizontal">
+                                <Avatar size="sizeIcon110" name={fullName(contact)} variant="entity" src={avatar} />
+                                <Box rowGap="space20">
+                                    <Heading as="h3" variant="heading30">
+                                        <Truncate>{fullName(contact)}</Truncate>
+                                    </Heading>
+                                    <DescriptionList>
+                                        <DescriptionListSet>
+                                            <DescriptionListTerm>Fecha Creación</DescriptionListTerm>
+                                            <DescriptionListDetails>{contact.createdate}</DescriptionListDetails>
+                                        </DescriptionListSet>
+                                    </DescriptionList>
                                 </Box>
-                            </FlexBox>
-                            <FlexBox grow>
-                                <Box padding="space40" width="100%">
-                                    <Tabs baseId="horizontal-tabs-example">
-                                        <TabList aria-label="Horizontal product tabs">
-                                            <Tab>Overview</Tab>
-                                            <Tab>Historial</Tab>
-                                        </TabList>
-                                        <TabPanels>
-                                            <TabPanel>
-                                                <Summary manager={manager} task={task} />
-                                            </TabPanel>
-                                            <TabPanel>
-                                                <ConversationHistory manager={manager} contact={contact} currentConversation={task?.attributes?.conversationSid} />
-                                            </TabPanel>
-                                        </TabPanels>
-                                    </Tabs>
-                                </Box>
-                            </FlexBox>
-                        </FlexBox>
+                            </Stack>
+                        </Box>
+                        <Box padding="space40" width="100%">
+                            <Tabs baseId="horizontal-tabs-example">
+                                <TabList aria-label="Horizontal product tabs">
+                                    <Tab>Overview</Tab>
+                                    <Tab>Historial</Tab>
+                                </TabList>
+                                <TabPanels>
+                                    <TabPanel>
+                                        <Summary manager={manager} task={task} />
+                                    </TabPanel>
+                                    <TabPanel>
+                                        <ConversationHistory manager={manager} contact={contact} currentConversation={task?.attributes?.conversationSid} />
+                                    </TabPanel>
+                                </TabPanels>
+                            </Tabs>
+                        </Box>
                         
                         
                     </Card>
