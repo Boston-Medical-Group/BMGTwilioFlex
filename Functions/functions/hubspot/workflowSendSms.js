@@ -40,6 +40,7 @@ const logDummyTask = async (context, m, options) => {
             await client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
                 .tasks(taskSid)
                 .update({
+                    status: 'completed',
                     assignmentStatus: 'canceled',
                     reason: 'SMS Bulk task',
                 })
