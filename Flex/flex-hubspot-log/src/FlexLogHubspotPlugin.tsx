@@ -14,47 +14,60 @@ const LogHubspotCall = async (task : CancelableTask, manager : Flex.Manager) => 
   // if task.attributes.hubspot_contact_id is not available end this callback
   //const { postCallLog } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
   const ownerId = manager.workerClient?.attributes?.hubspot_owner_id ?? null;
-
+ 
   const direction = task.attributes.direction.toUpperCase();
-  let params : any = {}
+  let params: any = {}
+  
+  let attributes : any = {};
+  if (typeof task.attributes === 'string') {
+    try {
+      attributes = JSON.parse(task.attributes);
+    } catch (e) {
+      console.log('Error parsing JSON string @ flex-hubspot-log/src/FlexLogHubspotPlugin.tsx@24')
+      attributes = {};
+    }
+  } else {
+    attributes = task.attributes;
+  }
+
   if (direction === 'INBOUND') {
     params = {
       //hs_object_id: task.attributes.hubspot_contact_id ?? null,
-      hs_call_callee_object_id: task.attributes.hubspot_contact_id ?? null,
-      hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
+      hs_call_callee_object_id: attributes.hubspot_contact_id ?? null,
+      hubspot_deal_id: attributes.hubspot_deal_id ?? null,
       // convert task.dateCreated Date Object to UTC time and to timestamp
       hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
       // @todo custom disposition codes
-      hs_call_body: `NOTA: "${task.attributes.conversations?.content ?? '--'}"`,
+      hs_call_body: `NOTA: "${attributes.conversations?.content ?? '--'}"`,
       hs_call_callee_object_type_id: '0-1',
       hs_call_direction: direction,
       //hs_call_disposition: mapOutcome[task.attributes.conversations?.outcome],
       hs_call_duration: task.age * 1000,
-      hs_call_from_number: task.attributes.from,
-      hs_call_to_number: task.attributes.to,
-      hs_call_recording_url: task.attributes.conversations?.segment_link ?? null,
+      hs_call_from_number: attributes.from,
+      hs_call_to_number: attributes.to,
+      hs_call_recording_url: attributes.conversations?.segment_link ?? null,
       //hs_call_status: task.status == 'completed' ? 'COMPLETED' : 'CALLING_CRM_USER',
-      //hs_call_title: ''
+      hs_call_title: attributes.callSid ? attributes.callSid : (attributes.conversationSid ?? null),
       hubspot_owner_id: ownerId,
     }
   } else if (direction === 'OUTBOUND') {
     params = {
       //hs_object_id: task.attributes.hubspot_contact_id ?? null,
-      hs_call_callee_object_id: task.attributes.hubspot_contact_id ?? null,
-      hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
+      hs_call_callee_object_id: attributes.hubspot_contact_id ?? null,
+      hubspot_deal_id: attributes.hubspot_deal_id ?? null,
       // convert task.dateCreated Date Object to UTC time and to timestamp
       hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
       // @todo custom disposition codes
-      hs_call_body: `NOTA: "${task.attributes.conversations?.content ?? '--'}"`,
+      hs_call_body: `NOTA: "${attributes.conversations?.content ?? '--'}"`,
       hs_call_callee_object_type_id: '0-1',
       hs_call_direction: direction,
       //hs_call_disposition: mapOutcome[task.attributes.conversations?.outcome],
       hs_call_duration: task.age * 1000,
       hs_call_from_number: task.formattedAttributes.from,
       hs_call_to_number: task.formattedAttributes.outbound_to,
-      hs_call_recording_url: task.attributes.conversations?.segment_link ?? null,
+      hs_call_recording_url: attributes.conversations?.segment_link ?? null,
       //hs_call_status: task.status == 'completed' ? 'COMPLETED' : 'CALLING_CRM_USER',
-      //hs_call_title: ''
+      hs_call_title: attributes.callSid ? attributes.callSid : (attributes.conversationSid ?? null),
       hubspot_owner_id: ownerId,
     }
   }

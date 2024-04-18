@@ -91,7 +91,6 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
   
   let summaryContent;
   try {
-    const conversationSid = event.conversationSid
     const conversationContext = context.getTwilioClient().conversations.v1.conversations(conversationSid)
     const history = await conversationContext.messages.list()
 

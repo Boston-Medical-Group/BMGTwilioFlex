@@ -24,6 +24,7 @@ type MyEvent = {
   hs_call_status: string
   hubspot_owner_id: string
   hubspot_deal_id: string
+  hs_call_title: string
 }
 
 //@ts-ignore
@@ -46,7 +47,8 @@ export const handler = FunctionTokenValidator(async function (
     hs_call_recording_url,
     hs_call_status,
     hubspot_owner_id,
-    hubspot_deal_id
+    hubspot_deal_id,
+    hs_call_title
   } = event
 
   let hs_call_callee_object_id = event.hs_call_callee_object_id
@@ -93,6 +95,7 @@ export const handler = FunctionTokenValidator(async function (
 
     const toHubspot : SimplePublicObjectInputForCreate = {
       'properties': {
+        hs_call_title,
         hs_call_callee_object_id,
         hs_timestamp,
         hs_call_body,
