@@ -53,6 +53,11 @@ export const handler = FunctionTokenValidator(async function (
 
   let hs_call_callee_object_id = event.hs_call_callee_object_id
 
+  // LOG SIN GRABACIÓN
+  if (!hs_call_recording_url || hs_call_recording_url === null) {
+    console.log('No recording URL for', hs_call_callee_object_id, hs_call_from_number, hs_call_to_number)
+  }
+
   const response = new Twilio.Response();
   response.appendHeader("Access-Control-Allow-Origin", "*");
   response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
@@ -61,9 +66,9 @@ export const handler = FunctionTokenValidator(async function (
   const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
   try {
     if (!hs_call_callee_object_id) {
-      let fixedNumber = hs_call_direction === 'INBOUND' ? hs_call_from_number : hs_call_to_number
+      let fixedNumberOrig = hs_call_direction === 'INBOUND' ? hs_call_from_number : hs_call_to_number
       // Remove dash, spaces and parenthesis from the number
-      fixedNumber = fixedNumber.replace(/[- )(]/g, '')
+      let fixedNumber = fixedNumberOrig.replace(/[- )(]/g, '')
 
       // FIX: si se marca desde dialpad, no tenemos CRMID así que buscamos el telefono en Hubspot
       const seachedCRMID : string | boolean = await hubspotClient.crm.contacts.searchApi.doSearch({
@@ -89,6 +94,7 @@ export const handler = FunctionTokenValidator(async function (
       } else {
         // SI no tenemos CRMID, algo anda mal porque este se crea en inbounds 
         // y no debería hacer log a contactos inexistentes en HS
+        console.log('No CRMID found for', fixedNumberOrig)
         throw new Error('CRMID Inválido');
       }
     }
