@@ -42,8 +42,10 @@ const InteractionContainer = ({ flex, manager } : MyProps) => {
             }
 
             if (data.hasOwnProperty('contact_id')) {
+                console.log('LOADING DATA FOR CONTACT ID', data.contact_id)
                 loadContact(data.contact_id);
             } else if (data.hasOwnProperty('deal_id')) {
+                console.log('LOADING DATA FOR DEAL ID', data.deal_id)
                 loadContact(null, data.deal_id);
             }
         }
@@ -73,6 +75,7 @@ const InteractionContainer = ({ flex, manager } : MyProps) => {
         if (contactId) {
             getDataByContactId({ contact_id: contactId, newToken: manager.store.getState().flex.session.ssoTokenPayload.token })
                 .then(data => {
+                    console.log('LOADED DATA FOR CONTACT ID', contactId, data)
                     setContact(data.properties)
                 })
                 .catch(() => console.log("Error while fetching data from Hubspot"))
@@ -80,6 +83,7 @@ const InteractionContainer = ({ flex, manager } : MyProps) => {
         } else if (dealId) {
             getDataByDealId({ deal_id: dealId, newToken: manager.store.getState().flex.session.ssoTokenPayload.token })
                 .then((data) => {
+                    console.log('LOADED DATA FOR DEAL ID', dealId, data)
                     setContact(data.properties)
                     if (data.deal !== undefined && data.deal !== null) {
                         setDeal(data.deal.properties)
