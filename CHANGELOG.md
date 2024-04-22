@@ -1,5 +1,8 @@
 # Changelog
 
+## 22/04/2024
+* Quita resumen hubspot de conversaciones cortas
+
 ## 18/04/2024
 * Corrige nota call
 * Ajusta UI Interacción
