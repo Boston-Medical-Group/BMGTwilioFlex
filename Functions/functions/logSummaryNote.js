@@ -101,7 +101,10 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
     if (clientMessages.length === 0 && agentMessages.length > 0) {
       summaryContent = 'Se ha contactado al paciente, pero aún no se obtuvo una respuesta'
     } else if (historyDelivered.length < 4) {
-      summaryContent = 'Aún no se ha generado resumen ya que la conversación es muy breve'
+      response.setBody({ result: 'TOO_SHORT' });
+      return callback(null, response);
+      //summaryContent = 'Aún no se ha generado resumen ya que la conversación es muy breve'
+
     } else {
       summaryContent = await createSummary(historyDelivered, context)
     }
