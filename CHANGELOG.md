@@ -1,6 +1,7 @@
 # Changelog
 
 ## 22/04/2024
+* Agrgega variables y fuerza deploy
 * Quita resumen hubspot de conversaciones cortas
 
 ## 18/04/2024
