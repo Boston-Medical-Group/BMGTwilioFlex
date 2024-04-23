@@ -25,6 +25,7 @@ type MyEvent = {
   hubspot_owner_id: string
   hubspot_deal_id: string
   hs_call_title: string
+  taskAttributes?: any
 }
 
 //@ts-ignore
@@ -56,6 +57,11 @@ export const handler = FunctionTokenValidator(async function (
   // LOG SIN GRABACIÓN
   if (!hs_call_recording_url || hs_call_recording_url === null) {
     console.log('No recording URL for', hs_call_callee_object_id, hs_call_from_number, hs_call_to_number)
+  }
+
+  // Debug task Attributes
+  if (event.taskAttributes) {
+    console.log('TASKATTRIBUTES',event.taskAttributes)
   }
 
   const response = new Twilio.Response();
