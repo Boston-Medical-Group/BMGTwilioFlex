@@ -1,5 +1,8 @@
 # Changelog
 
+## 23/04/2024
+* Fuerza despliegue
+
 ## 22/04/2024
 * Log en grabación de llamada
 * Agrgega variables y fuerza deploy
