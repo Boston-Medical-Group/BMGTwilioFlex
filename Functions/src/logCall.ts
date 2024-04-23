@@ -61,7 +61,7 @@ export const handler = FunctionTokenValidator(async function (
 
   // Debug task Attributes
   if (event.taskAttributes) {
-    console.log('TASKATTRIBUTES',event.taskAttributes)
+    console.log('TASKATTRIBUTES', JSON.stringify(event.taskAttributes))
   }
 
   const response = new Twilio.Response();
