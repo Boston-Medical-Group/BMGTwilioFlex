@@ -28,6 +28,10 @@ type MyEvent = {
   taskAttributes?: any
 }
 
+const delay = (delayInms: any) => {
+  return new Promise(resolve => setTimeout(resolve, delayInms));
+};
+
 //@ts-ignore
 export const handler = FunctionTokenValidator(async function (
   context: Context<MyContext>,
@@ -58,6 +62,8 @@ export const handler = FunctionTokenValidator(async function (
   if (!hs_call_recording_url || hs_call_recording_url === null) {
     console.log('No recording URL for', hs_call_callee_object_id, hs_call_from_number, hs_call_to_number)
     if (event.taskAttributes && event.taskAttributes.conference?.sid) {
+      let delayres = await delay(2000);
+      
       const client = context.getTwilioClient()
       await client.recordings.list({
         conferenceSid: event.taskAttributes.conference?.sid
