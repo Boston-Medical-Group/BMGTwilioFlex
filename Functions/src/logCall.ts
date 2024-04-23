@@ -54,14 +54,18 @@ export const handler = FunctionTokenValidator(async function (
 
   let hs_call_callee_object_id = event.hs_call_callee_object_id
 
-  // LOG SIN GRABACIÓN
+  let recordingUrl = hs_call_recording_url;
   if (!hs_call_recording_url || hs_call_recording_url === null) {
     console.log('No recording URL for', hs_call_callee_object_id, hs_call_from_number, hs_call_to_number)
-  }
-
-  // Debug task Attributes
-  if (event.taskAttributes) {
-    console.log('TASKATTRIBUTES', JSON.stringify(event.taskAttributes))
+    if (event.taskAttributes && event.taskAttributes.conference?.sid) {
+      const client = context.getTwilioClient()
+      await client.recordings.list({
+        conferenceSid: event.taskAttributes.conference?.sid
+      }).then(recordings => {
+        console.log('Fetched recording from conference', event.taskAttributes.conference?.sid)
+        recordingUrl = recordings[0].mediaUrl ?? ''
+      })
+    }
   }
 
   const response = new Twilio.Response();
@@ -115,7 +119,7 @@ export const handler = FunctionTokenValidator(async function (
         hs_call_duration,
         hs_call_from_number,
         hs_call_to_number,
-        hs_call_recording_url,
+        hs_call_recording_url: recordingUrl,
         hs_call_status,
         hs_call_disposition,
         hubspot_owner_id
