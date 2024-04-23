@@ -5,7 +5,7 @@ on:
       - main
     types: [closed] 
     paths:
-      - 'Functions/*'
+      - 'Functions/**'
       - 'CHANGELOG.md'
       - 'CHANGELOG_ARG.md'
 jobs:

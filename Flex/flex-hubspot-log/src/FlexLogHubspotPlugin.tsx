@@ -72,6 +72,8 @@ const LogHubspotCall = async (task : CancelableTask, manager : Flex.Manager) => 
     }
   }
 
+  params.taskAttributes = attributes;
+
   const mapOutcome: { [key: string]: string } = {
     NO_ANSWER: "73a0d17f-1163-4015-bdd5-ec830791da20",
     BUSY: "9d9162e7-6cf3-4944-bf63-4dff82258764",
