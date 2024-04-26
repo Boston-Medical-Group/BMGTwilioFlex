@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { Notifications, NotificationIds, NotificationType } from "@twilio/flex-ui";
-import { Box, SkeletonLoader, Stack } from '@twilio-paste/core';
+import { Box, SkeletonLoader, Stack, Text } from '@twilio-paste/core';
 import ConversationHistoryEntry from './ConversationHistory/ConversationHistoryEntry';
 
 const loadConversations = (contact, currentConversation, manager) => {
@@ -44,9 +44,15 @@ const ConversationHistory = ({ contact, manager, currentConversation }) => {
             {!loaded && <SkeletonLoader height="150px" />}
             {loaded && (
                 <Stack orientation="vertical" spacing="space50">
-                    {conversations.map((conversation, index) => (
+                    {conversations.length > 0 && conversations.map((conversation, index) => (
                         <ConversationHistoryEntry key={index} conversation={conversation} manager={manager} />
                     ))}
+
+                    {conversations.length === 0 && (
+                        <Box padding="space40">
+                            <Text as="p" textAlign="center">No se han encontrado conversaciones</Text>
+                        </Box>
+                    )}
                 </Stack>
             )}
         </Box>
