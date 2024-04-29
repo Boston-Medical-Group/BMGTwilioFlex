@@ -8,6 +8,7 @@ import { initializeDonotcall } from './initializers/initializeDonotcall';
 import { initializeBlacklist } from './initializers/initializeBlacklist';
 import { initializeDowntimeManager } from './initializers/initializeDowntimeManager';
 import { initializeWrapupCodes } from './initializers/initializeWrapupCodes';
+import { initializeInboundConfigs } from './initializers/initializeInboundConfigs';
 import axios from 'axios'
 import { hasAdminRights } from './helpers';
 
@@ -37,6 +38,7 @@ export default class BmgFlexAdminPlugin extends FlexPlugin {
         initializeBlacklist(flex, manager);
         //initializeDowntimeManager(flex, manager);
         //initializeWrapupCodes(flex, manager);
+        initializeInboundConfigs(flex, manager);
     }
 
     /**

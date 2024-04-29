@@ -16,17 +16,25 @@ export const sections : Array<SectionItemElement> = [
     }, {
         label: "Scheduling",
         childrens: [
-            {
-                label: "Business hours",
-                component: "downtime-manager"
-            }
+            // {
+            //     label: "Business hours",
+            //     component: "downtime-manager"
+            // }
         ]
     }, {
         label: "Conversations",
         childrens: [
+            // {
+            //     label: "Wrapup codes",
+            //     component: "wrapupcodes"
+            // }
+        ]
+    }, {
+        label: "Routing",
+        childrens: [
             {
-                label: "Wrapup codes",
-                component: "wrapupcodes"
+                label: "número fuera de horario",
+                component: "inboundconfigs"
             }
         ]
     }
