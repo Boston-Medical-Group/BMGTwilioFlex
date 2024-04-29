@@ -59,8 +59,13 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
 exports.getGPTThreadRun = async (openai, historyDelivered, instructions, assistant) => {
     let messages = []
     historyDelivered.forEach((h) => {
+        let author = 'assistant'
+        if (h.author.startsWith('whatsapp:')) {
+            author = 'user'
+        }
+        
         messages.push({
-            role: 'user',
+            role: author,
             content: h.body
         })
     })

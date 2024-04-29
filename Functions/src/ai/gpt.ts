@@ -12,7 +12,8 @@ import { ChatCompletionMessageParam } from "openai/resources";
 const TokenValidator = require('twilio-flex-token-validator').functionValidator;
 
 type MyContext = {
-    OPENAI_GPT_API_KEY: string;
+    OPENAI_GPT_ASSISTANT_APIKEY?: string;
+    OPENAI_GPT_SUMMARY_APIKEY?: string
     API_MODEL: string;
 }
 
@@ -40,7 +41,7 @@ exports.handler = TokenValidator(async (
     const requestType = event.requestType;
 
     // Getting the API key from Twilio environment variables
-    const API_KEY = context.OPENAI_GPT_API_KEY;
+    const API_KEY = context.OPENAI_GPT_SUMMARY_APIKEY;
     const API_MODEL = context.API_MODEL;
 
     const openai = new OpenAI({
