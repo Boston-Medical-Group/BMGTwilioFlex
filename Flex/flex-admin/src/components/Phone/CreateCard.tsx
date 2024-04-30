@@ -6,7 +6,12 @@ import { PlusIcon } from "@twilio-paste/icons/esm/PlusIcon";
 type Nullable<T> = T | null;
 type PhoneCreateResponse = { errors: Array<{ detail: string }> }
 
-type Props = { reloadFunction: () => void, createFunction: (number: string) => any }
+type Props = { reloadFunction: () => void, createFunction: (number: string) => any } & DefaultProps 
+type DefaultProps = Partial<typeof defaultProps>
+const defaultProps = {
+    setTitle: '',
+    defaultNumber: ''
+}
 
 const CreateCard = (props : Props) => {
     
@@ -47,7 +52,7 @@ const CreateCard = (props : Props) => {
     return (
 
         <Card>
-            <Heading as="h2" variant="heading20">Nuevo número</Heading>
+            <Heading as="h2" variant="heading20">{props.setTitle || "Nuevo número"}</Heading>
 
             <Stack orientation="vertical" spacing="space50">
                 <Box>

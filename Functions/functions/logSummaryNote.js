@@ -8,7 +8,7 @@ const createSummary = async (historyDelivered, context) => {
     return false
   }
 
-  const API_KEY = context.OPENAI_GPT_API_KEY;
+  const API_KEY = context.OPENAI_GPT_SUMMARY_APIKEY;
   const apiModel = context.API_MODEL;
 
   const openai = new OpenAI({

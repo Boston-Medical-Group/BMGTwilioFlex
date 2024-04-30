@@ -12,7 +12,7 @@ const createThreadAndRun = async (historyDelivered, instructions, context) => {
         return false
     }
 
-    const API_KEY = context.OPENAI_GPT_API_KEY;
+    const API_KEY = context.OPENAI_GPT_ASSISTANT_APIKEY;
     const ASSISTANT = context.OPENAI_ASSISTANT_ID;
 
     const openai = new OpenAI({
