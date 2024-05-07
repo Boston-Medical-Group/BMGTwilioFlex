@@ -5,6 +5,7 @@ import { Theme } from '@twilio-paste/core/dist/theme';
 import PhoneTableRow from "./Phone/TableRow";
 import PhoneCreateCard from "./Phone/CreateCard";
 import * as Flex from "@twilio/flex-ui";
+import parsePhoneNumber from 'libphonenumber-js';
 
 type Props = {
     manager: Flex.Manager
@@ -12,7 +13,7 @@ type Props = {
 type Nullable<T> = T | null;
 const InboundConfigsView = ({ manager }: Props) => {
     const [accountCountry, setAccountCountry] = useState(manager.serviceConfiguration.attributes.account_country);
-    const [errorInbound, setErrorInbound] = useState<Nullable<string>>(null);
+    const [errorInbound, setErrorInbound] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState < boolean > (false);
     const [configs, setConfigs] = useState(
         {
@@ -60,7 +61,7 @@ const InboundConfigsView = ({ manager }: Props) => {
     }
 
     const deleteHandler = async (phoneNumber: string) => {
-        updateHandler('');
+        return axio_patch('');
     }
 
     useEffect(() => {
@@ -69,14 +70,30 @@ const InboundConfigsView = ({ manager }: Props) => {
     }, [])
 
     const updateHandler = async (phoneNumber: string) => {
-        configs.forwardNumbers = phoneNumber || '';
-        return axios.patch(`inbound-configs/${accountCountry}`,{
+        setErrorInbound('');
+        try {
+            phoneNumber = phoneNumber || '';
+            phoneNumber = phoneNumber.startsWith('+') && phoneNumber.length > 0 ? phoneNumber : phoneNumber.replace(/^/,"+");
+            const phoneNumberEval = parsePhoneNumber(phoneNumber);
+            if (!phoneNumberEval!.isValid()) {
+                setErrorInbound("PhoneNumber is invalid");
+            } else {
+                phoneNumber = phoneNumberEval!.number;
+                return axio_patch(phoneNumber);
+            }
+        } catch (error) {
+            setIsLoaded(true);
+            setErrorInbound('error');
+            reloadHandler();
+        }
+    }
+
+    const axio_patch = async (phoneNumber: string) => {
+        axios.patch(`inbound-configs/${accountCountry}`,{
             data: {
                 type: "inbound-configs",
                 id: accountCountry,
                 attributes: {
-                    //forwardNumbers: `${phoneNumber}`    
-                    //configs
                     skillACD1: configs.skillACD1,
                     skillACD2: configs.skillACD2,
                     label: configs.label,
@@ -119,9 +136,8 @@ const InboundConfigsView = ({ manager }: Props) => {
             console.log(error)
             setIsLoaded(true)
             setErrorInbound(error)
-        });
+        });        
     }
-    
 
     return (
         <Theme.Provider theme="flex">
@@ -137,7 +153,7 @@ const InboundConfigsView = ({ manager }: Props) => {
                             </THead>
                             <TBody>
                                 {isLoaded
-                                    ? <Tr><Td><PhoneTableRow key={configs.forwardNumbers} phoneNumber={configs.forwardNumbers || ''} deleteFunction={deleteHandler} /></Td></Tr>
+                                    ? <Tr><Td><PhoneTableRow key={configs.forwardNumbers} phoneNumber={configs.forwardNumbers?.replace(/\D+/g, '') || ''} deleteFunction={deleteHandler} /></Td></Tr>
                                     : <Tr><Td><SkeletonLoader width="50%" /></Td></Tr>
                                 }
                             </TBody>
@@ -145,8 +161,7 @@ const InboundConfigsView = ({ manager }: Props) => {
                     </Card>
                 </FlexView>
                 <FlexView padding="space50" paddingLeft="space0">
-                    <PhoneCreateCard setTitle={' '} reloadFunction={reloadHandler} createFunction={updateHandler} />
-
+                    <PhoneCreateCard setTitle={' '} error={errorInbound}  reloadFunction={reloadHandler} createFunction={updateHandler} />
                 </FlexView>
             </FlexView>
         </Theme.Provider>
