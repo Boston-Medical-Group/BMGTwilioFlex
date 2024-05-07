@@ -102,6 +102,9 @@ export const handler  = async function (
     let result;
     try {
         let phone = event.from.trim()
+        if (phone.startsWith('whatsapp:')) {
+            phone = phone.slice(9);
+        }
         if (!phone.startsWith('+')) {
             phone = `+${phone}`
         }
