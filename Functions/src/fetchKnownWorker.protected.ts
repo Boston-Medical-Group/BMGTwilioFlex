@@ -109,7 +109,7 @@ export const handler  = async function (
             phone = `+${phone}`
         }
 
-        result = await fetchOwner(context, event.from)
+        result = await fetchOwner(context, phone)
     } catch (error) {
         result = { status: 'err' }
         response.setStatusCode(500);
