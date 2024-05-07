@@ -10,7 +10,8 @@ type Props = { reloadFunction: () => void, createFunction: (number: string) => a
 type DefaultProps = Partial<typeof defaultProps>
 const defaultProps = {
     setTitle: '',
-    defaultNumber: ''
+    defaultNumber: '',
+    error: ''
 }
 
 const CreateCard = (props : Props) => {
@@ -60,7 +61,7 @@ const CreateCard = (props : Props) => {
                     <Input aria-describedby="phone_number_help_text" id="phone_number" name="phone_number" type="text" placeholder=""
                         hasError={error !== null} value={number} onChange={handleChange} onBlur={handleChange}
                         insertBefore={<Text color="colorTextWeak" as="span" fontWeight="fontWeightSemibold">+</Text>}/>
-                    {error && <HelpText id="phone_number_help_text" variant="error">{error}.</HelpText>}
+                    {(error || props.error) && <HelpText id="phone_number_help_text" variant="error">{error || props.error}.</HelpText>}
                 </Box>
         
                 <Button onClick={addNumber} variant="primary" loading={isLoading}>

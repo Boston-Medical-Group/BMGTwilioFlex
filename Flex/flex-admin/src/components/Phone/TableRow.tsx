@@ -20,11 +20,15 @@ const TableRow =  (props : Props) => {
     const deleteNumber = (number : string) => {
         setIsLoading(true);
 
-        props.deleteFunction(number)
+        if (number) {
+            props.deleteFunction(number)
             .catch((err : AxiosError) => {
                 setIsLoading(false)
                 console.error(err.message)
             });
+        } else {
+            setIsLoading(false)
+        }
     }
 
     return (
