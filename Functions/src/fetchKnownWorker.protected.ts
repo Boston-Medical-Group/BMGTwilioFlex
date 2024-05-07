@@ -18,6 +18,7 @@ const fetchOwner = async (context: Context<EnvVars>, phone: string): Promise<Own
         owner_id: null
     }
 
+    console.log('FETCHKNOWNWORKER LOKING FOR:', phone)
     if (phone === undefined || phone === '') {
         return result
     }
@@ -33,6 +34,7 @@ const fetchOwner = async (context: Context<EnvVars>, phone: string): Promise<Own
             after: 0
         }).then(async (contacts: ContactsCollection) => {
             if (contacts.total > 0) {
+                console.log('FETCHKNOWNWORKER CONTACTS FOUND', contacts.total)
                 // Obtiene el negocio más reciente del contacto
                 return await hubspotClient.crm.deals.searchApi.doSearch({
                     filterGroups: [{
@@ -49,13 +51,17 @@ const fetchOwner = async (context: Context<EnvVars>, phone: string): Promise<Own
                     properties: ["hubspot_owner_id"],
                     after: 0
                 })
-                    .then(async (deals: DealsCollection) => deals.total > 0
-                        ? deals.results[0].properties.hubspot_owner_id
-                        : (contacts.total > 0
-                            ? contacts.results[0].properties.hubspot_owner_id
-                            : null)
+                    .then(async (deals: DealsCollection) => {
+                        console.log('FETCHKNOWNWORKER DEALS FOUND', deals.total)
+                        return deals.total > 0
+                            ? deals.results[0].properties.hubspot_owner_id
+                            : (contacts.total > 0
+                                ? contacts.results[0].properties.hubspot_owner_id
+                                : null)
+                        }
                     )
                     .catch((err) => {
+                        console.log('FETCHKNOWNWORKER ERR 64', JSON.stringify(err))
                         return null
                 })
             }
@@ -67,6 +73,7 @@ const fetchOwner = async (context: Context<EnvVars>, phone: string): Promise<Own
         })
 
         if (hubspotResult !== null) {
+            console.log('FETCHKNOWNWORKER', hubspotResult)
             const client = context.getTwilioClient();
             result.owner_id = await client.taskrouter.v1
                 .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
