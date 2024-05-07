@@ -1,5 +1,8 @@
 # Changelog
 
+## 07/05/2024
+* Fuerza despliegue perú
+
 ## 23/04/2024
 * Fuerza despliegue
 
