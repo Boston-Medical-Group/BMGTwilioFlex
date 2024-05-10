@@ -18,19 +18,10 @@ jobs:
       dir: ${{ steps.set-dirs.outputs.dir }} # generate output name folders by using inner step output
     steps:
       - uses: actions/checkout@v4
-      - name: Check Custom Installed
-        run: |
-          if [ -z "${{ vars.CUSTOM_INSTALLED }}" ]; then
-            CUSTOM_INSTALLED=1
-          else
-            CUSTOM_INSTALLED=${{ vars.CUSTOM_INSTALLED }}
-          fi
-          curl -L -X PATCH -H "Accept: application/vnd.github+json" -H "Authorization: Berarer ${{secrets.ENVIRONMENTS_TOKEN}}" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/${{github.repository}}/environments/Flex-DEVenv/variables/CUSTOM_INSTALLED -d '{"name":"CUSTOM_INSTALLED","value":"1"}'
       - id: set-dirs # Give it an id to handle to get step outputs in the outputs key above
         run: |
           if [[ ${{vars.CUSTOM_INSTALLED}} -eq 0]]; then
             echo "dir=$(cd Flex;ls -d */ | sed 's/.$//'| jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
-            echo "CUSTOM_INSTALLED=1" >> $GITHUB_ENV
           else
             echo "dir=$(curl -s  -H "Authorization: token ${{secrets.REPO_TOKEN}}" https://api.github.com/repos/${{github.repository}}/pulls/${{github.event.pull_request.number}}/files | jq -r '.[]  .filename' | cut -d "/" -f 1,2 | sed '/^Flex/!d'  | cut -d "/" -f 2 | jq -R -s -c 'split("\n")[:-1]' | jq -c '[.[]] | unique')" >> $GITHUB_OUTPUT
           fi
