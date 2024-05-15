@@ -9,15 +9,38 @@ import useApi from "../hooks/useApi";
  * @return { JSX.Element | null } - the rendered JSX element or null if isOpen is false
  */
 const SyncHubspotUser = ({ manager }) => {
-    const { getHubspotUserByEmail } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
+    const { getHubspotUserByEmail, getHubspotUserByUserId, getHubspotUserByOwnerId } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
     useEffect(async () => {
         await sync();
     }, [])
 
     const sync = async () => {
-        if (!manager.workerClient.attributes.hasOwnProperty('hubspot_id') || !manager.workerClient.attributes.hasOwnProperty('hubspot_owner_id')) {
-            getHubspotUserByEmail({ email: manager.workerClient.attributes.email })
+        let hubspotId = manager.workerClient.attributes.hasOwnProperty('hubspot_id') ? manager.workerClient.attributes.hubspot_id : false;
+        let hubspotOwnerId = manager.workerClient.attributes.hasOwnProperty('hubspot_owner_id') ? manager.workerClient.attributes.hubspot_owner_id : false;
+        if (hubspotId && !hubspotOwnerId) {
+            await getHubspotUserByUserId(hubspotId)
+                .then(async (owner) => {
+                    if (owner?.id) {
+                        manager.workerClient.attributes.hubspot_owner_id = owner.id;
+                    }
+
+                    await manager.workerClient.setAttributes(manager.workerClient.attributes);
+                })
+                .catch(() => console.log("Error while Syncing Hubspot User with UserID"));;
+        } else if (hubspotOwnerId && !hubspotId) {
+            // Sync con hubspot_id
+            await getHubspotUserByOwnerId(hubspotOwnerId)
+                .then(async (owner) => {
+                    if (owner?.userId) {
+                        manager.workerClient.attributes.hubspot_id = owner.userId;
+                    }
+
+                    await manager.workerClient.setAttributes(manager.workerClient.attributes);
+                })
+                .catch(() => console.log("Error while Syncing Hubspot User with OwnerID"));
+        } else if (!hubspotId && !hubspotOwnerId) {
+            await getHubspotUserByEmail(manager.workerClient.attributes.email)
                 .then(async (users) => {
                     if (users?.results && users.results[0]) {
                         const user = users.results[0];
@@ -28,12 +51,12 @@ const SyncHubspotUser = ({ manager }) => {
                             if (user.id) {
                                 manager.workerClient.attributes.hubspot_owner_id = user.id;
                             }
-                            
+
                             await manager.workerClient.setAttributes(manager.workerClient.attributes);
                         }
                     }
                 })
-                .catch(() => console.log("Error while Syncing Hubspot User"));
+                .catch(() => console.log("Error while Syncing Hubspot User with Email"));
         }
     }
 
