@@ -9,6 +9,7 @@ import { initializeBlacklist } from './initializers/initializeBlacklist';
 import { initializeDowntimeManager } from './initializers/initializeDowntimeManager';
 import { initializeWrapupCodes } from './initializers/initializeWrapupCodes';
 import { initializeInboundConfigs } from './initializers/initializeInboundConfigs';
+import { initializeGeoPermissions } from './initializers/initializeGeoPermissions';
 import axios from 'axios'
 import { hasAdminRights } from './helpers';
 
@@ -39,6 +40,7 @@ export default class BmgFlexAdminPlugin extends FlexPlugin {
         //initializeDowntimeManager(flex, manager);
         //initializeWrapupCodes(flex, manager);
         initializeInboundConfigs(flex, manager);
+        initializeGeoPermissions(flex, manager);
     }
 
     /**
