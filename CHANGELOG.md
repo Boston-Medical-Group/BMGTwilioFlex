@@ -1,4 +1,6 @@
 # Changelog
+## 17/05/2024
+* cambios de GeoPermission
 
 ## 07/05/2024
 * Fuerza despliegue perú
