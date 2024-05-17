@@ -13,6 +13,26 @@ import InteractionContainer from './components/InteractionContainer';
 
 const PLUGIN_NAME = 'HubspotInteractPlugin';
 
+const registerNotifications = () => {
+  Notifications.registerNotification({
+    id: "ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT",
+    content: "Al parecer el contacto con el que desea interactuar ya es encuentra en interacción con otro agente",
+    type: NotificationType.error
+  });
+
+  Notifications.registerNotification({
+    id: "ALREADY_ACTIVE_CONVERSATION_WITH_AGENT",
+    content: "Ya está interactuando con este contacto. Si esto es un error póngase en contacto con un Administrador",
+    type: NotificationType.error
+  });
+
+  Notifications.registerNotification({
+    id: "ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT",
+    content: "Al parecer este contacto se encuentra en una interacción activa. Si esto es un error póngase en contacto con un Administrador",
+    type: NotificationType.error
+  });
+}
+
 export default class HubspotInteractPlugin extends FlexPlugin {
   constructor() {
     super(PLUGIN_NAME);
@@ -25,6 +45,7 @@ export default class HubspotInteractPlugin extends FlexPlugin {
    * @param flex { typeof import('@twilio/flex-ui') }
    */
   async init(flex, manager) {
+    registerNotifications();
     manager.store.addReducer?.(namespace, reducers);
     
     const options = { sortOrder: 1000 };

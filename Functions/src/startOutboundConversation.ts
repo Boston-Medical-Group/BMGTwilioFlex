@@ -2,6 +2,8 @@ import '@twilio-labs/serverless-runtime-types';
 import { Context } from '@twilio-labs/serverless-runtime-types/types';
 import { Callback, functionValidator as FunctionTokenValidator, validator as TokenValidator } from 'twilio-flex-token-validator'
 import * as twilio from 'twilio';
+import { ParticipantConversationInstance } from 'twilio/lib/rest/conversations/v1/participantConversation';
+import { ConversationInstance } from 'twilio/lib/rest/conversations/v1/conversation';
 
 export type HubspotContact = {
     firstname?: string
@@ -11,6 +13,23 @@ export type HubspotContact = {
     email?: string
     reservar_cita?: string
     [key: string]: any
+}
+
+
+const getActiveConversation = async (client : twilio.Twilio, to : string) : Promise<ConversationInstance | false> => {
+    const participantConversations = await client.conversations.v1.participantConversations.list({
+        limit: 100,
+        pageSize: 100,
+        address: to
+    })
+
+    // Find first participantConversation with state active
+    const participantConversation = participantConversations.find((participantConversation: ParticipantConversationInstance) => participantConversation.conversationState === 'active')
+    if (participantConversation) {
+        return await client.conversations.v1.conversations(participantConversation.conversationSid).fetch();
+    }
+    
+    return false;
 }
 
 const openAChatTask = async (
@@ -25,6 +44,46 @@ const openAChatTask = async (
     hubspot_deal_id: string,
     routingProperties: any
 ) => {
+
+    const conversation = await getActiveConversation(client, To);
+    let conversationSid;
+    // Ya tiene una conversación activa
+    if (conversation) {
+        const participants = await conversation.participants().list()
+        // Si tiene más de un participante, significa que tiene una interacción con otro o el mismo agente
+        if (participants.length > 1) {
+            // Verificar si el agente ya es participante de esta conversación
+            const agent = participants.find((participant) => participant.identity === WorkerConversationIdentity)
+            // Si está interactuando con otro agente
+            if (!agent) {
+                return {
+                    success: false,
+                    errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT'
+                };
+            } else {
+                // Si está interactuando con el mismo agente
+                return {
+                    success: false,
+                    errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITH_AGENT'
+                };
+            }
+        } else {
+            // Conversación huerfana, notificar
+            return {
+                success: false,
+                errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT'
+            };
+            // @todo debería reactivar la conversación con el agente actual
+            /*
+            await client.conversations.v1.conversations(conversation.sid).participants.create({
+                identity: WorkerConversationIdentity
+            })
+            conversationSid = conversation.sid
+            */
+            
+        }
+    }
+
 
     const interaction = await client.flexApi.v1.interaction.create({
         channel: {
@@ -44,6 +103,7 @@ const openAChatTask = async (
                 ...routingProperties,
                 task_channel_unique_name: channel === 'whatsapp' ? 'chat' : channel,
                 attributes: {
+                    //conversationSid,
                     hubspotContact,
                     xTwilioWebhookEnabled: true,
                     name: customerName,
