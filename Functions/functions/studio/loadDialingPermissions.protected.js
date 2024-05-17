@@ -7,18 +7,18 @@ exports.handler = TokenValidator(async function (context, event, callback) {
   response.appendHeader('Access-Control-Allow-Origin', '*');
   response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS POST GET');
   response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
+  response.appendHeader('Content-Type', 'application/json');
+
   await client.voice.v1.dialingPermissions
       .countries
       .list({limit: 256})
       .then((countries) => {
-        response.appendHeader('Content-Type', 'application/json');
         response.setBody({ content : countries });
-        return callback(null, response);
       }
   ).catch((err) => {
-      response.appendHeader('Content-Type', 'plain/text');
-      response.setBody(err.message);
+      response.setBody({ error: err.message });
       response.setStatusCode(500);
-      return callback(null, response);
-  });  
+  });
+  
+  return callback(null, response);
 });
