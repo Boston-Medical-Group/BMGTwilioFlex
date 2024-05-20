@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlexPlugin } from '@twilio/flex-plugin';
 import * as Flex from "@twilio/flex-ui";
-
+import { Notifications, NotificationType } from '@twilio/flex-ui';
 import { initializeCustomCallSids } from './initializers/initializeCustomCallSids';
 import { initializeOutboundCall } from './initializers/initializeOutboundCall';
 //import CustomizePasteElements from './utils/PasteThemeProvider';
