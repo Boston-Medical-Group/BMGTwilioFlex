@@ -12,7 +12,7 @@ export const filterBySearchString2 = (
 
   return (
     lowerCaseName.includes(searchValue.toLocaleLowerCase()) || lowerCaseIsoCode.includes(searchValue.toLocaleLowerCase()) 
-    || lowerCaseCountryCodes.includes(searchValue.toLocaleLowerCase())
+    || lowerCaseCountryCodes.includes(searchValue.replace(/\D+/g, '').toLocaleLowerCase())
   );
 };
 

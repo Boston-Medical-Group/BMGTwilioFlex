@@ -13,11 +13,9 @@ const GeoPermissionsView = ({ manager }: Props) => {
     return (
         <Theme.Provider theme="flex">
             {/* <FlexView>Pais {accountCountry}</FlexView> */}
-
-            <Box margin="space50">
+            <Box padding="space40" height="95%" overflow="auto">
                 <DefaultFilterGroup />
             </Box>
-
         </Theme.Provider>
     )
 }

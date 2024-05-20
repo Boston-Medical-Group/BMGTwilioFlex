@@ -296,7 +296,6 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
           as="form"
           onSubmit={(event: React.SyntheticEvent) => {
             event.preventDefault();
-            setIsLoaded(true);
             handleApplyFilters2();
           }}
         >
