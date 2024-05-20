@@ -15,7 +15,9 @@ export type HubspotContact = {
     [key: string]: any
 }
 
-
+/**
+ * Get an active conversation for this contact
+ */
 const getActiveConversation = async (client : twilio.Twilio, to : string) : Promise<ConversationInstance | false> => {
     const participantConversations = await client.conversations.v1.participantConversations.list({
         limit: 100,
@@ -37,7 +39,7 @@ const openAChatTask = async (
     To: string,
     customerName: string,
     From: string,
-    WorkerConversationIdentity: string,
+    WorkerConversationIdentity: string, // Worker identity
     channel: any,
     hubspotContact: HubspotContact,
     hubspot_contact_id: string,
@@ -47,44 +49,43 @@ const openAChatTask = async (
 
     const conversation = await getActiveConversation(client, To);
     let conversationSid;
-    // Ya tiene una conversación activa
+
+    // Theres already an active conversation
     if (conversation) {
         const participants = await conversation.participants().list()
-        // Si tiene más de un participante, significa que tiene una interacción con otro o el mismo agente
+        // If more than one participant
         if (participants.length > 1) {
-            // Verificar si el agente ya es participante de esta conversación
+            // Check if current agent (Token) is part of this conversation
             const agent = participants.find((participant) => participant.identity === WorkerConversationIdentity)
-            // Si está interactuando con otro agente
-            if (!agent) {
+            if (!agent) { // Not the current agent
                 return {
                     success: false,
                     errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT'
                 };
-            } else {
-                // Si está interactuando con el mismo agente
+            } else { // Conversation is linked to current agent, cant start a new one
                 return {
                     success: false,
                     errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITH_AGENT'
                 };
             }
         } else {
-            // Conversación huerfana, notificar
+            // Orphan conversation. ...notify
             return {
                 success: false,
                 errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT'
             };
-            // @todo debería reactivar la conversación con el agente actual
-            /*
+            
+            // @todo Should route the conversation to current agent
+            /* BAD PRACTICE
             await client.conversations.v1.conversations(conversation.sid).participants.create({
                 identity: WorkerConversationIdentity
             })
             conversationSid = conversation.sid
             */
-            
         }
     }
 
-
+    // Create an interaction
     const interaction = await client.flexApi.v1.interaction.create({
         channel: {
             type: channel,
@@ -103,18 +104,22 @@ const openAChatTask = async (
                 ...routingProperties,
                 task_channel_unique_name: channel === 'whatsapp' ? 'chat' : channel,
                 attributes: {
-                    //conversationSid,
-                    hubspotContact,
+                    //conversationSid, // Disabled due that agent is not added as a participant
+                    direction: "outbound",
+                    channelType: channel,
                     xTwilioWebhookEnabled: true,
+
+                    from: To, // This is the contact number?
                     name: customerName,
+
+                    hubspotContact,
                     hubspot_contact_id,
                     hubspot_deal_id,
-                    from: To, // todo From debería ser el agente y debería enviar To como destinatario (contacto)
-                    direction: "outbound",
+                    
+                    twilioNumber: From,
+
                     customerName: customerName,
                     customerAddress: To,
-                    twilioNumber: From,
-                    channelType: channel,
                     customers: {
                         external_id: hubspotContact.hs_object_id || null,
                         phone: hubspotContact.phone || null,
@@ -124,6 +129,9 @@ const openAChatTask = async (
             },
         }
     });
+
+    // At this point the interaction should have created a new conversation if there is no active conversation
+    // Or it should have added the agent to the active conversation
 
     const taskAttributes = JSON.parse(interaction.routing.properties.attributes);
 
@@ -201,7 +209,7 @@ exports.handler = FunctionTokenValidator(async function (
         } = tokenInformation;
 
     
-        // create task and add the message to a channel
+        // create task and open chat window for user
         sendResponse = await openAChatTask(
             //@ts-ignore
             client,
@@ -217,7 +225,7 @@ exports.handler = FunctionTokenValidator(async function (
                 workspace_sid: context.TASK_ROUTER_WORKSPACE_SID,
                 workflow_sid: context.TASK_ROUTER_WORKFLOW_SID,
                 queue_sid: context.FLEX_APP_OUTBOUND_WHATSAPP_QUEUE_SID,
-                worker_sid: worker_sid
+                worker_sid: worker_sid // Perhaps knownWorker
             }
         );
 
