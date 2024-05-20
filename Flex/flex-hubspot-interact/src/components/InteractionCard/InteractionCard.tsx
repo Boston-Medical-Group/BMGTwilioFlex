@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import * as Flex from "@twilio/flex-ui";
+import { Notifications } from "@twilio/flex-ui";
 import { CustomizationProvider } from '@twilio-paste/core/customization';
 import { Theme } from '@twilio-paste/core/theme';
 import { Box, Card, Heading, Paragraph, Button } from '@twilio-paste/core';
@@ -91,7 +92,7 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
   type CountryMap = {
     [key: string]: string
   }
-  const sendWAHandler = useCallback((contact: HubspotContact, deal?: HubspotDeal) => {
+  const sendWAHandler = useCallback(async (contact: HubspotContact, deal?: HubspotDeal) => {
     if (contact.country) {
       const countryMap: CountryMap = {
         CO: '+57',
@@ -113,8 +114,9 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
     }
     
 
+    // @todo Enviar mensajes de hubspot con interaction 
     // @todo corregir telefono e164
-    startOutboundConversation({
+    const result = await startOutboundConversation({
         To: `whatsapp:${ contact.phone }`,
         customerName: `${contact.firstname || ''} ${contact.lastname || ''}`.trim(),
         WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
@@ -126,6 +128,12 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
     })
     
     interactionHandler()
+
+    const isSuccess = result.success
+    if (!isSuccess) {
+      const errorCode = result.errorMessage
+      Notifications.showNotification(errorCode);
+    }
   }, []);
 
   const handleCloseModel = React.useCallback(() => {

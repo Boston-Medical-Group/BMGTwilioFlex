@@ -37,5 +37,14 @@ export const sections : Array<SectionItemElement> = [
                 component: "inboundconfigs"
             }
         ]
+    }, {
+        label: "Voice",
+        childrens: [
+            {
+                label: "Geographic Permissions",
+                component: "geopermissions"
+            }
+        ]
     }
+    
 ]

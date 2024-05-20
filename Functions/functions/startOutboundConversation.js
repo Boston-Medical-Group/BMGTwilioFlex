@@ -49,11 +49,76 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("@twilio-labs/serverless-runtime-types");
 var twilio_flex_token_validator_1 = require("twilio-flex-token-validator");
-var openAChatTask = function (client, To, customerName, From, WorkerConversationIdentity, channel, hubspotContact, hubspot_contact_id, hubspot_deal_id, routingProperties) { return __awaiter(void 0, void 0, void 0, function () {
-    var interaction, taskAttributes;
+/**
+ * Get an active conversation for this contact
+ */
+var getActiveConversation = function (client, to) { return __awaiter(void 0, void 0, void 0, function () {
+    var participantConversations, participantConversation;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, client.flexApi.v1.interaction.create({
+            case 0: return [4 /*yield*/, client.conversations.v1.participantConversations.list({
+                    limit: 100,
+                    pageSize: 100,
+                    address: to
+                })
+                // Find first participantConversation with state active
+            ];
+            case 1:
+                participantConversations = _a.sent();
+                participantConversation = participantConversations.find(function (participantConversation) { return participantConversation.conversationState === 'active'; });
+                if (!participantConversation) return [3 /*break*/, 3];
+                return [4 /*yield*/, client.conversations.v1.conversations(participantConversation.conversationSid).fetch()];
+            case 2: return [2 /*return*/, _a.sent()];
+            case 3: return [2 /*return*/, false];
+        }
+    });
+}); };
+var openAChatTask = function (client, To, customerName, From, WorkerConversationIdentity, // Worker identity
+channel, hubspotContact, hubspot_contact_id, hubspot_deal_id, routingProperties) { return __awaiter(void 0, void 0, void 0, function () {
+    var conversation, conversationSid, participants, agent, interaction, taskAttributes;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, getActiveConversation(client, To)];
+            case 1:
+                conversation = _a.sent();
+                if (!conversation) return [3 /*break*/, 3];
+                return [4 /*yield*/, conversation.participants().list()
+                    // If more than one participant
+                ];
+            case 2:
+                participants = _a.sent();
+                // If more than one participant
+                if (participants.length > 1) {
+                    agent = participants.find(function (participant) { return participant.identity === WorkerConversationIdentity; });
+                    if (!agent) { // Not the current agent
+                        return [2 /*return*/, {
+                                success: false,
+                                errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT'
+                            }];
+                    }
+                    else { // Conversation is linked to current agent, cant start a new one
+                        return [2 /*return*/, {
+                                success: false,
+                                errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITH_AGENT'
+                            }];
+                    }
+                }
+                else {
+                    // Orphan conversation. ...notify
+                    return [2 /*return*/, {
+                            success: false,
+                            errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT'
+                        }];
+                    // @todo Should route the conversation to current agent
+                    /* BAD PRACTICE
+                    await client.conversations.v1.conversations(conversation.sid).participants.create({
+                        identity: WorkerConversationIdentity
+                    })
+                    conversationSid = conversation.sid
+                    */
+                }
+                _a.label = 3;
+            case 3: return [4 /*yield*/, client.flexApi.v1.interaction.create({
                     channel: {
                         type: channel,
                         initiated_by: "agent",
@@ -68,17 +133,18 @@ var openAChatTask = function (client, To, customerName, From, WorkerConversation
                     },
                     routing: {
                         properties: __assign(__assign({}, routingProperties), { task_channel_unique_name: channel === 'whatsapp' ? 'chat' : channel, attributes: {
-                                hubspotContact: hubspotContact,
+                                //conversationSid, // Disabled due that agent is not added as a participant
+                                direction: "outbound",
+                                channelType: channel,
                                 xTwilioWebhookEnabled: true,
+                                from: To,
                                 name: customerName,
+                                hubspotContact: hubspotContact,
                                 hubspot_contact_id: hubspot_contact_id,
                                 hubspot_deal_id: hubspot_deal_id,
-                                from: To,
-                                direction: "outbound",
+                                twilioNumber: From,
                                 customerName: customerName,
                                 customerAddress: To,
-                                twilioNumber: From,
-                                channelType: channel,
                                 customers: {
                                     external_id: hubspotContact.hs_object_id || null,
                                     phone: hubspotContact.phone || null,
@@ -87,7 +153,7 @@ var openAChatTask = function (client, To, customerName, From, WorkerConversation
                             } }),
                     }
                 })];
-            case 1:
+            case 4:
                 interaction = _a.sent();
                 taskAttributes = JSON.parse(interaction.routing.properties.attributes);
                 return [2 /*return*/, {
@@ -128,10 +194,10 @@ exports.handler = (0, twilio_flex_token_validator_1.functionValidator)(function 
                             workspace_sid: context.TASK_ROUTER_WORKSPACE_SID,
                             workflow_sid: context.TASK_ROUTER_WORKFLOW_SID,
                             queue_sid: context.FLEX_APP_OUTBOUND_WHATSAPP_QUEUE_SID,
-                            worker_sid: worker_sid
+                            worker_sid: worker_sid // Perhaps knownWorker
                         })];
                 case 3:
-                    // create task and add the message to a channel
+                    // create task and open chat window for user
                     sendResponse = _a.sent();
                     response.appendHeader("Content-Type", "application/json");
                     response.setBody(sendResponse);
@@ -156,4 +222,4 @@ exports.handler = (0, twilio_flex_token_validator_1.functionValidator)(function 
         });
     });
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3RhcnRPdXRib3VuZENvbnZlcnNhdGlvbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9zdGFydE91dGJvdW5kQ29udmVyc2F0aW9uLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxpREFBK0M7QUFFL0MsMkVBQWdJO0FBYWhJLElBQU0sYUFBYSxHQUFHLFVBQ2xCLE1BQXFCLEVBQ3JCLEVBQVUsRUFDVixZQUFvQixFQUNwQixJQUFZLEVBQ1osMEJBQWtDLEVBQ2xDLE9BQVksRUFDWixjQUE4QixFQUM5QixrQkFBMEIsRUFDMUIsZUFBdUIsRUFDdkIsaUJBQXNCOzs7O29CQUdGLHFCQUFNLE1BQU0sQ0FBQyxPQUFPLENBQUMsRUFBRSxDQUFDLFdBQVcsQ0FBQyxNQUFNLENBQUM7b0JBQzNELE9BQU8sRUFBRTt3QkFDTCxJQUFJLEVBQUUsT0FBTzt3QkFDYixZQUFZLEVBQUUsT0FBTzt3QkFDckIsWUFBWSxFQUFFOzRCQUNWO2dDQUNJLE9BQU8sRUFBRSxFQUFFO2dDQUNYLGFBQWEsRUFBRSxJQUFJOzZCQUN0Qjt5QkFDSjt3QkFDRCxxQkFBcUIsRUFBRSxJQUFJO3dCQUMzQixZQUFZLEVBQUUsb0JBQWEsSUFBSSxpQkFBTyxFQUFFLENBQUU7cUJBQzdDO29CQUNELE9BQU8sRUFBRTt3QkFDTCxVQUFVLHdCQUNILGlCQUFpQixLQUNwQix3QkFBd0IsRUFBRSxPQUFPLEtBQUssVUFBVSxDQUFDLENBQUMsQ0FBQyxNQUFNLENBQUMsQ0FBQyxDQUFDLE9BQU8sRUFDbkUsVUFBVSxFQUFFO2dDQUNSLGNBQWMsZ0JBQUE7Z0NBQ2QscUJBQXFCLEVBQUUsSUFBSTtnQ0FDM0IsSUFBSSxFQUFFLFlBQVk7Z0NBQ2xCLGtCQUFrQixvQkFBQTtnQ0FDbEIsZUFBZSxpQkFBQTtnQ0FDZixJQUFJLEVBQUUsRUFBRTtnQ0FDUixTQUFTLEVBQUUsVUFBVTtn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
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic3RhcnRPdXRib3VuZENvbnZlcnNhdGlvbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9zdGFydE91dGJvdW5kQ29udmVyc2F0aW9uLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFBQSxpREFBK0M7QUFFL0MsMkVBQWdJO0FBZWhJOztHQUVHO0FBQ0gsSUFBTSxxQkFBcUIsR0FBRyxVQUFPLE1BQXNCLEVBQUUsRUFBVzs7OztvQkFDbkMscUJBQU0sTUFBTSxDQUFDLGFBQWEsQ0FBQyxFQUFFLENBQUMsd0JBQXdCLENBQUMsSUFBSSxDQUFDO29CQUN6RixLQUFLLEVBQUUsR0FBRztvQkFDVixRQUFRLEVBQUUsR0FBRztvQkFDYixPQUFPLEVBQUUsRUFBRTtpQkFDZCxDQUFDO2dCQUVGLHVEQUF1RDtjQUZyRDs7Z0JBSkksd0JBQXdCLEdBQUcsU0FJL0I7Z0JBR0ksdUJBQXVCLEdBQUcsd0JBQXdCLENBQUMsSUFBSSxDQUFDLFVBQUMsdUJBQXdELElBQUssT0FBQSx1QkFBdUIsQ0FBQyxpQkFBaUIsS0FBSyxRQUFRLEVBQXRELENBQXNELENBQUMsQ0FBQTtxQkFDL0ssdUJBQXVCLEVBQXZCLHdCQUF1QjtnQkFDaEIscUJBQU0sTUFBTSxDQUFDLGFBQWEsQ0FBQyxFQUFFLENBQUMsYUFBYSxDQUFDLHVCQUF1QixDQUFDLGVBQWUsQ0FBQyxDQUFDLEtBQUssRUFBRSxFQUFBO29CQUFuRyxzQkFBTyxTQUE0RixFQUFDO29CQUd4RyxzQkFBTyxLQUFLLEVBQUM7OztLQUNoQixDQUFBO0FBRUQsSUFBTSxhQUFhLEdBQUcsVUFDbEIsTUFBcUIsRUFDckIsRUFBVSxFQUNWLFlBQW9CLEVBQ3BCLElBQVksRUFDWiwwQkFBa0MsRUFBRSxrQkFBa0I7QUFDdEQsT0FBWSxFQUNaLGNBQThCLEVBQzlCLGtCQUEwQixFQUMxQixlQUF1QixFQUN2QixpQkFBc0I7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
