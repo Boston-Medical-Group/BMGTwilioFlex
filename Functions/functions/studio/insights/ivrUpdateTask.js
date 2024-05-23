@@ -28,7 +28,7 @@ var handler = function (context, event, callback) {
         attributes.conversations.ivr_path = digits;
         attributes.conversations.ivr_time = IVR_time;
         //was the call abandoned?
-        if (callStatus !== "completed") {
+        if (callStatus === "completed") {
             attributes.conversations.abandoned = "Yes";
             attributes.conversations.abandoned_phase = "IVR";
         }
