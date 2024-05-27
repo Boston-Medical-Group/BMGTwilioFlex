@@ -30,15 +30,19 @@ exports.handler = async function (
 
     let { contactId, property, value } = event;
 
-    // Validar propiedades
-    if (typeof property === 'string' && typeof value !== 'string') {
-        return callback('Both property and value should be a string or an array')
+
+    let check = false;
+    if (typeof property === 'string' && typeof value === 'string') {
+        check = true;
     } else if (Array.isArray(property) && Array.isArray(value)) {
-        if (property.length !== value.length) {
-            return callback('Both property and value should have the same length')
+        if (property.length === value.length) {
+            check = true;
         }
-    } else {
-        return callback('Both property and value should be a string or an array')
+    }
+
+    // Validar propiedades
+    if (!check) {
+        return callback('Both property and value should be a string or an array with the items length for property and value')
     }
 
     let properties: { [key: string]: string } = {  };
