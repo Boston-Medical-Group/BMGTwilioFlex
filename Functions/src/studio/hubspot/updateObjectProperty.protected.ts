@@ -11,7 +11,8 @@ type MyContext = {
 }
 
 type MyEvent = {
-    contactId: string
+    objectType: string
+    objectId: string
 } & (
         {
             property: string
@@ -28,8 +29,7 @@ exports.handler = async function (
     callback: ServerlessCallback
 ) {
 
-    let { contactId, property, value } = event;
-
+    let { objectType, objectId, property, value } = event;
 
     let check = false;
     if (typeof property === 'string' && typeof value === 'string') {
@@ -58,7 +58,7 @@ exports.handler = async function (
     }
 
     const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
-    await hubspotClient.crm.contacts.basicApi.update(contactId, {
+    await hubspotClient.crm.objects.basicApi.update(objectType, objectId, {
         properties
     }).then(function (contact: SimplePublicObject) {
         //the result object stores the data you need from hubspot. In this example we're returning the CRM ID, first name and last name only.
