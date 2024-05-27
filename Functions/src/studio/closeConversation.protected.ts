@@ -1,5 +1,3 @@
-import { Client as HubspotClient } from '@hubspot/api-client';
-import { SimplePublicObject } from '@hubspot/api-client/lib/codegen/crm/contacts';
 import { Context, ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
 
 type MyEvent = {
