@@ -12,10 +12,24 @@ type MyEvent = {
     template?: string
     message?: string
     flowSid: string
-    contactId: string
+    contactId?: string
     phone: string
     [key: string] : string | undefined
 }
+
+/**
+ * 
+ * Available parameters:
+ * - template?
+ * - message?
+ * - flowSid
+ * - contactId?
+ * - phone
+ * - objectId?
+ * - objectType?
+ * - param_*?
+ * 
+ */
 
 export const handler = async (
     context: Context<MyContext>,
@@ -46,7 +60,33 @@ export const handler = async (
 
     const client = context.getTwilioClient()
 
-
+    let parameters: Object = Object.keys(event)
+        .filter((k) => k.indexOf('param_') == 0)
+        .reduce((newObj, k) => {
+            let propName = k.replace('param_', '');
+            //@ts-ignore
+            newObj[parseInt(propName)] = event[k];
+            return newObj;
+        }, {})
+    
+    let attributes: { [key: string] : string } = Object.keys(event)
+        .filter((k) => k.indexOf('param_') != 0)
+        .reduce((newObj, k) => {
+            //@ts-ignore
+            newObj[k] = event[k];
+            return newObj;
+        }, {})
+    
+    const currentlyRequiredAttributes = ['customerName', 'name', 'crmid', 'hubspot_contact_id'];
+    currentlyRequiredAttributes.forEach((k) => {
+        if (!attributes.hasOwnProperty(k)) {
+            if (k == 'customerName' || k == 'name') {
+                attributes[k] = event.fullname ?? 'Unknown name';
+            } else if (k == 'crmid' || k == 'hubspot_contact_id') {
+                attributes[k] = event.contactId as string
+            }
+        }
+    })
 
     try {
         const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
@@ -80,14 +120,7 @@ export const handler = async (
                             body: event.message
                         })
                     } else if (event.template) {
-                        let parameters : Object = Object.keys(event)
-                            .filter((k) => k.indexOf('param_') == 0)
-                            .reduce((newObj, k) => {
-                                let propName = k.replace('param_', '');
-                                //@ts-ignore
-                                newObj[parseInt(propName)] = event[k];
-                                return newObj;
-                            }, {})
+                        
                         
                         return await client.conversations.v1.conversations(conversation.sid).messages.create({
                             contentSid: event.template,
