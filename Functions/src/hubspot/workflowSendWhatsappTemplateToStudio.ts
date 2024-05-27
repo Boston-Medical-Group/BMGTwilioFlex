@@ -80,11 +80,12 @@ export const handler = async (
                             body: event.message
                         })
                     } else if (event.template) {
-                        let parameters = Object.keys(event)
+                        let parameters : Object = Object.keys(event)
                             .filter((k) => k.indexOf('param_') == 0)
                             .reduce((newObj, k) => {
+                                let propName = k.replace('param_', '');
                                 //@ts-ignore
-                                newObj[k] = event[k];
+                                newObj[parseInt(propName)] = event[k];
                                 return newObj;
                             }, {})
                         
