@@ -58,14 +58,23 @@ exports.handler = async function (
     }
 
     const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
+    let result: any;
     await hubspotClient.crm.contacts.basicApi.update(contactId, {
         properties
     }).then(function (contact: SimplePublicObject) {
         //the result object stores the data you need from hubspot. In this example we're returning the CRM ID, first name and last name only.
-        callback(null, {});
+        result = {}
     }).catch(function (error) {
-        console.log(`Error: ${error}`);
-        callback(null, error);
+        result = { error: error}
     });
+
+    const response = new Twilio.Response();
+    response.appendHeader("Access-Control-Allow-Origin", "*");
+    response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
+    response.appendHeader("Access-Control-Allow-Headers", "Content-Type");
+    response.appendHeader("Content-Type", "application/json");
+    response.setBody(result);
+
+    callback(null, response);
 };
 
