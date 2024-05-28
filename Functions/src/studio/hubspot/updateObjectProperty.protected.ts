@@ -58,13 +58,14 @@ exports.handler = async function (
     }
 
     const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
+    console.info('Updating properties : ' + JSON.stringify(properties));
     await hubspotClient.crm.objects.basicApi.update(objectType, objectId, {
         properties
     }).then(function (contact: SimplePublicObject) {
         //the result object stores the data you need from hubspot. In this example we're returning the CRM ID, first name and last name only.
         callback(null, {});
     }).catch(function (error) {
-        console.log(`Error: ${error}`);
+        console.log(`Error updateObjectProperty@67: ${error}`);
         callback(null, error);
     });
 };
