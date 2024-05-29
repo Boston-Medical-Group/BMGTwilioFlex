@@ -94,12 +94,7 @@ export const handler = async (
         const timestamp = (new Date).getTime();
         await client.conversations.v1.conversations.create({
             friendlyName: `HubspotWorkflow -> ${event.phone} (${timestamp})`,
-            attributes: JSON.stringify({
-                customerName: event.fullname ?? 'Unknown name',
-                name: event.fullname ?? 'Unknown name',
-                crmid: event.contactId,
-                hubspot_contact_id: event.contactId
-            }),
+            attributes: JSON.stringify(attributes),
             timers: {
                 inactive: 'PT1H',
                 closed: 'PT24H'
