@@ -3,9 +3,22 @@ on:
   pull_request:
     branches:
       - main
-    types: [closed] 
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      description:
+        description: 'Deploy description'
+        required: false
+        type: string
 
 jobs:
+  printdescription:
+    runs-on: ubuntu-latest
+    steps:
+      - if: ${{ inputs.description != '' }}
+        run: |
+          echo "Manual Trigger: '${{ inputs.description }}'"
+          
   prepare: # Job that list subdirectories inside flex
     runs-on: ubuntu-latest
     environment: flex-arg
