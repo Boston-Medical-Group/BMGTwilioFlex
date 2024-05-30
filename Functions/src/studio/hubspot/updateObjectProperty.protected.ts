@@ -1,5 +1,5 @@
 import { Client as HubspotClient } from '@hubspot/api-client';
-import { SimplePublicObject, CollectionResponseWithTotalSimplePublicObjectForwardPaging } from '@hubspot/api-client/lib/codegen/crm/contacts';
+import { SimplePublicObject } from '@hubspot/api-client/lib/codegen/crm/objects';
 import { Context, ServerlessCallback } from '@twilio-labs/serverless-runtime-types/types';
 
 /** Receives a phone number, queries HUBSPOT and returns the customer record.
@@ -45,12 +45,12 @@ exports.handler = async function (
         return callback('Both property and value should be a string or an array with the items length for property and value')
     }
 
-    let properties: { [key: string]: string } = {  };
+    let props: { [key: string]: string } = {  };
     if (typeof property === 'string') {
         //@ts-ignore
-        properties[property] = value;
+        props[property] = value;
     } else if (Array.isArray(property)) {
-        properties = property.reduce((map, key, index) => {
+        props = property.reduce((map, key, index) => {
             //@ts-ignore
             map[key] = value[index];
             return map;
@@ -58,10 +58,11 @@ exports.handler = async function (
     }
 
     const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
-    console.info('Updating properties : ' + JSON.stringify(properties));
+    console.info(props);
+    console.info('Updating properties : ' + JSON.stringify(props));
     let result: any;
     await hubspotClient.crm.objects.basicApi.update(objectType, objectId, {
-        properties
+        properties: props
     }).then(function (contact: SimplePublicObject) {
         //the result object stores the data you need from hubspot. In this example we're returning the CRM ID, first name and last name only.
         result = {}
