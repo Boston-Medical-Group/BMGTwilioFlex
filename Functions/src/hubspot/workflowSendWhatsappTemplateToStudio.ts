@@ -70,7 +70,7 @@ export const handler = async (
         }, {})
     
     let attributes: { [key: string] : string } = Object.keys(event)
-        .filter((k) => k.indexOf('param_') != 0)
+        .filter((k) => k.indexOf('param_') != 0 && k != 'request')
         .reduce((newObj, k) => {
             //@ts-ignore
             newObj[k] = event[k];
