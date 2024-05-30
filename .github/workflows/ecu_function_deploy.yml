@@ -14,6 +14,7 @@ on:
         description: 'Deploy description'
         required: false
         type: string
+        default: ''
 
 jobs:
   printdescription:

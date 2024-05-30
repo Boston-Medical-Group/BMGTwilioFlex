@@ -16,7 +16,11 @@ exports.handler = async function (
 
   const client = context.getTwilioClient()
 
-  await client.conversations.v1.conversations(conversationSid).update({ state: "closed" })
+  try {
+    await client.conversations.v1.conversations(conversationSid).update({ state: "closed" })
+  } catch (error) {
+    console.log(error);
+  }
 
   callback(null, {});
 };
