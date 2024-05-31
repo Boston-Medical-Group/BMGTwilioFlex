@@ -7,11 +7,12 @@ export enum CallbackNotification {
   ErrorCallBackAndVoicemail = 'ErrorCallBackAndVoicemail',
 }
 
-export default (flex: typeof Flex, manager: Flex.Manager) => {
-  errorNotification(flex, manager);
-  outboundDialingNotEnabled(flex, manager);
-};
 
+export default (flex: typeof Flex, manager: Flex.Manager) => {
+  //errorNotification(flex, manager);
+  //outboundDialingNotEnabled(flex, manager);
+};
+/*
 function errorNotification(flex: typeof Flex, manager: Flex.Manager) {
   flex.Notifications.registerNotification({
     id: CallbackNotification.ErrorCallBackAndVoicemail,
@@ -27,3 +28,4 @@ function outboundDialingNotEnabled(flex: typeof Flex, manager: Flex.Manager) {
     content: StringTemplates.OutboundDialingNotEnabled,
   });
 }
+*/
