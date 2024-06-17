@@ -99,22 +99,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
         setTemplateList([]);
         setError(false);
 
-        getContents({
-            prefix: 'ui_',
-            hubspot: {
-                contact: task.attributes.hubspotContact,
-                deal: task.attributes.deal ?? {},
-                hubspot_id: task.attributes.hubspot_contact_id ?? null,
-                contact_id: task.attributes.hubspot_contact_id ?? null,
-                deal_id: task.attributes.hubspot_deal_id ?? null,
-            },
-            flex: {
-                agent: {
-                    full_name: workerAttributes?.full_name ?? 'Agente',
-                    firstname: workerAttributes?.firstname ? workerAttributes?.firstname : (workerAttributes?.full_name ? workerAttributes?.full_name : 'Agente'),
-                }
-            }
-        })
+        getContents('ui_', manager.store.getState().flex.session.ssoTokenPayload.token)
             .then((data) => { setTemplateList(data) })
             .catch(() => setError(true))
             .finally(() => setIsLoading(false));

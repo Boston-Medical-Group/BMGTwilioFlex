@@ -78,7 +78,7 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
-  const getContents = useCallback(async (data, newToken) => {
+  const getContents = useCallback(async (prefix, newToken) => {
 
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchContent`, {
       method: "POST",
@@ -86,7 +86,7 @@ const useApi = ({ token }) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        data,
+        prefix,
         Token: newToken ?? token
       })
     });

@@ -4,6 +4,7 @@ import { functionValidator as FunctionTokenValidator } from 'twilio-flex-token-v
 type MyContext = {}
 
 type MyEvent = {
+  prefix?: string
   Token: string
 }
 
@@ -35,7 +36,13 @@ exports.handler = FunctionTokenValidator(async function (
     // @todo Filtramos por algún prefijo?
 
     // Filter templates to get only those with property approvalRequests.status = 'approved'
-    const approvedTemplates = templates.filter((template: any) => template.approvalRequests?.status === 'approved')
+    const approvedTemplates = templates.filter((template: any) => {
+      if (event.prefix && event.prefix !== '') {
+        return template.approvalRequests?.status === 'approved' && template.friendlyName.startWtith(event.prefix)
+      }
+
+      return template.approvalRequests?.status === 'approved'
+    })
   
     response.setBody(approvedTemplates);
 
