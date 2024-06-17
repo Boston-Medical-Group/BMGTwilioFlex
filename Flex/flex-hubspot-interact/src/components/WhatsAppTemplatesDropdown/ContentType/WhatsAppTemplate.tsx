@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import * as Flex from "@twilio/flex-ui";
-import { Actions } from "@twilio/flex-ui";
 import { Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions, Stack, Box, Button, Badge, Paragraph, Table, THead, Tr, Th, TBody, Td, Text, Input } from '@twilio-paste/core';
+import { SendIcon } from "@twilio-paste/icons/esm/SendIcon";
 import { ContentApprovalInstance } from 'types/WhatsAppTemplates';
 import { getStrings } from '../../../utils/helpers'
 import { useSelector } from 'react-redux';
@@ -25,11 +25,35 @@ Flex.Notifications.registerNotification({
     type: Flex.NotificationType.error
 });
 
+/**
+ * Available replazable parameters:
+ * 
+ * country
+ * email
+ * firstname
+ * id
+ * lastname
+ * phone
+ * calendar
+ * worker_fullname
+ * worker_email
+ *
+ */
+
+
 const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task, manager, item, isOpen, closeHandler }) => {
 
     const { sendMessage } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const [parameters, setParameters] = useState<Parameters>({})
-    const language = useSelector((state: any) => state.language ?? 'es')
+    
+    const { contact, deal, language } = useSelector(
+        (state: any) => ({
+            contact: state.hubspotInteraction.interaction.contact,
+            deal: state.hubspotInteraction.interaction.deal,
+            language: state.language ?? 'es'
+        })
+    );
+
     const [strings, setStrings] = useState<{ [key: string]: string }>(getStrings(language ?? 'es'))
     const [isDisabled, setIsDisabled] = useState<boolean>(true)
     const [isSending, setIsSending] = useState<boolean>(false)
@@ -45,21 +69,76 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
         return body
     }, [item, parameters])
 
+    // Switch de idioma
     useEffect(() => {
-        setStrings(language ?? 'es')
+        setStrings(getStrings(language ?? 'es'))
     }, [language])
 
+    // Carga los parametros de la plantilla
     useEffect(() => {
         let newParams: Parameters = {}
         if (item) {
             Object.keys(item.variables).forEach((key: string) => {
-                newParams[key] = null
+                newParams[key] = discoverParameterValue(key)
             })
 
             setParameters(newParams)
         }
     }, [item])
 
+    // Carga valores por defecto de los parametros
+    const discoverParameterValue = (key: string) => {
+        type ParametersMap = {
+            [key: string]: string[]
+        }
+        type WorkerParametersMap = {
+            [key: string]: () => string
+        }
+
+        const workerParameters : WorkerParametersMap = {
+            fullname: (): string => manager.workerClient?.attributes?.full_name ?? '',
+            email: (): string => manager.workerClient?.attributes?.email ?? ''
+        }
+
+        if (key.startsWith('worker_')) {
+            let workerParamter = key.replace('worker_', '');
+            if (workerParameters.hasOwnProperty(workerParamter)) {
+                return workerParameters[workerParamter]()
+            }
+        }
+
+        const parameterMap : ParametersMap = {
+            country: ['country'],
+            email: ['email'],
+            firstname: ['firstname'],
+            id: ['hs_object_id', 'deal.hs_object_id'],
+            lastname: ['lastname'],
+            phone: ['phone', 'numero_de_telefono_adicional', 'numero_de_telefono_adicional_'],
+            calendar: ['reservar_cita', 'deal.reservar_cita'],
+        }
+
+        let value = item.variables[key]
+        if (parameterMap.hasOwnProperty(key)) {
+            return value
+        }
+
+        parameterMap[key].forEach((item: string) => {
+            if (item.startsWith('deal.')) {
+                let param: string = item.replace('deal.', '')
+                if (deal.hasOwnProperty(param) && deal[param] !== '') {
+                    value = deal[param]
+                    return
+                }
+            } else if (contact.hasOwnProperty(item) && contact[item] !== '') {
+                value = contact[item]
+                return
+            }
+        })
+
+        return value
+    }
+
+    // Desactiva el envío si no se han completado todos los valores
     useEffect(() => {
         let filled = true
         if (parameters !== null) {
@@ -164,7 +243,10 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
                     <Button variant="primary" onClick={submitTemplate}
                         disabled={isDisabled}
                         loading={isSending}
-                    >{strings['Send']}</Button>
+                    >
+                        {strings['Send']}
+                        <SendIcon decorative={false} title="Description of icon" />
+                    </Button>
                 </ModalFooterActions>
             </ModalFooter>
         </Modal>

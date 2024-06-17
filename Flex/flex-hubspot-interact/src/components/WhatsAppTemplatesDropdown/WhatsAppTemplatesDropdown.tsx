@@ -23,7 +23,7 @@ interface WhatsAppTemplatesDropdownProps {
 
 const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdownProps> = ({ task, manager }) => {
 
-    const { getTemplates, getMessageErrors, getContents } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
+    const { getMessageErrors, getContents } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const [templateList, setTemplateList] = useState([]);
 
     const [isLoading, setIsLoading] = useState(true);
@@ -100,6 +100,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
         setError(false);
 
         getContents({
+            prefix: 'ui_',
             hubspot: {
                 contact: task.attributes.hubspotContact,
                 deal: task.attributes.deal ?? {},
