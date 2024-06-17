@@ -67,12 +67,14 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
 
   /** DO NOT CALL & DO NOT WHATSAPP */
   useEffect(() => {
-    const parseBool = (val : string | boolean) => val === true || val === "true"
-    let dnc = typeof contact.donotcall === 'string' ? parseBool(contact.donotcall.toLowerCase()) : contact.donotcall;
-    setDoNotCall(dnc ? true : false)
-    
-    let dnw = typeof contact.whatsappoptout === 'string' ? parseBool(contact.whatsappoptout.toLowerCase()) : contact.whatsappoptout;
-    setDoNotWhatsapp(dnw ? true : false)
+    const parseBool = (val: string | boolean) => val === true || val === "true"
+    if (typeof contact === 'object') {
+      let dnc = typeof contact.donotcall === 'string' ? parseBool(contact.donotcall.toLowerCase()) : contact.donotcall;
+      setDoNotCall(dnc ? true : false)
+      
+      let dnw = typeof contact?.whatsappoptout === 'string' ? parseBool(contact?.whatsappoptout.toLowerCase()) : contact.whatsappoptout;
+      setDoNotWhatsapp(dnw ? true : false)
+    }
 
   }, [contact])
 
