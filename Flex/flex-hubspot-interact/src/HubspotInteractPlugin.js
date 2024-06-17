@@ -45,8 +45,9 @@ export default class HubspotInteractPlugin extends FlexPlugin {
    * @param flex { typeof import('@twilio/flex-ui') }
    */
   async init(flex, manager) {
+    manager.store.addReducer(namespace, reducers);
+
     registerNotifications();
-    manager.store.addReducer?.(namespace, reducers);
     
     const options = { sortOrder: 1000 };
 

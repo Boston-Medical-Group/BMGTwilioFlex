@@ -7,8 +7,14 @@ import interactionCallCardReducer, {
     setIsLoading
 } from './interactionCallCardState';
 
+import interactionReducer, {
+    InteractionState,
+    setContact,
+    setDeal
+} from './interactionState';
+
 // You need to register your redux store(s) under a unique namespace
-export const namespace = 'interactionCallCardState';
+export const namespace = 'hubspotInteraction';
 
 // It can be helpful to create a map of all actions for typed access
 export const actions = {
@@ -16,6 +22,10 @@ export const actions = {
         setCallCard,
         setIsLoading
     },
+    interaction: {
+        setContact,
+        setDeal
+    }
 };
 
 // The type for your app's state will have flex at the top level,
@@ -25,9 +35,16 @@ export interface AppState {
     interactionCallCardState: {
         interactionCallCard: InteractionCallCardState;
     };
+    interactionState: {
+        interaction: InteractionState
+    },
+    strings: {
+        [key: string]: string
+    }
 }
 
 // Combine any number of reducers to support the needs of your plugin
 export const reducers = combineReducers({
     interactionCallCard: interactionCallCardReducer,
+    interaction: interactionReducer
 });

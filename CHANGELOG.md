@@ -1,4 +1,9 @@
 # Changelog
+
+## 17/06/2024
+* Upgrade a plantillas de content template builder
+* Corrige fetch de contactos hubspot
+
 ## 17/05/2024
 * cambios de GeoPermission
 

@@ -38,19 +38,28 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = function (context, event, callback) {
     return __awaiter(this, void 0, void 0, function () {
-        var conversationSid, client;
+        var conversationSid, client, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     conversationSid = event.conversationSid;
                     client = context.getTwilioClient();
-                    return [4 /*yield*/, client.conversations.v1.conversations(conversationSid).update({ state: "closed" })];
+                    _a.label = 1;
                 case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, client.conversations.v1.conversations(conversationSid).update({ state: "closed" })];
+                case 2:
                     _a.sent();
+                    return [3 /*break*/, 4];
+                case 3:
+                    error_1 = _a.sent();
+                    console.log(error_1);
+                    return [3 /*break*/, 4];
+                case 4:
                     callback(null, {});
                     return [2 /*return*/];
             }
         });
     });
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY2xvc2VDb252ZXJzYXRpb24ucHJvdGVjdGVkLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL3N0dWRpby9jbG9zZUNvbnZlcnNhdGlvbi5wcm90ZWN0ZWQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFRQSxPQUFPLENBQUMsT0FBTyxHQUFHLFVBQ2hCLE9BQTJCLEVBQzNCLEtBQWMsRUFDZCxRQUE0Qjs7Ozs7O29CQUd0QixlQUFlLEdBQUcsS0FBSyxDQUFDLGVBQWUsQ0FBQTtvQkFFdkMsTUFBTSxHQUFHLE9BQU8sQ0FBQyxlQUFlLEVBQUUsQ0FBQTtvQkFFeEMscUJBQU0sTUFBTSxDQUFDLGFBQWEsQ0FBQyxFQUFFLENBQUMsYUFBYSxDQUFDLGVBQWUsQ0FBQyxDQUFDLE1BQU0sQ0FBQyxFQUFFLEtBQUssRUFBRSxRQUFRLEVBQUUsQ0FBQyxFQUFBOztvQkFBeEYsU0FBd0YsQ0FBQTtvQkFFeEYsUUFBUSxDQUFDLElBQUksRUFBRSxFQUFFLENBQUMsQ0FBQzs7Ozs7Q0FDcEIsQ0FBQyJ9
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY2xvc2VDb252ZXJzYXRpb24ucHJvdGVjdGVkLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL3N0dWRpby9jbG9zZUNvbnZlcnNhdGlvbi5wcm90ZWN0ZWQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFRQSxPQUFPLENBQUMsT0FBTyxHQUFHLFVBQ2hCLE9BQTJCLEVBQzNCLEtBQWMsRUFDZCxRQUE0Qjs7Ozs7O29CQUd0QixlQUFlLEdBQUcsS0FBSyxDQUFDLGVBQWUsQ0FBQTtvQkFFdkMsTUFBTSxHQUFHLE9BQU8sQ0FBQyxlQUFlLEVBQUUsQ0FBQTs7OztvQkFHdEMscUJBQU0sTUFBTSxDQUFDLGFBQWEsQ0FBQyxFQUFFLENBQUMsYUFBYSxDQUFDLGVBQWUsQ0FBQyxDQUFDLE1BQU0sQ0FBQyxFQUFFLEtBQUssRUFBRSxRQUFRLEVBQUUsQ0FBQyxFQUFBOztvQkFBeEYsU0FBd0YsQ0FBQTs7OztvQkFFeEYsT0FBTyxDQUFDLEdBQUcsQ0FBQyxPQUFLLENBQUMsQ0FBQzs7O29CQUdyQixRQUFRLENBQUMsSUFBSSxFQUFFLEVBQUUsQ0FBQyxDQUFDOzs7OztDQUNwQixDQUFDIn0=
