@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 import * as Flex from "@twilio/flex-ui";
 import { Notifications } from "@twilio/flex-ui";
 import { CustomizationProvider } from '@twilio-paste/core/customization';
@@ -10,7 +11,7 @@ import SendSmsModal from './SendSmsModal';
 import SendWAModal from './SendWAModal';
 import { HubspotContact, HubspotDeal } from 'Types';
 // @ts-ignore
-import { fullName } from '../../utils/helpers';
+import { fullName, getStrings } from '../../utils/helpers';
 
 
 type Props = {
@@ -35,11 +36,20 @@ const disabledButtonStyles = {
   }
 }
 
+Flex.Notifications.registerNotification({
+  id: "contact_not_found_on_hubpost",
+  content: 'Error',
+  type: Flex.NotificationType.error
+});
+
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
 const InteractionCard = ({manager, contact, deal, callHandler, interactionHandler} : Props) => {
   const { startOutboundConversation } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
+
+  const language = useSelector((state: any) => state.language ?? 'es')
+  const [strings] = useState<{ [key: string]: string }>(getStrings(language ?? 'es'))
 
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [selectedSmsContact, setSelectedSmsContact] = useState<HubspotContact>();
@@ -162,7 +172,12 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
     return '';
   }, [actionDisabled])
 
-  if (!contact.hasOwnProperty('hs_object_id')) {
+  if (typeof contact !== 'object' || contact === null || !contact.hasOwnProperty('hs_object_id')) {
+    let notification = Flex.Notifications.registeredNotifications.get('contact_not_found_on_hubpost')
+    if (notification) {
+      notification.content = strings['contact_not_found_on_hubpost']
+    }
+    Flex.Notifications.showNotification("contact_not_found_on_hubpost", undefined);
     return null;
   }
 

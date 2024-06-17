@@ -2,5 +2,7 @@
     "Variables": "Variáveis",
     "Values": "Valores",
     "Cancel": "Cancelar",
-    "Send": "Enviar"
+    "Send": "Enviar",
+
+    "contact_not_found_on_hubpost": "Contato não encontrado no HubSpot"
 }

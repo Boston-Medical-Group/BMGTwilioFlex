@@ -23,8 +23,7 @@ Flex.Notifications.registerNotification({
     id: "whatsapptemplate_sendmessage",
     content: 'Error',
     type: Flex.NotificationType.error
-}
-);
+});
 
 const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task, manager, item, isOpen, closeHandler }) => {
 
