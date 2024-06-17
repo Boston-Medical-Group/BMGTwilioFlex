@@ -30,7 +30,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
     const { sendMessage } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const [parameters, setParameters] = useState<Parameters>({})
     const language = useSelector((state: any) => state.language ?? 'es')
-    const [strings] = useState<{ [key: string]: string }>(getStrings(language ?? 'es'))
+    const [strings, setStrings] = useState<{ [key: string]: string }>(getStrings(language ?? 'es'))
     const [isDisabled, setIsDisabled] = useState<boolean>(true)
     const [isSending, setIsSending] = useState<boolean>(false)
 
@@ -44,6 +44,10 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
 
         return body
     }, [item, parameters])
+
+    useEffect(() => {
+        setStrings(language ?? 'es')
+    }, [language])
 
     useEffect(() => {
         let newParams: Parameters = {}
