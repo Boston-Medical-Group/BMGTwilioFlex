@@ -9,7 +9,8 @@ type MyEvent = {
 }
 
 //@ts-ignore
-exports.handler = FunctionTokenValidator(async function (
+//exports.handler = FunctionTokenValidator(async function (
+exports.handler = async function (
   context: Context<MyContext>,
   event: MyEvent,
   callback: ServerlessCallback
@@ -38,7 +39,7 @@ exports.handler = FunctionTokenValidator(async function (
     // Filter templates to get only those with property approvalRequests.status = 'approved'
     const approvedTemplates = templates.filter((template: any) => {
       if (event.prefix && event.prefix !== '') {
-        return template.approvalRequests?.status === 'approved' && template.friendlyName.startWtith(event.prefix)
+        return template.approvalRequests?.status === 'approved' && template.friendlyName.startsWith(event.prefix)
       }
 
       return template.approvalRequests?.status === 'approved'
@@ -58,4 +59,5 @@ exports.handler = FunctionTokenValidator(async function (
 
   // Return a success response using the callback function.
   callback(null, response);
-})
+}
+//})
