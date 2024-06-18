@@ -120,11 +120,10 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
         }
 
         let contact = task.attributes?.hubspotContact
-        console.log(contact);
         parameterMap[key].forEach((item: string) => {
-            console.log(item)
             if (typeof contact == 'object' && contact.hasOwnProperty(item) && contact[item] !== '') {
                 value = contact[item]
+                updateParam(key, value)
                 return
             }
         })
@@ -218,7 +217,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
                                             <Text as="p">{`{{${key}}}`}</Text>
                                         </Td>
                                         <Td>
-                                            <Input type='text' placeholder={parameters[key]?.toString()} onChange={(e) => updateParam(key, e.target.value)} />
+                                            <Input type='text' defaultValue={parameters[key]?.toString()} placeholder={parameters[key]?.toString()} onChange={(e) => updateParam(key, e.target.value)} />
                                         </Td>
                                     </Tr>
                                 ))}
