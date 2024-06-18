@@ -73,18 +73,13 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
 
     // Carga los parametros de la plantilla
     useEffect(() => {
-        let newParams: Parameters = {}
         if (item) {
-            Object.keys(item.variables).forEach((key: string) => {
-                newParams[key] = discoverParameterValue(item.variables[key])
-            })
-
-            setParameters(newParams)
+            discoverParameterValue(item.variables)
         }
     }, [item])
 
     // Carga valores por defecto de los parametros
-    const discoverParameterValue = (key: string) => {
+    const discoverParameterValue = (variables: {[key: string] : string}) => {
         type ParametersMap = {
             [key: string]: string[]
         }
@@ -97,14 +92,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
             email: (): string => manager.workerClient?.attributes?.email ?? ''
         }
 
-        if (key.startsWith('worker_')) {
-            let workerParamter = key.replace('worker_', '');
-            if (workerParameters.hasOwnProperty(workerParamter)) {
-                return workerParameters[workerParamter]()
-            }
-        }
-
-        const parameterMap : ParametersMap = {
+        const parameterMap: ParametersMap = {
             country: ['country'],
             email: ['email'],
             firstname: ['firstname'],
@@ -114,21 +102,27 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
             calendar: ['reservar_cita'],
         }
 
-        let value = key
-        if (!parameterMap.hasOwnProperty(key)) {
-            return value
-        }
-
         let contact = task.attributes?.hubspotContact
-        parameterMap[key].forEach((item: string) => {
-            if (typeof contact == 'object' && contact.hasOwnProperty(item) && contact[item] !== '') {
-                value = contact[item]
-                updateParam(key, value)
+
+        Object.keys(variables).forEach((key: string) => {
+            if (key.startsWith('worker_')) {
+                let workerParamter = key.replace('worker_', '');
+                if (workerParameters.hasOwnProperty(workerParamter)) {
+                    return workerParameters[workerParamter]()
+                }
+            }
+
+            if (!parameterMap.hasOwnProperty(key)) {
                 return
             }
-        })
 
-        return value
+            parameterMap[key].forEach((item: string) => {
+                if (typeof contact == 'object' && contact.hasOwnProperty(item) && contact[item] !== '') {
+                    updateParam(key, contact[item])
+                    return
+                }
+            })
+        })
     }
 
     // Desactiva el envío si no se han completado todos los valores
@@ -217,7 +211,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
                                             <Text as="p">{`{{${key}}}`}</Text>
                                         </Td>
                                         <Td>
-                                            <Input type='text' defaultValue={parameters[key]?.toString()} placeholder={parameters[key]?.toString()} onChange={(e) => updateParam(key, e.target.value)} />
+                                            <Input type='text' defaultValue={parameters[key]?.toString()} placeholder={item.variables[key]} onChange={(e) => updateParam(key, e.target.value)} />
                                         </Td>
                                     </Tr>
                                 ))}
