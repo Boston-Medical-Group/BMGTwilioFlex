@@ -49,14 +49,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
     const { sendMessage } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const [parameters, setParameters] = useState<Parameters>({})
     
-    const { contact, language } = useSelector(
-        (state: any) => {
-            return {
-                contact: state.hubspotCRM.contact,
-                language: state.language ?? 'es'
-            }
-        }
-    );
+    const language = useSelector((state: any) => state.language ?? 'es');
 
     const [strings, setStrings] = useState<{ [key: string]: string }>(getStrings(language ?? 'es'))
     const [isDisabled, setIsDisabled] = useState<boolean>(true)
@@ -126,8 +119,9 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
             return value
         }
 
+        const contact = task.attributes?.hubspotContact
         parameterMap[key].forEach((item: string) => {
-            if (contact.hasOwnProperty(item) && contact[item] !== '') {
+            if (typeof contact == 'object' && contact.hasOwnProperty(item) && contact[item] !== '') {
                 value = contact[item]
                 return
             }
