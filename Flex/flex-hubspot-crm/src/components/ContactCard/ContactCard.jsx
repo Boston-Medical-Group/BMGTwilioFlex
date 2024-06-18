@@ -8,7 +8,7 @@ import {
 import { fullName } from '../../utils/helpers';
 import gravatarUrl from 'gravatar-url';
 import { Summary, ConversationHistory } from './ContactCardModules'
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { actions } from '../../states';
 
 

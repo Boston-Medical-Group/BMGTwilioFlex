@@ -5,7 +5,6 @@ import hubspotCRMReducer, {
     HubspotCRMState,
     setContact
 } from './hubspotCRMState';
-import HubspotCrmPlugin from 'HubspotCrmPlugin';
 
 // You need to register your redux store(s) under a unique namespace
 export const namespace = 'hubspotCRM';
@@ -21,7 +20,7 @@ export const actions = {
 // along with any additional state added by your plugin
 export interface AppState {
     flex: FlexAppState;
-    interactionCRMState: {
+    hubspotCRMState: {
         hubspotCRM: HubspotCRMState
     },
     strings: {
