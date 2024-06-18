@@ -3,6 +3,7 @@ import { FlexPlugin } from '@twilio/flex-plugin';
 import SyncHubspotUser from './components/SyncHubspotUser';
 import ContactCard from './components/ContactCard';
 import { Notifications, NotificationType } from '@twilio/flex-ui';
+import { namespace, reducers } from './states';
 
 const PLUGIN_NAME = 'HubspotCrmPlugin';
 
@@ -39,6 +40,7 @@ export default class HubspotCrmPlugin extends FlexPlugin {
    * @param flex { typeof import('@twilio/flex-ui') }
    */
   async init(flex, manager) {
+    manager.store.addReducer(namespace, reducers);
 
     registerNotifications()
     flex.AgentDesktopView.Panel1.Content.add(<SyncHubspotUser key="HubspotCrmPlugin-component-SyncHubspotUser" manager={manager} />)
