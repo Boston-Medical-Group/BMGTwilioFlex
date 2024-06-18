@@ -49,12 +49,10 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
     const { sendMessage } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const [parameters, setParameters] = useState<Parameters>({})
     
-    const { contact, deal, language } = useSelector(
+    const { contact, language } = useSelector(
         (state: any) => {
-            console.log(state)
             return {
-                contact: state.hubspotInteraction.interaction.contact,
-                deal: state.hubspotInteraction.interaction.deal,
+                contact: state.hubspotCRM.contact,
                 language: state.language ?? 'es'
             }
         }
@@ -117,13 +115,11 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
             country: ['country'],
             email: ['email'],
             firstname: ['firstname'],
-            id: ['hs_object_id', 'deal.hs_object_id'],
+            id: ['hs_object_id'],
             lastname: ['lastname'],
             phone: ['phone', 'numero_de_telefono_adicional', 'numero_de_telefono_adicional_'],
-            calendar: ['reservar_cita', 'deal.reservar_cita'],
+            calendar: ['reservar_cita'],
         }
-
-        console.log(contact, deal, language)
 
         let value = key
         if (!parameterMap.hasOwnProperty(key)) {
@@ -131,13 +127,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
         }
 
         parameterMap[key].forEach((item: string) => {
-            if (item.startsWith('deal.')) {
-                let param: string = item.replace('deal.', '')
-                if (deal.hasOwnProperty(param) && deal[param] !== '') {
-                    value = deal[param]
-                    return
-                }
-            } else if (contact.hasOwnProperty(item) && contact[item] !== '') {
+            if (contact.hasOwnProperty(item) && contact[item] !== '') {
                 value = contact[item]
                 return
             }

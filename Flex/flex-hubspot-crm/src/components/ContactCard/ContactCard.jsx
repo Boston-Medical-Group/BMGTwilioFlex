@@ -8,6 +8,8 @@ import {
 import { fullName } from '../../utils/helpers';
 import gravatarUrl from 'gravatar-url';
 import { Summary, ConversationHistory } from './ContactCardModules'
+import { useSelector } from 'react-redux';
+import { actions } from '../../states';
 
 
 const getDataByContactId = async (contact_id, manager) => {
@@ -29,6 +31,9 @@ const getDataByContactId = async (contact_id, manager) => {
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
 const ContactCard = ({ manager, task }) => {
+
+    const stateContact = useSelector(state => state.hubspotCRM.contact)
+    const dispatch = useDispatch()
 
     const [contact, setContact] = useState();
     const [contactId, setContactId] = useState();
@@ -60,6 +65,12 @@ const ContactCard = ({ manager, task }) => {
                 setAvatar(gravatarUrl(email))
             }
         }
+
+        let taskContact = task.attributes?.hubspotContact ?? {}
+        if (!stateContact.hasOwnProperty('hs_object_id') || (taskContact && taskContact.hasOwnProperty('hs_object_id') && taskContact[hs_object_id] != stateContact[hs_object_id])) {
+            dispatch(actions.hubspotCRM.setContact(taskContact))
+        }
+
     }, [contact])
 
     if (!contact || !contact.hasOwnProperty('hs_object_id')) {
