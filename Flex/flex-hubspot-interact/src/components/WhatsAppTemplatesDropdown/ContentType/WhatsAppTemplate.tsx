@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import * as Flex from "@twilio/flex-ui";
-import { Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions, Stack, Box, Button, Badge, Paragraph, Table, THead, Tr, Th, TBody, Td, Text, Input } from '@twilio-paste/core';
+import {
+    Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions,
+    Stack, Box, Button, Badge, Paragraph, Table, THead, Tr, Th, TBody, Td, Text, Input
+} from '@twilio-paste/core';
 import { SendIcon } from "@twilio-paste/icons/esm/SendIcon";
 import { ContentApprovalInstance } from 'types/WhatsAppTemplates';
 import { getStrings } from '../../../utils/helpers'
@@ -118,7 +121,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
         }
 
         let value = item.variables[key]
-        if (parameterMap.hasOwnProperty(key)) {
+        if (!parameterMap.hasOwnProperty(key)) {
             return value
         }
 

@@ -151,7 +151,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                                             return (
                                                 <Card key={index} padding='space60'>
                                                     <Heading as="h3" variant="heading30">{item.friendlyName}</Heading>
-                                                    <Box display="flex" columnGap="space40">
+                                                    <Box display="flex" columnGap="space40" marginBottom={'space20'}>
                                                         <Badge as="span" variant="decorative10">{item.approvalRequests.category}</Badge>
                                                         <Badge as="span" variant="decorative40">{item.language}</Badge>
                                                     </Box>
