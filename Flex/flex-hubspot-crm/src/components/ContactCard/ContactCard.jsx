@@ -32,7 +32,10 @@ const getDataByContactId = async (contact_id, manager) => {
  */
 const ContactCard = ({ manager, task }) => {
 
-    const stateContact = useSelector(state => state.hubspotCRM.contact)
+    const stateContact = useSelector(state => {
+        console.log(state)
+        return state.hubspotCRM?.contact
+    })
     const dispatch = useDispatch()
 
     const [contact, setContact] = useState();
