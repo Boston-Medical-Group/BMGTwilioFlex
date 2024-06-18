@@ -82,7 +82,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
         let newParams: Parameters = {}
         if (item) {
             Object.keys(item.variables).forEach((key: string) => {
-                newParams[key] = discoverParameterValue(key)
+                newParams[key] = discoverParameterValue(item.variables[key])
             })
 
             setParameters(newParams)
@@ -120,7 +120,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
             calendar: ['reservar_cita', 'deal.reservar_cita'],
         }
 
-        let value = item.variables[key]
+        let value = key
         if (!parameterMap.hasOwnProperty(key)) {
             return value
         }
