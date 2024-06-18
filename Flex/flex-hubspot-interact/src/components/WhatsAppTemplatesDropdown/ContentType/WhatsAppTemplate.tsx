@@ -218,7 +218,7 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
                                             <Text as="p">{`{{${key}}}`}</Text>
                                         </Td>
                                         <Td>
-                                            <Input type='text' placeholder={item.variables[key]} onChange={(e) => updateParam(key, e.target.value)} />
+                                            <Input type='text' placeholder={parameters[key]?.toString()} onChange={(e) => updateParam(key, e.target.value)} />
                                         </Td>
                                     </Tr>
                                 ))}
