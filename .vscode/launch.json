@@ -22,7 +22,7 @@
             "url": "http://localhost:3000",
             "webRoot": "${workspaceRoot}/Flex/flex-hubspot-interact/src",
             "sourceMapPathOverrides": {
-                "webpack:///src/": "${webRoot}/"
+                "webpack:///src/": "${webRoot}/*"
             }
         },
         {

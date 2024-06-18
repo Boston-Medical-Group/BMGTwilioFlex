@@ -103,26 +103,32 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
         }
 
         let contact = task.attributes?.hubspotContact
+        let newParams: { [key: string]: string | null } = {}
 
         Object.keys(variables).forEach((key: string) => {
-            if (key.startsWith('worker_')) {
-                let workerParamter = key.replace('worker_', '');
-                if (workerParameters.hasOwnProperty(workerParamter)) {
-                    return workerParameters[workerParamter]()
+            let varName = variables[key]
+            newParams[key] = null;
+            if (varName.startsWith('worker_')) {
+                let workerParameter = varName.replace('worker_', '');
+                if (workerParameters.hasOwnProperty(workerParameter)) {
+                    newParams[key] = workerParameters[workerParameter]()
+                    return
                 }
             }
 
-            if (!parameterMap.hasOwnProperty(key)) {
+            if (!parameterMap.hasOwnProperty(varName)) {
                 return
             }
 
-            parameterMap[key].forEach((item: string) => {
+            parameterMap[varName].forEach((item: string) => {
                 if (typeof contact == 'object' && contact.hasOwnProperty(item) && contact[item] !== '') {
-                    updateParam(key, contact[item])
+                    newParams[key] = contact[item]
                     return
                 }
             })
         })
+
+        setParameters(newParams)
     }
 
     // Desactiva el envío si no se han completado todos los valores
