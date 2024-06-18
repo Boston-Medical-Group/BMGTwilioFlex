@@ -119,8 +119,10 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
             return value
         }
 
-        const contact = task.attributes?.hubspotContact
+        let contact = task.attributes?.hubspotContact
+        console.log(contact);
         parameterMap[key].forEach((item: string) => {
+            console.log(item)
             if (typeof contact == 'object' && contact.hasOwnProperty(item) && contact[item] !== '') {
                 value = contact[item]
                 return
