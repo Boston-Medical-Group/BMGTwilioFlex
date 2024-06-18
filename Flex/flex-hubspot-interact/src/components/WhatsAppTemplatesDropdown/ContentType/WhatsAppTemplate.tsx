@@ -50,11 +50,14 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
     const [parameters, setParameters] = useState<Parameters>({})
     
     const { contact, deal, language } = useSelector(
-        (state: any) => ({
-            contact: state.hubspotInteraction.interaction.contact,
-            deal: state.hubspotInteraction.interaction.deal,
-            language: state.language ?? 'es'
-        })
+        (state: any) => {
+            console.log(state)
+            return {
+                contact: state.hubspotInteraction.interaction.contact,
+                deal: state.hubspotInteraction.interaction.deal,
+                language: state.language ?? 'es'
+            }
+        }
     );
 
     const [strings, setStrings] = useState<{ [key: string]: string }>(getStrings(language ?? 'es'))
@@ -119,6 +122,8 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
             phone: ['phone', 'numero_de_telefono_adicional', 'numero_de_telefono_adicional_'],
             calendar: ['reservar_cita', 'deal.reservar_cita'],
         }
+
+        console.log(contact, deal, language)
 
         let value = key
         if (!parameterMap.hasOwnProperty(key)) {
