@@ -15,20 +15,10 @@ export type HubspotContact = {
     [key: string]: any
 }
 
-export type HubspotDeal = {
-    dealname?: string
-    dealstage?: string
-    hs_object_id?: string
-    reservar_cita?: string
-    [key: string]: any
-}
-
-export type HubpostContactType = undeined |{
+export type HubpostContactType = undefined |{
     contact?: HubspotContact,
     deal?: HubspotDeal
 }
-
-export type CallCardType = HubpostContactType
 
 export type HubspotContactRaw = {
     id: string

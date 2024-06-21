@@ -27,7 +27,8 @@ exports.handler = async function (
     firstname: '',
     lastname: '',
     fullname: '',
-    lifecyclestage: ''
+    lifecyclestage: '',
+    leadtype: ''
   };
   let from = event.from;
   let to   = event.to;
@@ -49,6 +50,7 @@ exports.handler = async function (
     result.lastname = `${contact.properties.lastname}`;
     result.fullname = `${contact.properties.firstname ?? ''} ${contact.properties.lastname ?? ''}`;
     result.lifecyclestage = `${contact.properties?.lifecyclestage ?? 'lead'}`;
+    result.leadtype = `${contact.properties?.tipo_de_lead ?? 'Llamada'}`;
     if (result.fullname.trim() == '') {
       result.fullname = 'Customer'
     }

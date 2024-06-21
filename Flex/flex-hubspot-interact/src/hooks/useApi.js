@@ -78,6 +78,23 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
+  const getContents = useCallback(async (prefix, newToken) => {
+
+    const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchContent`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prefix,
+        Token: newToken ?? token
+      })
+    });
+
+    return await request.json();
+
+  }, [token]);
+
   const getTemplate = useCallback(async (data, newToken) => {
 
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchTemplate`, {
@@ -160,14 +177,35 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
+  const sendMessage = useCallback(async (contentSid, contentVariables, conversationSid) => {
+
+    const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/sendMessage`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        contentSid,
+        contentVariables,
+        conversationSid,
+        Token: token
+      })
+    });
+
+    return await request.json();
+
+  }, [token]);
+
   return {
     getDataByContactId,
     getDataByDealId,
     getTemplate,
     getTemplates,
+    getContents,
     sendOutboundMessage,
     startOutboundConversation,
-    getMessageErrors
+    getMessageErrors,
+    sendMessage
   }
 }
 

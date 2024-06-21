@@ -30,7 +30,7 @@ exports.handler = async function (
     //if the string from contains a whatsapp prefix we need to remove it
     from = from.replace('whatsapp:', '');
     from = from.replace(' ', '+');
-    let fromWithoutPrefix = removePrefix(from, ['+593', '+52', '+34', '+1', '+51', '+54', '+56', '+57'])
+    let fromWithoutPrefix = removePrefix(from, ['+593', '+52', '+521', '+34', '+1', '+51', '+54', '+56', '+57'])
 
     const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
     await hubspotClient.crm.contacts.searchApi.doSearch({

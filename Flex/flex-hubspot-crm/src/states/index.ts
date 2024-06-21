@@ -1,30 +1,18 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import { AppState as FlexAppState } from '@twilio/flex-ui';
 
-import interactionCallCardReducer, {
-    InteractionCallCardState,
-    setCallCard,
-    setIsLoading
-} from './interactionCallCardState';
-
-import interactionReducer, {
-    InteractionState,
-    setContact,
-    setDeal
-} from './interactionState';
+import hubspotCRMReducer, {
+    HubspotCRMState,
+    setContact
+} from './hubspotCRMState';
 
 // You need to register your redux store(s) under a unique namespace
-export const namespace = 'hubspotInteraction';
+export const namespace = 'hubspotCRM';
 
 // It can be helpful to create a map of all actions for typed access
 export const actions = {
-    interactionCallCard: {
-        setCallCard,
-        setIsLoading
-    },
-    interaction: {
+    hubspotCRM: {
         setContact,
-        setDeal
     }
 };
 
@@ -32,11 +20,8 @@ export const actions = {
 // along with any additional state added by your plugin
 export interface AppState {
     flex: FlexAppState;
-    interactionCallCardState: {
-        interactionCallCard: InteractionCallCardState;
-    };
-    interactionState: {
-        interaction: InteractionState
+    hubspotCRMState: {
+        hubspotCRM: HubspotCRMState
     },
     strings: {
         [key: string]: string
@@ -45,6 +30,5 @@ export interface AppState {
 
 // Combine any number of reducers to support the needs of your plugin
 export const reducers = combineReducers({
-    interactionCallCard: interactionCallCardReducer,
-    interaction: interactionReducer
+    hubspotCRM: hubspotCRMReducer
 });

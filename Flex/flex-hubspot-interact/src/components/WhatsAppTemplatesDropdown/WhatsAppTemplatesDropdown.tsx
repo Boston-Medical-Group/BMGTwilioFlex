@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Actions, ITask, useFlexSelector, TaskHelper } from '@twilio/flex-ui';
 import { Box } from '@twilio-paste/core/box';
 import { Tooltip } from '@twilio-paste/tooltip';
@@ -9,11 +9,12 @@ import { WarningIcon } from '@twilio-paste/icons/esm/WarningIcon';
 import { CloseIcon } from '@twilio-paste/icons/esm/CloseIcon';
 import { Button } from '@twilio-paste/core/button';
 import * as Flex from "@twilio/flex-ui";
-import { WhatsAppTemplate } from '../../types/WhatsAppTemplates';
+import { ContentApprovalInstance } from '../../types/WhatsAppTemplates';
 import useApi from '../../hooks/useApi';
-import { Card, Heading, Input, Label, Stack } from '@twilio-paste/core';
+import { Card, Heading, Input, Label, Stack, Badge } from '@twilio-paste/core';
 import { DescriptionList, DescriptionListDetails, DescriptionListSet, DescriptionListTerm } from '@twilio-paste/description-list';
 import { Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions, Paragraph } from '@twilio-paste/core';
+import WhatsAppTemplate from './ContentType';
 
 interface WhatsAppTemplatesDropdownProps {
     task: ITask;
@@ -22,7 +23,7 @@ interface WhatsAppTemplatesDropdownProps {
 
 const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdownProps> = ({ task, manager }) => {
 
-    const { getTemplates, getMessageErrors } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
+    const { getMessageErrors, getContents } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const [templateList, setTemplateList] = useState([]);
 
     const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +36,9 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
     const conversationSid = task.attributes.conversationSid ?? task.attributes.channelSid;
     const inputState = useFlexSelector((state) => state.flex.chat.conversationInput[conversationSid]?.inputText);
     const [workerAttributes, setWorkerAttributes] = useState(manager.workerClient?.attributes)
+
+    const [selectedTemplate, setSelectedTemplate] = useState<ContentApprovalInstance>();
+    //const [isTemplateOpen, setIsTemplateOpen] = useState(false)
 
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
@@ -55,13 +59,16 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
         setIsErrorsOpen(false)
     };
 
-    const onClickInsert = (text: string) => {
+    /**
+     * Use the selected template
+     */
+    const onClickUse = (contentApproval : ContentApprovalInstance) => {
         if (!conversationSid) return;
         let currentInput = inputState;
         if (currentInput.length > 0 && currentInput.charAt(currentInput.length - 1) !== ' ') {
             currentInput += ' ';
         }
-        currentInput += text;
+        //currentInput += text;
 
         Actions.invokeAction('SetInputText', {
             body: currentInput,
@@ -92,25 +99,24 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
         setTemplateList([]);
         setError(false);
 
-        getTemplates({
-            hubspot: {
-                contact: task.attributes.hubspotContact,
-                deal: task.attributes.deal ?? {},
-                hubspot_id: task.attributes.hubspot_contact_id ?? null,
-                contact_id: task.attributes.hubspot_contact_id ?? null,
-                deal_id: task.attributes.hubspot_deal_id ?? null,
-            },
-            flex: {
-                agent: {
-                    full_name: workerAttributes?.full_name ?? 'Agente',
-                    firstname: workerAttributes?.firstname ? workerAttributes?.firstname : (workerAttributes?.full_name ? workerAttributes?.full_name : 'Agente'),
-                }
-            }
-        })
+        getContents('ui_', manager.store.getState().flex.session.ssoTokenPayload.token)
             .then((data) => { setTemplateList(data) })
             .catch(() => setError(true))
             .finally(() => setIsLoading(false));
     }, []);
+
+    const closeSelectedTemplateHandler = useCallback((close : boolean) : void => {
+        setSelectedTemplate(undefined)
+        if (close) {
+            handleCloseModal()
+        }
+
+        return
+    }, [])
+
+    const setTemplate = (content: ContentApprovalInstance) => {
+        setSelectedTemplate(content)
+    }
 
     return (
         <>
@@ -121,6 +127,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                         <Button variant="secondary" size="circle" onClick={handleOpenModal}>
                             <ChatIcon decorative={false} title="Plantillas" />
                         </Button>
+                        <WhatsAppTemplate manager={manager} item={selectedTemplate as ContentApprovalInstance} isOpen={selectedTemplate !== undefined} closeHandler={closeSelectedTemplateHandler} />
                         <Modal ariaLabelledby="whatsapp-templates-modal" isOpen={isModalOpen} onDismiss={handleCloseModal} size="wide">
                             <ModalHeader>
                                 <ModalHeading as="h3" id="whatsapp-templates-modal">Seleccione una plantilla</ModalHeading>
@@ -139,18 +146,22 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                                 </Box>
                                 <Stack orientation="vertical" spacing="space60">
                                 {
-                                    templateList.map((item: WhatsAppTemplate, index) => {
-                                        if (search.length < 3 || (search.length >= 3 && item.name.includes(search))) {
+                                        templateList.map((item: ContentApprovalInstance, index) => {
+                                        if (search.length < 3 || (search.length >= 3 && item.friendlyName.includes(search))) {
                                             return (
                                                 <Card key={index} padding='space60'>
-                                                    <Heading as="h3" variant="heading30">{item.name}</Heading>
-                                                    <Paragraph>{item.message}</Paragraph>
+                                                    <Heading as="h3" variant="heading30">{item.friendlyName}</Heading>
+                                                    <Box display="flex" columnGap="space40" marginBottom={'space20'}>
+                                                        <Badge as="span" variant="decorative10">{item.approvalRequests.category}</Badge>
+                                                        <Badge as="span" variant="decorative40">{item.language}</Badge>
+                                                    </Box>
+                                                    <Paragraph>{item.types[item.approvalRequests.content_type].body}</Paragraph>
                                                     <Button variant="primary" type='button'
                                                         onClick={() => {
-                                                            onClickInsert(item.message);
-                                                            handleCloseModal();
+                                                            setTemplate(item)
+                                                            //onClickUse(item);
+                                                            //handleCloseModal();
                                                         }}>Seleccionar</Button>
-
                                                 </Card>
                                             )
                                         }

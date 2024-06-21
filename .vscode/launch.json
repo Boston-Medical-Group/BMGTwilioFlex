@@ -18,7 +18,7 @@
         }, {
             "name": "Chrome - FlexHubspotInteract",
             "type": "chrome",
-            "request": "attach",
+            "request": "launch",
             "url": "http://localhost:3000",
             "webRoot": "${workspaceRoot}/Flex/flex-hubspot-interact/src",
             "sourceMapPathOverrides": {

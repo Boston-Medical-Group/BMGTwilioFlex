@@ -24,6 +24,7 @@ const countryMap : { [key: string]: string } = {
 type MyEvent = {
   from: string;
   to: string;
+  leadtype?: string
 }
 
 type MyContext = {
@@ -41,7 +42,8 @@ exports.handler = async function (
     firstname: '',
     lastname: '',
     fullname: '',
-    lifecyclestage: ''
+    lifecyclestage: '',
+    leadtype: ''
   };
   let from = event.from;
   let to = event.to;
@@ -58,7 +60,7 @@ exports.handler = async function (
       lastname: 'Contact',
       phone: from,
       hs_lead_status: 'NEW',
-      tipo_de_lead: 'Llamada',
+      tipo_de_lead: event.leadtype ?? 'Llamada',
       country: countryMap[context.COUNTRY],
       tf_inbound_ddi: to.replace(/\s/g, ""),
       tf_inbound_date: `${(new Date()).getTime()}`
@@ -72,6 +74,7 @@ exports.handler = async function (
     result.lastname = `${contact.properties.lastname}`;
     result.fullname = `${contact.properties.firstname ?? ''} ${contact.properties.lastname ?? ''}`;
     result.lifecyclestage = `${contact.properties?.lifecyclestage ?? 'lead'}`;
+    result.leadtype = `${contact.properties?.tipo_de_lead ?? 'Llamada'}`;
     if (result.fullname.trim() == '') {
       result.fullname = 'Customer'
     }
