@@ -33,7 +33,10 @@
         "Filter templates": "Filter templates",
         "Filter": "Filter",
         "Clear": "Clear",
-        "Select": "Select"
+        "Select": "Select",
+        "Latest errors": "Latest errors",
+        "No recent errors": "No recent errors",
+        "Error fetching templates": "Error fetching templates"
     },
     "es": {
         "Call %": "Llamar a",
@@ -69,7 +72,10 @@
         "Filter templates": "Filtrar plantillas",
         "Filter": "Filtrar",
         "Clear": "Limpiar",
-        "Select": "Seleccionar"
+        "Select": "Seleccionar",
+        "Latest errors": "Últimos errores",
+        "No recent errors": "No hay errores recientes",
+        "Error fetching templates": "Error al obtener las plantillas"
     },
     "br": {
         "Call %": "Ligar",
@@ -105,6 +111,9 @@
         "Filter templates": "Filtrar modelos",
         "Filter": "Filtrar",
         "Clear": "Limpar",
-        "Select": "Selecionar"
+        "Select": "Selecionar",
+        "Latest errors": "Últimos erros",
+        "No recent errors": "Nenhum erro recente",
+        "Error fetching templates": "Erro ao buscar modelos"
     }
 }
