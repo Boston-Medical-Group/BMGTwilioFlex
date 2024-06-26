@@ -2,7 +2,6 @@ import React from "react";
 import { DataGrid, DataGridHead, DataGridRow, DataGridHeader, DataGridBody, DataGridCell } from "@twilio-paste/data-grid";
 import { tableHeaders2 } from "./constants";
 import type { TableDataRow2 } from "./types";
-import { SkeletonLoader } from "@twilio-paste/core";
 
 export const GeoPermissionsDataGrid: React.FC<{ tableData2: TableDataRow2[], tableDataOrigin: TableDataRow2[]
   , CheckboxCell: any, allChecked: any, allChecked2: any, indeterminate: any, indeterminate2: any
@@ -11,7 +10,7 @@ export const GeoPermissionsDataGrid: React.FC<{ tableData2: TableDataRow2[], tab
     , checkedItems, checkedItems2, setCheckedItems, setCheckedItems2 }) => 
   {
   return (
-  <DataGrid aria-label="Voice Geographic Permissions">
+  <DataGrid aria-label="Voice Geographic Permissions" width={"100%"}>
     <DataGridHead stickyHeader>
       <DataGridRow>
         {tableHeaders2.map((header) => (

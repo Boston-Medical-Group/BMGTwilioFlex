@@ -13,12 +13,15 @@ import type { FilterGroupProps, RiskTypes, TableDataRow2 } from "./types";
 import { filterByRoomType, filterBySearchString2 } from "./helpers";
 import { GeoPermissionsDataGrid } from "./GeoPermissionsDataGrid";
 import { EmptyState } from "./EmptyState";
-import { AlertDialog, Box, Checkbox, ScreenReaderOnly, Spinner, Stack, Toaster, useToaster } from "@twilio-paste/core";
+import { AlertDialog, Box, Checkbox, ScreenReaderOnly, Spinner, Stack, Text, Toaster, useToaster } from "@twilio-paste/core";
 import _ from 'lodash';
 import useApi from "./useApi";
 import { Flex as FlexBox } from "@twilio-paste/core";
+import useLang from "../../hooks/useLang";
 
 export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType }) => {
+  const { _l } = useLang();
+
   const initialized = React.useRef(false);
   const [isLoaded, setIsLoaded] = React.useState < boolean > (false)
   const riskTypesId = `type-${useUID()}`;
@@ -117,21 +120,15 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
     );
 
     return (
-      <Box textAlign="center" vertical-align="top">
-        {text}
+      <Stack orientation="vertical" spacing="space20">
+        <Text as="span" textAlign={"center"} display={"block"}>{text}</Text>
         <Box
-          position="absolute"
-          top="5"
-          left="0"
-          right="0"
-          bottom="0"
           display="flex"
           justifyContent="center"
           alignItems="center"
           onClick={handleClick}
           cursor="pointer"
         >
-          <Box marginLeft="space20">
             <Checkbox
               id={id}
               checked={checked}
@@ -141,9 +138,8 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
             >
               <ScreenReaderOnly>{label}</ScreenReaderOnly>
             </Checkbox>
-          </Box>
         </Box>
-      </Box>
+      </Stack>
     );
   };
   ////////////////////////////////////////////////////////////////////////////////////
@@ -248,7 +244,7 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
     <Box paddingBottom="space70">
       <Box display="flex" alignItems="flex-end" columnGap="space50">
         <Box>
-          <Label htmlFor={riskTypesId}>Risk Number type</Label>
+          <Label htmlFor={riskTypesId}>{_l('Risk Number type')}</Label>
           <Select
             id={riskTypesId}
             name="type"
@@ -276,14 +272,14 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
             onClick={handleApplyFilters2}
           >
             <FilterIcon decorative />
-            Apply
+            {_l('Apply')}
           </Button>
           <Button
             variant="link"
             disabled={areButtonsDisabled}
             onClick={handleClearAll}
           >
-            Clear all
+            {_l('Clear all')}
           </Button>
         </Box>
       </Box> 
@@ -302,14 +298,14 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
           <Input
             aria-label="Search"
             type="text"
-            placeholder="Search..."
+            placeholder={_l('Search...')}
             value={searchValue}
             onChange={(event) => {
               setSearchValue(event.target.value);
             }}
             insertAfter={
               <Button variant="link" onClick={handleApplyFilters2}>
-                <SearchIcon decorative={false} title="Search" />
+                <SearchIcon decorative={false} title={_l('Search')} />
               </Button>
             }
           />
@@ -317,7 +313,7 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
       </Box>
       <Box paddingY="space50">
       </Box>
-      <Box width="700px" overflowY="auto" minHeight="200px" boxShadow="shadowBorder" maxHeight="550px" borderStyle="solid">
+      <Box width="100%" overflowY="auto" minHeight="200px" boxShadow="shadowBorder" maxHeight="550px" borderStyle="solid">
           {isLoaded ? 
             <FlexBox paddingTop="space190" hAlignContent="center" >
               <Spinner decorative={false} title="Loading" size="sizeIcon80" /> 
@@ -335,8 +331,8 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
       </Box>   
       <Box paddingY="space50">
         <Stack orientation="horizontal" spacing="space60">
-          <Button onClick={handleOpen} variant="primary">Save</Button>
-          <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
+          <Button onClick={handleOpen} variant="primary">{_l('Save')}</Button>
+          <Button variant="secondary" onClick={handleCancel}>{_l('Cancel')}</Button>
         </Stack>
       </Box> 
       <div>
@@ -348,7 +344,7 @@ export const DefaultFilterGroup: React.FC<FilterGroupProps> = ({ defaultRoomType
           onDismiss={handleClose}
           onDismissLabel="Cancel"
         >
-          Are you sure you want to submit?
+          {_l('Are you sure you want to submit?')}
         </AlertDialog>
       </div>
       <Toaster {...toaster} />

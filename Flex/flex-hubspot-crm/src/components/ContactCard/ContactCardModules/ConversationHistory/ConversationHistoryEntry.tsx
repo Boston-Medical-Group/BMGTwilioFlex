@@ -1,13 +1,15 @@
+import * as Flex from "@twilio/flex-ui";
 import {
     Disclosure, DisclosureHeading, DisclosureContent, useDisclosureState,
     ChatLog, ChatMessage, ChatBubble, ChatAttachment, ChatAttachmentLink, ChatAttachmentDescription, ChatMessageMeta, ChatMessageMetaItem,
     ChatEvent, ChatBookend, ChatBookendItem
 } from "@twilio-paste/core"
 import { Icon, Notifications } from "@twilio/flex-ui";
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 import SummaryContent from "../Summary/SummaryContent";
+import useLang from "../../../../hooks/useLang";
 
-const getConversationLog = async (sid, manager) => {
+const getConversationLog = async (sid : string, manager : Flex.Manager) => {
     return fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversationMessages`, {
         method: "POST",
         headers: {
@@ -21,7 +23,11 @@ const getConversationLog = async (sid, manager) => {
         .then((resp) => resp.json());
 }
 
-const useDelayedDisclosureState = ({ conversation, manager, ...initialState }) => {
+type DisclosureState = {
+    conversation: any,
+    manager: Flex.Manager
+}
+const useDelayedDisclosureState = ({ conversation, manager, ...initialState } : DisclosureState) => {
     const disclosure = useDisclosureState(initialState);
     const [transitioning, setTransitioning] = useState(false);
     const [conversationLog, setConversationLog] = useState([]);
@@ -57,7 +63,12 @@ const useDelayedDisclosureState = ({ conversation, manager, ...initialState }) =
     };
 };
 
-const ChannelTitle = ({ icon, title }) => {
+type ChannelTitleProps = {
+    icon: string
+    title: string
+}
+
+const ChannelTitle = ({ icon, title } : ChannelTitleProps) => {
     return (
         <>
             <Icon icon={icon} /> 
@@ -66,7 +77,13 @@ const ChannelTitle = ({ icon, title }) => {
     )
 }
 
-const ConversationHistoryEntry = ({ conversation, manager }) => {
+type Props = { 
+    conversation: any,
+    manager: Flex.Manager
+}
+
+const ConversationHistoryEntry = ({ conversation, manager }: Props) => {
+    const { _l } = useLang()
     const { transitioning, conversationLog, conversationSummary, ...disclosure } = useDelayedDisclosureState({
         conversation,
         manager
@@ -89,27 +106,27 @@ const ConversationHistoryEntry = ({ conversation, manager }) => {
     return (
         <Disclosure variant="contained" state={disclosure} key={conversation.conversationSid}>
             <DisclosureHeading as="h2" variant="heading40">
-                {transitioning ? 'Por favor espere...' : <ChannelTitle icon={channelIcon} title={conversation.conversationDateCreated} />}
+                {transitioning ? _l('Please wait...') : <ChannelTitle icon={channelIcon} title={conversation.conversationDateCreated} />}
             </DisclosureHeading>
             <DisclosureContent>
 
                 {conversationSummary && (
-                    <SummaryContent summary={{content: conversationSummary}} withoutButtons={true} />
+                    <SummaryContent summary={{ content: conversationSummary }} withoutButtons={true} reloadAction={() => { }} suggestAction={() => { }} />
                 )}
 
                 <ChatLog>
                     {conversationLog.length === 0 && (
                         <ChatEvent>
-                            <strong>No hay mensajes en la conversación</strong>
+                            <strong>{_l('No messages in the conversation')}</strong>
                         </ChatEvent>
                     )}
                     
                     {conversationLog.length > 0 && (
                         <ChatEvent>
-                            <strong>Inicio de la conversación</strong>
+                            <strong>{_l('Conversation start')}</strong>
                         </ChatEvent>
                     )}
-                    {conversationLog.map((message, index) => {
+                    {conversationLog.map((message : any, index) => {
                         let dateTime = message.dateCreated;
                         const uuidPattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
                         if (message.author.startsWith("whatsapp:") || message.author.startsWith("+") || uuidPattern.test(message.author) || message.author === 'Virtual Assistant') {
@@ -117,7 +134,7 @@ const ConversationHistoryEntry = ({ conversation, manager }) => {
                                 <ChatMessage variant="inbound" key={message.index}>
                                     <ChatBubble >{message.body}</ChatBubble>
                                     {
-                                        message.media?.map((media, index) => {
+                                        message.media?.map((media : any, index : any) => {
                                             if (!media) {
                                                 return;
                                             }
@@ -153,7 +170,7 @@ const ConversationHistoryEntry = ({ conversation, manager }) => {
                                 <ChatMessage variant="outbound" key={message.index}>
                                     <ChatBubble >{message.body}</ChatBubble>
                                     {
-                                        message.media?.map((media, index) => {
+                                        message.media?.map((media : any, index : any) => {
                                             if (!media) {
                                                 return;
                                             }
@@ -186,7 +203,7 @@ const ConversationHistoryEntry = ({ conversation, manager }) => {
                     {conversationLog.length > 0 && (
                         <ChatBookend>
                             <ChatBookendItem>
-                                <strong>Fin de la conversación</strong>
+                                <strong>{_l('Conversation end')}</strong>
                             </ChatBookendItem>
                         </ChatBookend>
                     )}

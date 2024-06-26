@@ -1,6 +1,6 @@
 {
   "name": "flex-quick-call-from-chat",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "postinstall": "flex-plugin pre-script-check"
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@twilio/flex-ui": "2.5.1",
     "react-test-renderer": "17.0.2",
-    "typescript": "^4"
+    "typescript": "^5.3.3",
+    "@types/react-redux": "^7.1.33"
   }
 }

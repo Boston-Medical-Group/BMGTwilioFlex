@@ -6,13 +6,15 @@ import { useEffect, useState, useCallback } from 'react';
 import useApi from '../../hooks/useApi';
 import CallCard from '../InteractionCard/CallCard';
 import { actions } from '../../states';
+import useLang from '../../hooks/useLang';
 
 type MyProps = {
     flex: typeof FlexInstance
     manager: FlexInstance.Manager
 }
 
-const InteractionContainer = ({ flex, manager } : MyProps) => {
+const InteractionContainer = ({ flex, manager }: MyProps) => {
+    const { _l } = useLang();
     const { getDataByContactId, getDataByDealId, startOutboundConversation } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
     const {contact, deal} = useSelector(
@@ -117,8 +119,7 @@ const InteractionContainer = ({ flex, manager } : MyProps) => {
         <>
             <Modal isOpen={isOpen} size="default" onDismiss={() => setIsOpen(false)} ariaLabelledby='interaction-modal'>
                 <ModalHeader>
-                    <ModalHeading>Boston Medical/Elexial
-                    </ModalHeading>
+                    <ModalHeading>{_l('Boston Medical/Elexial')}</ModalHeading>
                 </ModalHeader>
 
                 <ModalBody>

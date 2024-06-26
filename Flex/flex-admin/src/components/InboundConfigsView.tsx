@@ -1,17 +1,19 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { Heading, Paragraph, Table, TBody, Td, Th, THead, Tr, Flex as FlexView, Card, SkeletonLoader, Button, AlertDialog, Input, Label, Box, Stack, HelpText, Text } from "@twilio-paste/core";
-import { Theme } from '@twilio-paste/core/dist/theme';
+import { Heading, Table, TBody, Td, Th, THead, Tr, Flex as FlexView, Card, SkeletonLoader, Box } from "@twilio-paste/core";
 import PhoneTableRow from "./Phone/TableRow";
 import PhoneCreateCard from "./Phone/CreateCard";
 import * as Flex from "@twilio/flex-ui";
 import parsePhoneNumber from 'libphonenumber-js';
+import useLang from "../hooks/useLang";
 
 type Props = {
     manager: Flex.Manager
 }
 type Nullable<T> = T | null;
 const InboundConfigsView = ({ manager }: Props) => {
+    const { _l } = useLang();
+
     const [accountCountry, setAccountCountry] = useState(manager.serviceConfiguration.attributes.account_country);
     const [errorInbound, setErrorInbound] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState < boolean > (false);
@@ -140,15 +142,18 @@ const InboundConfigsView = ({ manager }: Props) => {
     }
 
     return (
-        <Theme.Provider theme="flex">
-            <FlexView>
-                <FlexView padding="space50" paddingLeft="space0">
+        <Box overflowY="auto" minHeight="100%" width={"100%"} padding={"space60"} verticalAlign={"top"}>
+            <FlexView vAlignContent={"top"}>
+    
+                <PhoneCreateCard setTitle={' '} error={errorInbound}  reloadFunction={reloadHandler} createFunction={updateHandler} />
+
+                <FlexView grow paddingLeft="space50" paddingRight={"space50"}>
                     <Card>
-                        <Heading as="h2" variant="heading20">Número fuera de horario</Heading>
+                        <Heading as="h2" variant="heading20">{_l('After hours number')}</Heading>
                         <Table>
                             <THead>
                                 <Tr>
-                                    <Th>Número</Th>
+                                    <Th>{_l('Number')}</Th>
                                 </Tr>
                             </THead>
                             <TBody>
@@ -160,11 +165,8 @@ const InboundConfigsView = ({ manager }: Props) => {
                         </Table>
                     </Card>
                 </FlexView>
-                <FlexView padding="space50" paddingLeft="space0">
-                    <PhoneCreateCard setTitle={' '} error={errorInbound}  reloadFunction={reloadHandler} createFunction={updateHandler} />
-                </FlexView>
             </FlexView>
-        </Theme.Provider>
+        </Box>
     )
 }
 

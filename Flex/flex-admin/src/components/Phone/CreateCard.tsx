@@ -2,6 +2,7 @@ import React, { ChangeEvent, useState } from "react";
 import { AxiosError } from "axios";
 import { Card, Heading, Label, Input, HelpText, Button, Text, Box, Stack } from "@twilio-paste/core";
 import { PlusIcon } from "@twilio-paste/icons/esm/PlusIcon";
+import useLang from "../../hooks/useLang";
 
 type Nullable<T> = T | null;
 type PhoneCreateResponse = { errors: Array<{ detail: string }> }
@@ -15,7 +16,8 @@ const defaultProps = {
 }
 
 const CreateCard = (props : Props) => {
-    
+    const { _l } = useLang();
+
     const [error, setError] = useState<Nullable<string>>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [number, setNumber] = useState<string>("")
@@ -53,11 +55,11 @@ const CreateCard = (props : Props) => {
     return (
 
         <Card>
-            <Heading as="h2" variant="heading20">{props.setTitle || "Nuevo número"}</Heading>
+            <Heading as="h2" variant="heading20">{props.setTitle || _l("New number")}</Heading>
 
             <Stack orientation="vertical" spacing="space50">
                 <Box>
-                    <Label htmlFor="phone_number">Número</Label>
+                    <Label htmlFor="phone_number">{_l('Number')}</Label>
                     <Input aria-describedby="phone_number_help_text" id="phone_number" name="phone_number" type="text" placeholder=""
                         hasError={error !== null} value={number} onChange={handleChange} onBlur={handleChange}
                         insertBefore={<Text color="colorTextWeak" as="span" fontWeight="fontWeightSemibold">+</Text>}/>
@@ -66,7 +68,7 @@ const CreateCard = (props : Props) => {
         
                 <Button onClick={addNumber} variant="primary" loading={isLoading}>
                     <PlusIcon decorative={true} />
-                    <Text as="span" color="colorTextBrandInverse">Agregar</Text>
+                    {_l('Add')}
                 </Button>
             </Stack>
         </Card>

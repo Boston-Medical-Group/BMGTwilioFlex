@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Button, ITask } from '@twilio/flex-ui'
 import { VoiceCapableIcon } from '@twilio-paste/icons/esm/VoiceCapableIcon'
 import { Flex } from '@twilio/flex-ui/src/FlexGlobal'
+import useLang from '../../hooks/useLang'
 
 type MyProps = {
   manager: Flex.Manager
@@ -15,6 +16,7 @@ const isNullOrEmpty = (value: any) => {
 
 export const CallButton = ({ manager, task }: MyProps) => {
 
+  const { _l } = useLang()
   const [payload, setPayload] = useState({});
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export const CallButton = ({ manager, task }: MyProps) => {
     //@ts-ignore
     <Button variant="primary" onClick={() => startCall()} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
         <VoiceCapableIcon decorative={false}
-          title='Llamara a contacto'
+          title={_l('Call contact')}
           size='sizeIcon10'
           />
       </Button>

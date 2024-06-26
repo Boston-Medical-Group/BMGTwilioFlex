@@ -5,6 +5,7 @@ import { Spinner } from '@twilio-paste/core/spinner'
 import { Flex } from '@twilio/flex-ui/src/FlexGlobal'
 import useApi from '../../hooks/useApi'
 import { useQuery, QueryClient, QueryClientProvider, useMutation, useQueryClient } from '@tanstack/react-query'
+import useLang from '../../hooks/useLang'
 
 const queryClient = new QueryClient()
 
@@ -22,6 +23,7 @@ export const CalendarButton = ({ manager, task }: MyProps) => {
 }
 
 const QuickScheduleButton = ({ manager, task }: MyProps) => {
+  const { _l } = useLang()
   const { getCalendarUrl } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
   //const queryClient = useQueryClient()
@@ -57,10 +59,10 @@ const QuickScheduleButton = ({ manager, task }: MyProps) => {
     //@ts-ignore
     <Button variant="primary" href={data.calendarUrl} target="_blank" isLink={true} size="icon_small" style={{paddingTop: '0.32rem', paddingBottom: '0.32rem', minWidth: 'auto', marginRight: '0.25rem'}}>
         {isLoading ? (
-          <Spinner size='sizeIcon10' decorative={false} title='Loading' />
+          <Spinner size='sizeIcon10' decorative={false} title={_l('Loading')} />
         ) : (
         <CalendarIcon decorative={false}
-          title='Agendar cita'
+          title={_l('Schedule')}
           size='sizeIcon10'
           />
         )}

@@ -1,9 +1,12 @@
 import React, { useEffect, useCallback, useState } from 'react';
+import * as Flex from "@twilio/flex-ui";
 import { Notifications, NotificationIds, NotificationType } from "@twilio/flex-ui";
 import { Box, SkeletonLoader, Stack, Text } from '@twilio-paste/core';
 import ConversationHistoryEntry from './ConversationHistory/ConversationHistoryEntry';
+import { HubspotContact } from '../../../Types';
+import useLang from '../../../hooks/useLang';
 
-const loadConversations = (contact, currentConversation, manager) => {
+const loadConversations = (contact: HubspotContact, currentConversation : string, manager : Flex.Manager) => {
     const phone = contact.phone
 
     return fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversations`, {
@@ -20,13 +23,19 @@ const loadConversations = (contact, currentConversation, manager) => {
         .then((resp) => resp.json());
 }
 
-const ConversationHistory = ({ contact, manager, currentConversation }) => {
-    
+type Props = {
+    contact: HubspotContact
+    manager: Flex.Manager
+    currentConversation: string
+}
+
+const ConversationHistory = ({ contact, manager, currentConversation } : Props) => {
+    const { _l } = useLang();
     const [loaded, setLoaded] = useState(false);
     const [conversations, setConversations] = useState([])
 
-    useEffect(async () => {
-        await loadConversations(contact, currentConversation, manager)
+    useEffect(() => {
+        loadConversations(contact, currentConversation, manager)
             .then((conversations) => {
                 if (!conversations.hasOwnProperty('error')) {
                     setConversations(conversations)
@@ -50,7 +59,7 @@ const ConversationHistory = ({ contact, manager, currentConversation }) => {
 
                     {conversations.length === 0 && (
                         <Box padding="space40">
-                            <Text as="p" textAlign="center">No se han encontrado conversaciones</Text>
+                            <Text as="p" textAlign="center">{_l('No conversations found')}</Text>
                         </Box>
                     )}
                 </Stack>

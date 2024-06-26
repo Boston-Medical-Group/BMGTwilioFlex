@@ -12,6 +12,12 @@ const fullName = (contact) => {
     return fullName;
 }
 
+const getStrings = () => {
+    const langStrings = require(`../langs.json`)
+    return langStrings
+}
+
 export {
-    fullName
+    fullName,
+    getStrings
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import * as Flex from "@twilio/flex-ui";
 import { Theme } from '@twilio-paste/core/theme';
 import {
     Box, Card, Heading, Stack, Avatar, DescriptionList, DescriptionListSet,
@@ -8,9 +9,15 @@ import {
 import { fullName } from '../../utils/helpers';
 import gravatarUrl from 'gravatar-url';
 import { Summary, ConversationHistory } from './ContactCardModules'
+import { HubspotContact } from '../../Types';
+import useLang from '../../hooks/useLang';
 
+type Props = {
+    manager: Flex.Manager
+    task: Flex.ITask
+}
 
-const getDataByContactId = async (contact_id, manager) => {
+const getDataByContactId = async (contact_id : string, manager : Flex.Manager) => {
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/fetchHubspotContact`, {
         method: "POST",
         headers: {
@@ -28,28 +35,30 @@ const getDataByContactId = async (contact_id, manager) => {
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
-const ContactCard = ({ manager, task }) => {
+const ContactCard = ({ manager, task } : Props) => {
 
-    const [contact, setContact] = useState();
+    const { _l } = useLang();
+    const [contact, setContact] = useState<HubspotContact>();
     const [contactId, setContactId] = useState();
 
-    const [avatar, setAvatar] = useState();
+    const [avatar, setAvatar] = useState<string>();
 
-    useEffect(async () => {
-        let hcid = task.attributes?.hubspotContact ?? false
+    useEffect(() => {
+        let hcid = task?.attributes?.hubspotContact ?? false
         if (!hcid) {
-            if (!task.attributes?.hubspot_contact_id) {
-                console.log('CONTACTID NOT FOUND: components/ContactCard/ContactCard.jsx@41')
+            if (!task?.attributes?.hubspot_contact_id) {
+                console.log('CONTACTID NOT FOUND: components/ContactCard/ContactCard.jsx@47')
+            } else {
+                getDataByContactId(task.attributes?.hubspot_contact_id, manager)
+                    .then((data) => {
+                        setContact(data.properties)
+                    })
             }
-
-            await getDataByContactId(task.attributes?.hubspot_contact_id, manager)
-                .then((data) => {
-                    setContact(data.properties)
-                })
         } else {
             setContact(task.attributes?.hubspotContact)
         }
-        setContactId(task.attributes?.hubspot_contact_id)
+
+        setContactId(task?.attributes?.hubspot_contact_id)
     }, [task])
 
     /** DO NOT CALL & DO NOT WHATSAPP */
@@ -62,7 +71,7 @@ const ContactCard = ({ manager, task }) => {
         }
     }, [contact])
 
-    if (!contact || !contact.hasOwnProperty('hs_object_id')) {
+    if (!contact || !contact.hasOwnProperty('hs_object_id') || !task) {
         return null;
     }
 
@@ -76,11 +85,11 @@ const ContactCard = ({ manager, task }) => {
                                 <Avatar size="sizeIcon110" name={fullName(contact)} variant="entity" src={avatar} />
                                 <Box rowGap="space20">
                                     <Heading as="h3" variant="heading30">
-                                        <Truncate>{fullName(contact)}</Truncate>
+                                        <Truncate title={fullName(contact)}>{fullName(contact)}</Truncate>
                                     </Heading>
                                     <DescriptionList>
                                         <DescriptionListSet>
-                                            <DescriptionListTerm>Fecha Creación</DescriptionListTerm>
+                                            <DescriptionListTerm>{_l('Created Date')}</DescriptionListTerm>
                                             <DescriptionListDetails>{contact.createdate}</DescriptionListDetails>
                                         </DescriptionListSet>
                                     </DescriptionList>
@@ -90,8 +99,8 @@ const ContactCard = ({ manager, task }) => {
                         <Box padding="space40" width="100%">
                             <Tabs baseId="horizontal-tabs-example">
                                 <TabList aria-label="Horizontal product tabs">
-                                    <Tab>Overview</Tab>
-                                    <Tab>Historial</Tab>
+                                    <Tab>{_l('Overview')}</Tab>
+                                    <Tab>{_l('History')}</Tab>
                                 </TabList>
                                 <TabPanels>
                                     <TabPanel>

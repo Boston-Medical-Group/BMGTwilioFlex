@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
-import { Heading, Paragraph, Table, TBody, Td, Th, THead, Tr, Card, SkeletonLoader, Flex as FlexView } from "@twilio-paste/core";
-import { Theme } from "@twilio-paste/core/dist/theme";
+import { Heading, Paragraph, Table, TBody, Td, Th, THead, Tr, Card, SkeletonLoader, Flex as FlexView, Box, Stack } from "@twilio-paste/core";
 import PhoneTableRow from "./Phone/TableRow";
 import PhoneCreateCard from "./Phone/CreateCard";
 import * as Flex from "@twilio/flex-ui";
+import useLang from "../hooks/useLang";
 
 type Props = {
     manager: Flex.Manager
 }
 
-const DoNotCallView = ({ manager } : Props) => {
+const DoNotCallView = ({ manager }: Props) => {
+    const { _l } = useLang();
+    
     const [accountCountry, setAccountCountry] = useState(manager.serviceConfiguration.attributes.account_country);
     const [error, setError] = useState(null)
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
@@ -62,17 +64,20 @@ const DoNotCallView = ({ manager } : Props) => {
     }
 
     return (
-        <Theme.Provider theme="flex">
-            <FlexView>
-                <FlexView grow padding="space50">
+        <Box overflowY="auto" minHeight="100%" width={"100%"} padding={"space60"} verticalAlign={"top"}>
+            <FlexView vAlignContent={"top"}>
+    
+                <PhoneCreateCard reloadFunction={reloadHandler} createFunction={createHandler} />
+
+                <FlexView grow paddingLeft="space50" paddingRight={"space50"}>
                     <Card>
-                        <Heading as="h2" variant="heading20">Lista de números bloqueados</Heading>
-                        <Paragraph>Listado de números a los que no se realizarán llamadas</Paragraph>
+                        <Heading as="h2" variant="heading20">{_l('List of blocked numbers')}</Heading>
+                        <Paragraph>{_l('List of numbers to which calls will not be made')}</Paragraph>
 
                         <Table>
                             <THead>
                                 <Tr>
-                                    <Th>Número</Th>
+                                    <Th>{_l('Number')}</Th>
                                 </Tr>
                             </THead>
                             <TBody>
@@ -84,12 +89,8 @@ const DoNotCallView = ({ manager } : Props) => {
                         </Table>
                     </Card>
                 </FlexView>
-
-                <FlexView padding="space50" paddingLeft="space0">
-                    <PhoneCreateCard reloadFunction={reloadHandler} createFunction={createHandler} />
-                </FlexView>
             </FlexView>
-        </Theme.Provider>   
+        </Box>
     )
 }
 

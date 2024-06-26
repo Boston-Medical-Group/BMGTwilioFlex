@@ -4,11 +4,14 @@ import { Text, Flex as FlexBox, Button } from "@twilio-paste/core";
 import * as Flex from '@twilio/flex-ui';
 import parsePhoneNumber from 'libphonenumber-js';
 import { DeleteIcon } from "@twilio-paste/icons/esm/DeleteIcon";
+import useLang from "../../hooks/useLang";
 
 const manager = Flex.Manager.getInstance();
 
 type Props = { deleteFunction : (number : string) => any, phoneNumber: string }
-const TableRow =  (props : Props) => {
+const TableRow = (props: Props) => {
+    
+    const { _l } = useLang();
     const [isLoading, setIsLoading] = useState<boolean>(false)
     
     const formatNumber = (number : string) =>  {
@@ -38,7 +41,7 @@ const TableRow =  (props : Props) => {
             <Button variant="destructive_icon" loading={isLoading} name="" onClick={() => {
                 deleteNumber(props.phoneNumber)
             }}>
-                <DeleteIcon decorative={false} title="Eliminar número" />
+                <DeleteIcon decorative={false} title={_l('Delete number')} />
             </Button>
         </FlexBox>
         

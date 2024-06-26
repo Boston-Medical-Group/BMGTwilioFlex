@@ -3,15 +3,16 @@ import {
     Label, Stack, Button, Input, TextArea, HelpText, SkeletonLoader, Separator, Alert
 } from "@twilio-paste/core"
 import { useUID } from "@twilio-paste/core/dist/uid-library"
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, ChangeEvent } from "react";
 import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import * as Flex from "@twilio/flex-ui"
 import { Actions, useFlexSelector, Notifications, NotificationType } from "@twilio/flex-ui";
 import { SendIcon } from "@twilio-paste/icons/esm/SendIcon";
+import useLang from "../../../../hooks/useLang";
 
 const queryClient = new QueryClient()
 
-const createThreadAndRun = async (manager, conversationSid, instruction) => {
+const createThreadAndRun = async (manager : Flex.Manager, conversationSid : string, instruction : string) => {
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/createAssistantThread`, {
         method: "POST",
         headers: {
@@ -27,7 +28,7 @@ const createThreadAndRun = async (manager, conversationSid, instruction) => {
     return request.json();
 }
 
-const getRunStatus = async (manager, data) => {
+const getRunStatus = async (manager : Flex.Manager, data : any) => {
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getAssistantRunResult`, {
         method: "POST",
         headers: {
@@ -44,7 +45,7 @@ const getRunStatus = async (manager, data) => {
 }
 
 
-const GPTReplyModal = ({ manager, isOpen, handleClose, conversationSid, messagesCount }) => {
+const GPTReplyModal = ({ manager, isOpen, handleClose, conversationSid, messagesCount } : Props) => {
     return (
         <QueryClientProvider client={queryClient}>
             <GPTReplyModalComponent manager={manager} isOpen={isOpen}
@@ -53,7 +54,16 @@ const GPTReplyModal = ({ manager, isOpen, handleClose, conversationSid, messages
     )
 }
 
-const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid, messagesCount }) => {
+type Props = {
+    manager: Flex.Manager
+    isOpen: boolean
+    handleClose: () => void
+    conversationSid: string
+    messagesCount: number
+}
+
+const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid, messagesCount }: Props) => {
+    const { _l } = useLang()
     const modalHeadingID = useUID();
 
     const [polling, setPolling] = useState(false);
@@ -96,7 +106,6 @@ const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid,
         if (messagesCount === 0) {
             handleClose()
             Notifications.showNotification('errorNotEnoughMessages');
-            console.log('NOT ENOUGH MESSAGES')
         } else {
             setLoading(true)
 
@@ -104,7 +113,6 @@ const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid,
                 .then(async (run) => {
                     if (run.hasOwnProperty('error')) {
                         Notifications.showNotification('errorNotEnoughMessages');
-                        console.log('NOT ENOUGH CLIENT MESSAGES', run.error)
                         handleClose()
                         return
                     } else if (run !== null) {
@@ -154,29 +162,29 @@ const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid,
         handleClose()
     }
 
-    const handleInputChange = useCallback((e) => {
+    const handleInputChange = (e : ChangeEvent<HTMLInputElement>) => {
         setInstruction(e.target.value)
-    })
+    }
 
     if (!isOpen) {
-        return ''
+        return (null)
     }
 
     return (
         <Modal ariaLabelledby={modalHeadingID} isOpen onDismiss={handleClose} size="default">
             <ModalHeader>
                 <ModalHeading as="h3" id={modalHeadingID}>
-                    Asistente IA
+                    {_l('AI Assistant')}
                 </ModalHeading>
             </ModalHeader>
             <ModalBody>
 
                 <Paragraph>
-                    Hola. Soy el asistente IA. Basándome en la conversación actual y en el contexto generado, te sugiero esta respuesta:
+                    {_l('Hi. I\'m your AI Assistant. Based on the current conversation and the generated context, here\'s my suggestion:')}
                 </Paragraph>
 
                 {isError && (
-                    <Alert variant="error">Se ha producido un error al generar una sugerencia o ha tardado más de lo esperado.</Alert>
+                    <Alert variant="error">{_l('An error has occurred while generating a suggestion or taking too long.')}</Alert>
                 )}
                 
                 {!isError && (loading || isLoading) ? (
@@ -196,24 +204,24 @@ const GPTReplyModalComponent = ({ manager, isOpen, handleClose, conversationSid,
                 </Box>
 
                 <Box>
-                    <Label htmlFor="refine">Refinar sugerencia </Label>
-                    <Input maxLength="255" aria-describedby="refine_reply" id="refine_reply" name="refine_reply" type="text" placeholder="" onChange={handleInputChange} required />
-                    <HelpText id="refine_reply_text">Agrega una instrucción que te ayude a mejorar la respuesta. (Máx. 255 caracteres)</HelpText>
+                    <Label htmlFor="refine">{_l('Refine suggestion')}</Label>
+                    <Input maxLength={255} aria-describedby="refine_reply" id="refine_reply" name="refine_reply" type="text" placeholder="" onChange={handleInputChange} required />
+                    <HelpText id="refine_reply_text">{_l('Add instructions to help us improve the suggestion. (255 characters max)')}</HelpText>
 
                     <Box paddingTop="space40">
-                        <Button variant="primary" onClick={() => getReplySuggestion()} disabled={loading}>Refinar</Button>
+                        <Button variant="primary" onClick={() => getReplySuggestion()} disabled={loading}>{_l('Refine')}</Button>
                     </Box>
                 </Box>
             </ModalBody>
             <ModalFooter>
                 <ModalFooterActions>
                     <Button variant="secondary" onClick={handleClose}>
-                        Cancel
+                        {_l('Cancel')}
                     </Button>
-                    <Button variant="primary_inverted" onClick={applySuggestion}>Usar sugerencia</Button>
+                    <Button variant="secondary" onClick={applySuggestion}>Usar sugerencia</Button>
                     <Button variant="primary" onClick={sendSuggestion}>
-                        <SendIcon decorative={false} title="Enviar sugerencia" />
-                        Enviar sugerencia</Button>
+                        <SendIcon decorative={false} title={_l('Send suggestion')} />
+                        {_l('Send suggestion')}</Button>
                 </ModalFooterActions>
             </ModalFooter>
         </Modal>
