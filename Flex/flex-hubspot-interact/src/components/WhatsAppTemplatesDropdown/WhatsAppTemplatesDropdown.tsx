@@ -15,6 +15,7 @@ import { Card, Heading, Input, Label, Stack, Badge } from '@twilio-paste/core';
 import { DescriptionList, DescriptionListDetails, DescriptionListSet, DescriptionListTerm } from '@twilio-paste/description-list';
 import { Modal, ModalHeader, ModalHeading, ModalBody, ModalFooter, ModalFooterActions, Paragraph } from '@twilio-paste/core';
 import WhatsAppTemplate from './ContentType';
+import useLang from '../../hooks/useLang';
 
 interface WhatsAppTemplatesDropdownProps {
     task: ITask;
@@ -22,7 +23,7 @@ interface WhatsAppTemplatesDropdownProps {
 }
 
 const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdownProps> = ({ task, manager }) => {
-
+    const { _l } = useLang();
     const { getMessageErrors, getContents } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const [templateList, setTemplateList] = useState([]);
 
@@ -80,17 +81,17 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
 
     const errorMessageString = (code: number) => {
         if (code === 63016) {
-            return 'Fuera de la ventana de 24 horas. Inicie la conversación utilizando una plantilla de WhatsApp'
+            return _l('Out of 24 hour window. Start conversation using a WhatsApp template.')
         } else if (code === 63051) {
-            return 'La cuenta de WhatsApp Business se encuentra bloqueada'
+            return _l('WhatsaApp Business Account blocked')
         } else if (code === 63032) {
-            return 'No podemos enviar el mensaje debido a una limitación de Whatsapp'
+            return _l('Unable to send WhatsApp message due to a service limitation')
         } else if (code === 63024) {
-            return 'Destinatario inválido'
+            return _l('Invalid destination')
         } else if (code === 21610) {
-            return 'Usuario ha solicitado no ser contactado (OptOut)'
+            return _l('User has Opted out of WhatsApp messages')
         } else {
-            return 'Error no catalogado'
+            return _l('Unhandled error')
         }
     }
 
@@ -125,21 +126,21 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                 {Boolean(templateList) && !isLoading && (
                     <>
                         <Button variant="secondary" size="circle" onClick={handleOpenModal}>
-                            <ChatIcon decorative={false} title="Plantillas" />
+                            <ChatIcon decorative={false} title={_l('Templates')} />
                         </Button>
                         <WhatsAppTemplate manager={manager} item={selectedTemplate as ContentApprovalInstance} isOpen={selectedTemplate !== undefined} closeHandler={closeSelectedTemplateHandler} />
                         <Modal ariaLabelledby="whatsapp-templates-modal" isOpen={isModalOpen} onDismiss={handleCloseModal} size="wide">
                             <ModalHeader>
-                                <ModalHeading as="h3" id="whatsapp-templates-modal">Seleccione una plantilla</ModalHeading>
+                                <ModalHeading as="h3" id="whatsapp-templates-modal">{_l('Select a template')}</ModalHeading>
                             </ModalHeader>
                             <ModalBody>
 
                                 <Box marginBottom='space30'>
-                                    <Label htmlFor="search">Filtrar plantillas</Label>
-                                    <Input id="search" name="search" type="email" value={search} placeholder="Filtrar" onChange={(event) => setSearch(event.target.value)}
+                                    <Label htmlFor="search">{_l('Filter templates')}</Label>
+                                    <Input id="search" name="search" type="email" value={search} placeholder={_l('Filter')} onChange={(event) => setSearch(event.target.value)}
                                         insertAfter={
                                             <Button variant="link" onClick={() => setSearch("")}>
-                                                <CloseIcon decorative={false} size="sizeIcon20" title="Limpiar" />
+                                                <CloseIcon decorative={false} size="sizeIcon20" title={_l('Clear')} />
                                             </Button>
                                         }
                                     />
@@ -161,7 +162,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                                                             setTemplate(item)
                                                             //onClickUse(item);
                                                             //handleCloseModal();
-                                                        }}>Seleccionar</Button>
+                                                        }}>{_l('Select')}</Button>
                                                 </Card>
                                             )
                                         }
@@ -171,7 +172,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                             </ModalBody>
                             <ModalFooter>
                                 <ModalFooterActions>
-                                    <Button variant="secondary" onClick={handleCloseModal}>Cancelar</Button>
+                                    <Button variant="secondary" onClick={handleCloseModal}>{_l('Cancel')}</Button>
                                 </ModalFooterActions>
                             </ModalFooter>
                         </Modal>
@@ -184,13 +185,13 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                 </Button>
                 <Modal ariaLabelledby="message-errors-modal" isOpen={isErrorsOpen} onDismiss={handleCloseErrors} size="default">
                     <ModalHeader>
-                        <ModalHeading as="h3" id="message-errors-modal">Últimos errores</ModalHeading>
+                        <ModalHeading as="h3" id="message-errors-modal">{_l('Latest errors')}</ModalHeading>
                     </ModalHeader>
                     <ModalBody>
                         
                         {isErrorsOpen && isLoadingErrors && (<SkeletonLoader />)}
                         {!isLoadingErrors && messageErrors.length === 0 && (
-                            <Paragraph>No hay errores recientes</Paragraph>
+                            <Paragraph>{_l('No recent errors')}</Paragraph>
                         )}
                         {!isLoadingErrors && messageErrors.length > 0 && (
                             <DescriptionList>
@@ -211,7 +212,7 @@ const WhatsAppTemplatesDropdown: React.FunctionComponent<WhatsAppTemplatesDropdo
                     </ModalBody>
                 </Modal>
                 {error && (
-                    <Tooltip text="Error obteniendo plantillas">
+                    <Tooltip text={_l('Error fetching templates')}>
                         <Button variant={'destructive_icon'}>
                             <ErrorIcon decorative />
                         </Button>

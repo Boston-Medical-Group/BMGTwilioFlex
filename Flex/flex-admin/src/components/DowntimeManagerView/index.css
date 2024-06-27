@@ -1,9 +1,0 @@
-.Twilio-View-downtime-manager-view > div {
-  width: 100%;
-  overflow: auto;
-}
-
-.loading-modal-dialog {
-  min-height: 0px !important;
-  width: fit-content !important;
-}

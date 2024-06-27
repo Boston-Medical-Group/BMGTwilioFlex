@@ -13,7 +13,7 @@ export const sections : Array<SectionItemElement> = [
                 component: "blacklist"
             }
         ]
-    }, {
+    },/* {
         label: "Scheduling",
         childrens: [
             // {
@@ -21,7 +21,8 @@ export const sections : Array<SectionItemElement> = [
             //     component: "downtime-manager"
             // }
         ]
-    }, {
+    },
+    /*{
         label: "Conversations",
         childrens: [
             // {
@@ -29,11 +30,11 @@ export const sections : Array<SectionItemElement> = [
             //     component: "wrapupcodes"
             // }
         ]
-    }, {
+    },*/ {
         label: "Routing",
         childrens: [
             {
-                label: "número fuera de horario",
+                label: "Out of business hour number",
                 component: "inboundconfigs"
             }
         ]

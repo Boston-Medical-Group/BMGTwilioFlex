@@ -12,6 +12,7 @@ import SendWAModal from './SendWAModal';
 import { HubspotContact, HubspotDeal } from 'Types';
 // @ts-ignore
 import { fullName, getStrings } from '../../utils/helpers';
+import useLang from '../../hooks/useLang';
 
 
 type Props = {
@@ -45,11 +46,9 @@ Flex.Notifications.registerNotification({
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
-const InteractionCard = ({manager, contact, deal, callHandler, interactionHandler} : Props) => {
+const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandler }: Props) => {
+  const { _l } = useLang()
   const { startOutboundConversation } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
-
-  const language = useSelector((state: any) => state.language ?? 'es')
-  const [strings] = useState<{ [key: string]: string }>(getStrings(language ?? 'es'))
 
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [selectedSmsContact, setSelectedSmsContact] = useState<HubspotContact>();
@@ -90,16 +89,6 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
     setSelectedSmsContact(contact);
     interactionHandler()
   }, []);
-
-  /*
-  const sendWAHandler = React.useCallback((data : HubspotContact) => {
-    // get last active conversation window
-    const lastConversation = getLastConversation(data)
-
-    // if no conversation window, open whatsapp modal
-    setSelectedWAContact(data);
-  }, []);
-  */
 
   type CountryMap = {
     [key: string]: string
@@ -177,7 +166,7 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
   if (typeof contact !== 'object' || contact === null || !contact.hasOwnProperty('hs_object_id')) {
     let notification = Flex.Notifications.registeredNotifications.get('contact_not_found_on_hubpost')
     if (notification) {
-      notification.content = strings['contact_not_found_on_hubpost']
+      notification.content = _l('Contact not found on HubSpot')
     }
     Flex.Notifications.showNotification("contact_not_found_on_hubpost", undefined);
     return null;
@@ -189,24 +178,23 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
         <SendSmsModal selectedContact={selectedSmsContact} dealId={deal?.hs_object_id} manager={manager} handleClose={handleCloseModel} />
         <SendWAModal selectedContact={selectedWAContact} dealId={deal?.hs_object_id} manager={manager} handleClose={handleCloseModel} />
         <Box paddingTop="space60">
-          <Heading as="h4" variant="heading40">Interactuar con {fullName(contact)}</Heading>
+          <Heading as="h4" variant="heading40">{_l('Interact with %')} {fullName(contact)}</Heading>
           <Paragraph>
-            Seleccione el método de interacción con el contacto seleccionado.
+            {_l('Select interaction method')}
             </Paragraph>
             {doNotCall && (
               <Paragraph>
-                El contacto está marcado como "No Llamar".
+                {_l('Contact marked as "Don\'t call"')}
               </Paragraph>
             )}
             <Box display="flex"
               rowGap="space60"
               flexWrap="wrap"
               justifyContent="space-between"
-            flexDirection="column"
-            margin="auto"
-            maxWidth="300px"
-            >
-              <Button variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={callHandler}><FaPhoneAlt /> Call</Button>
+              flexDirection="column"
+              margin="auto"
+              maxWidth="300px">
+            <Button variant="primary" title={doNotCall ? _l('Do not call') : (actionDisabled ? _l('To make a call, please change your status different from \'Offline\'') : _l('Make a call'))} disabled={actionDisabled || doNotCall} onClick={callHandler}><FaPhoneAlt /> {_l('Start call')}</Button>
               <CustomizationProvider
                 elements={{
                   BUTTON: {
@@ -222,7 +210,7 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
                   },
                 }}
               >
-                <Button variant="primary" disabled={actionDisabled} fullWidth onClick={() => sendSmsHandler(contact, deal)}><FaSms /> SMS</Button>
+                <Button variant="primary" disabled={actionDisabled} fullWidth onClick={() => sendSmsHandler(contact, deal)}><FaSms /> {_l('SMS')}</Button>
               </CustomizationProvider>
               <CustomizationProvider
                 elements={{
@@ -241,10 +229,10 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
               >
                 <Button variant="primary"
                   fullWidth
-                  title={doNotWhatsapp ? 'No enviar WhatsApp' : (actionDisabled ? "Para enviar mensajes de WhatsApp, por favor cambie su estado distinto de 'Offline'" : "Iniciar conversación de WhatsApp")}
+                title={doNotWhatsapp ? _l('Do not WhatsApp') : (actionDisabled ? _l('To start a WhatsApp conversation, please change your status different from \'Offline\'') : _l('Start WhatsApp conversation'))}
                   disabled={actionDisabled || doNotWhatsapp}
                   onClick={() => sendWAHandler(contact, deal)}
-                ><FaWhatsapp /> WhatsApp</Button>
+              ><FaWhatsapp /> {_l('WhatsApp')}</Button>
               </CustomizationProvider>
 
               {calendar() !== '' && (
@@ -263,7 +251,7 @@ const InteractionCard = ({manager, contact, deal, callHandler, interactionHandle
                     },
                   }}
                 >
-                  <Button disabled={actionDisabled} variant="primary" onClick={sendCalendarHandler} fullWidth><FaCalendar /> Cita</Button>
+                <Button disabled={actionDisabled} variant="primary" onClick={sendCalendarHandler} fullWidth><FaCalendar /> {_l('Appointment')}</Button>
                 </CustomizationProvider>
               )}
           </Box>

@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
-import { Heading, Paragraph, Table, TBody, Td, Th, THead, Tr, Flex as FlexView, Card, SkeletonLoader } from "@twilio-paste/core";
-import { Theme } from '@twilio-paste/core/dist/theme';
+import { Heading, Paragraph, Table, TBody, Td, Th, THead, Tr, Flex as FlexView, Card, SkeletonLoader, Box } from "@twilio-paste/core";
 import PhoneTableRow from "./Phone/TableRow";
 import PhoneCreateCard from "./Phone/CreateCard";
 import * as Flex from "@twilio/flex-ui";
+import useLang from '../hooks/useLang'
 
 type Props = {
     manager: Flex.Manager
 }
 
 const BlacklistView = ({ manager }: Props) => {
+    const { _l } = useLang();
     const [accountCountry, setAccountCountry] = useState(manager.serviceConfiguration.attributes.account_country);
     const [error, setError] = useState(null)
     const [isLoaded, setIsLoaded] = useState < boolean > (false)
@@ -62,17 +63,20 @@ const BlacklistView = ({ manager }: Props) => {
     }
 
     return (
-        <Theme.Provider theme="flex">
-            <FlexView>
-                <FlexView grow padding="space50">
+        <Box overflowY="auto" minHeight="100%" width={"100%"} padding={"space60"} verticalAlign={"top"}>
+            <FlexView vAlignContent={"top"}>
+    
+                <PhoneCreateCard reloadFunction={reloadHandler} createFunction={createHandler} />
+
+                <FlexView grow paddingLeft="space50" paddingRight={"space50"}>
                     <Card>
-                        <Heading as="h2" variant="heading20">Lista de números entrantes bloqueados</Heading>
-                        <Paragraph>Listado de números que no se recibirán llamadas</Paragraph>
+                        <Heading as="h2" variant="heading20">{_l('Blocked inbound numbers')}</Heading>
+                        <Paragraph>{_l('List of incoming numbers to be rejected')}</Paragraph>
 
                         <Table>
                             <THead>
                                 <Tr>
-                                    <Th>Número</Th>
+                                    <Th>{_l('Number')}</Th>
                                 </Tr>
                             </THead>
                             <TBody>
@@ -84,12 +88,8 @@ const BlacklistView = ({ manager }: Props) => {
                         </Table>
                     </Card>
                 </FlexView>
-
-                <FlexView padding="space50" paddingLeft="space0">
-                    <PhoneCreateCard reloadFunction={reloadHandler} createFunction={createHandler} />
-                </FlexView>
             </FlexView>
-        </Theme.Provider>
+        </Box>
     )
 }
 

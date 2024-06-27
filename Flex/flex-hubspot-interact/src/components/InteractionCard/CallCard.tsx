@@ -1,11 +1,11 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import * as Flex from "@twilio/flex-ui";
-import { Theme } from '@twilio-paste/core/theme';
-import { Box, Card, Heading, Select, Option, Stack, Label, Button } from '@twilio-paste/core';
+import { Box, Heading, Select, Option, Stack, Label, Button } from '@twilio-paste/core';
 import { FaPhoneAlt } from 'react-icons/fa';
 import { Workspace, TaskQueue } from "twilio-taskrouter";
 import { HubspotContact, HubspotDeal } from '../../Types';
 import { fullName } from '../../utils/helpers';
+import useLang from '../../hooks/useLang';
 
 const { FLEX_APP_OUTBOUND_WORKFLOW_SID, FLEX_APP_OUTBOUND_QUEUE_SID } = process.env;
 
@@ -24,7 +24,8 @@ type PhonesList = Array<{
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
-const CallCard = ({ manager, contact, deal, interactionHandler } : Props) => {
+const CallCard = ({ manager, contact, deal, interactionHandler }: Props) => {
+  const { _l } = useLang()
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [queues, setQueues] = useState<Array<TaskQueue>>([]);
   const [defaultQueue] = useState<string>(manager.workerClient?.attributes?.last_used_queue ?? FLEX_APP_OUTBOUND_QUEUE_SID as string);
@@ -142,9 +143,9 @@ const CallCard = ({ manager, contact, deal, interactionHandler } : Props) => {
   return (
       <>
         <Box paddingTop="space60" marginX="space60">
-          <Heading as="h4" variant="heading40">Llamar a {fullName(contact)}</Heading>
+          <Heading as="h4" variant="heading40">{_l('Call %')} {fullName(contact)}</Heading>
           <Box justifyContent="center" alignItems="center" rowGap="space10" marginBottom="space80">
-              <Label htmlFor="queue">Seleccione la cola</Label>
+          <Label htmlFor="queue">{_l('Select queue')}</Label>
               <Select id="queue" value={selectedQueue ?? queues.at(0)?.queueSid} onChange={handleSelectChange}>
                 { queues.map((queue : TaskQueue) => (
                   <Option value={queue.queueSid} key={queue.queueSid}>{queue.queueName}</Option>
@@ -153,7 +154,7 @@ const CallCard = ({ manager, contact, deal, interactionHandler } : Props) => {
             </Box>
             
             <Box justifyContent="center" alignItems="center" rowGap="space10" marginBottom="space80">
-              <Label htmlFor="to">Seleccione télefono a llamar</Label>
+          <Label htmlFor="to">{_l('Select number to call')}</Label>
               <Select id="to" value={selectedPhone ?? phonesList.at(0)?.phone} onChange={handlePhoneChange}>
                 {phonesList.map((phone) => (
                   <Option value={phone.phone} key={phone.phone}>{phone.obfuscated}</Option>
@@ -161,7 +162,7 @@ const CallCard = ({ manager, contact, deal, interactionHandler } : Props) => {
               </Select>
             </Box>
           <Stack orientation="horizontal" spacing="space30">
-            <Button loading={isLoading} variant="primary" title={doNotCall ? 'No Llamar' : (actionDisabled ? "To make a call, please change your status from 'Offline'" : "Make a call")} disabled={actionDisabled || doNotCall} onClick={() => initiateCallHandler()}><FaPhoneAlt /> Iniciar llamada</Button>
+          <Button loading={isLoading} variant="primary" title={doNotCall ? _l('Do no call') : (actionDisabled ? _l('To make a call, please change your status different from \'Offline\'') : _l('Make a call'))} disabled={actionDisabled || doNotCall} onClick={() => initiateCallHandler()}><FaPhoneAlt /> {_l('Start call')}</Button>
           </Stack>
         </Box>
       </>

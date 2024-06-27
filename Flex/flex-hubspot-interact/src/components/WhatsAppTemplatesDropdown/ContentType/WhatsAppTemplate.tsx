@@ -6,9 +6,9 @@ import {
 } from '@twilio-paste/core';
 import { SendIcon } from "@twilio-paste/icons/esm/SendIcon";
 import { ContentApprovalInstance } from 'types/WhatsAppTemplates';
-import { getStrings } from '../../../utils/helpers'
 import { useSelector } from 'react-redux';
 import useApi from '../../../hooks/useApi';
+import useLang from '../../../hooks/useLang';
 
 type WhatsAppTemplateProps = {
     task: Flex.ITask
@@ -45,13 +45,10 @@ Flex.Notifications.registerNotification({
 
 
 const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task, manager, item, isOpen, closeHandler }) => {
-
+    const { _l } = useLang();
     const { sendMessage } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const [parameters, setParameters] = useState<Parameters>({})
     
-    const language = useSelector((state: any) => state.language ?? 'es');
-
-    const [strings, setStrings] = useState<{ [key: string]: string }>(getStrings(language ?? 'es'))
     const [isDisabled, setIsDisabled] = useState<boolean>(true)
     const [isSending, setIsSending] = useState<boolean>(false)
 
@@ -65,11 +62,6 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
 
         return body
     }, [item, parameters])
-
-    // Switch de idioma
-    useEffect(() => {
-        setStrings(getStrings(language ?? 'es'))
-    }, [language])
 
     // Carga los parametros de la plantilla
     useEffect(() => {
@@ -206,8 +198,8 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
                         <Table>
                             <THead>
                                 <Tr>
-                                    <Th>{ strings['Variables'] }</Th>
-                                    <Th>{ strings['Values'] }</Th>
+                                    <Th>{ _l('Variables') }</Th>
+                                    <Th>{ _l('Values') }</Th>
                                 </Tr>
                             </THead>
                             <TBody>
@@ -232,12 +224,12 @@ const WhatsAppTemplate: React.FunctionComponent<WhatsAppTemplateProps> = ({ task
             </ModalBody>
             <ModalFooter>
                 <ModalFooterActions>
-                    <Button variant="secondary" onClick={() => closeHandler(false)}>{strings['Cancel']}</Button>
+                    <Button variant="secondary" onClick={() => closeHandler(false)}>{_l('Cancel')}</Button>
                     <Button variant="primary" onClick={submitTemplate}
                         disabled={isDisabled}
                         loading={isSending}
                     >
-                        {strings['Send']}
+                        {_l('Send')}
                         <SendIcon decorative={false} title="Description of icon" />
                     </Button>
                 </ModalFooterActions>

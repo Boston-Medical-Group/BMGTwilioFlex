@@ -13,8 +13,8 @@ const fullName = (contact: HubspotContact) => {
     return fullName;
 }
 
-const getStrings = (language: string) => {
-    const langStrings = require(`../langs/${language}.json`)
+const getStrings = () => {
+    const langStrings = require(`../langs.json`)
     return langStrings
 }
 

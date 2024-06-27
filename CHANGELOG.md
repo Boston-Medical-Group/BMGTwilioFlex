@@ -1,5 +1,12 @@
 # Changelog
 
+## 27/06/2024
+* Agrega tarea para nobody
+
+## 26/06/2024
+* Implementa idiomas
+* Actualización de dependencias
+
 ## 17/06/2024
 * Upgrade a plantillas de content template builder
 * Corrige fetch de contactos hubspot
