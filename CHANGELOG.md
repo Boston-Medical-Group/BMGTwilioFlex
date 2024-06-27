@@ -1,5 +1,8 @@
 # Changelog
 
+## 27/06/2024
+* Agrega tarea para nobody
+
 ## 26/06/2024
 * Implementa idiomas
 * Actualización de dependencias
