@@ -10,7 +10,7 @@ var handler = function (context, event, callback) {
     conversations.abandoned = abandoned === "true" ? "Yes" : "No";
     conversations.abandoned_phase = "BOT";
     conversations.kind = "Bot";
-    conversations.communication_channel = "chat";
+    conversations.communication_channel = "Chat";
     conversations.conversation_label_1 = "Conversation Sid";
     conversations.conversation_attribute_1 = conversationSid;
     conversations.conversation_label_2 = "Flow Sid";
