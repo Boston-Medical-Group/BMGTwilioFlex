@@ -132,7 +132,7 @@ export const handler = async (
 
                     await createNobodyTask({
                         context,
-                        from: whatsappAddressFrom,
+                        from: whatsappAddressTo,
                         conversationSid: conversation.sid,
                         flowSid: event.flowSid,
                         flowName: event.flowName ?? 'Unknown Flow',
