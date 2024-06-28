@@ -1,9 +1,14 @@
 import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types"
+import { Client as HubspotClient } from "@hubspot/api-client";
+import { AccessTokenInfoResponse } from "@hubspot/api-client/lib/codegen/oauth";
 
 type MyContext = {
     ACCOUNT_SID: string
     AUTH_TOKEN: string
     TWILIO_WA_PHONE_NUMBER: string
+    TASK_ROUTER_WORKSPACE_SID: string
+    TASK_ROUTER_NOBODY_WORKFLOW_SID: string
+    HUBSPOT_TOKEN: string
 }
 
 type MyEvent = {
@@ -12,6 +17,7 @@ type MyEvent = {
     template?: string
     message?: string
     flowSid: string
+    flowName?: string
     contactId?: string
     phone: string
     [key: string] : string | undefined
@@ -88,6 +94,8 @@ export const handler = async (
         }
     })
 
+    let returnObject : any = {'result': 'OK'};
+
     try {
         const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
@@ -110,28 +118,125 @@ export const handler = async (
                     //@ts-ignore
                     "configuration.flowSid": event.flowSid
                 }).then(async (webhook) => {
+                    let msg;
                     if (event.message) {
-                        return await client.conversations.v1.conversations(conversation.sid).messages.create({
+                        msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                             body: event.message
                         })
                     } else if (event.template) {
-                        
-                        
-                        return await client.conversations.v1.conversations(conversation.sid).messages.create({
+                        msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                             contentSid: event.template,
                             contentVariables: JSON.stringify(parameters)
                         })
                     }
+
+                    await createNobodyTask({
+                        context,
+                        from: whatsappAddressFrom,
+                        conversationSid: conversation.sid,
+                        flowSid: event.flowSid,
+                        flowName: event.flowName ?? 'Unknown Flow',
+                        name: event.fullname,
+                        leadOrPatient: event.leadOrPatient ?? '',
+                        contactId: event.contactId,
+                        hubspotAccountId: event.hubspotAccountId ?? undefined,
+                        implementation: event.implementation ?? 'Transactional',
+                        abandoned: event.abandoned ?? 'No'
+                    })
+
+                    returnObject = {
+                        ...returnObject,
+                        ...msg
+                    }
                 })
             })
         })
-
-        callback(null, 'OK')
     } catch (error) {
         console.log(error)
-        callback(null, 'ERROR')
+        returnObject.result = 'ERROR'
+        returnObject.error = error
     }
 
+    callback(null, returnObject)
+
+}
+
+type ConversationsObject = {
+    [key: string]: any
+}
+
+type NobodyTaskParams = {
+    context: Context<MyContext>
+    from: string
+    conversationSid: string
+    flowSid: string
+    flowName?: string
+    name?: string
+    leadOrPatient?: string
+    contactId?: string
+    hubspotAccountId?: string | number
+    implementation: string
+    abandoned: string
+}
+
+type CustomersObject = {
+    [key: string]: any
+}
+
+const createNobodyTask = async ({
+    context,
+    from,
+    conversationSid,
+    flowSid,
+    flowName,
+    name,
+    leadOrPatient,
+    contactId,
+    hubspotAccountId,
+    implementation,
+    abandoned
+} : NobodyTaskParams) => {
+    const client = context.getTwilioClient()
+    const conversations: ConversationsObject = {}
+    conversations.conversation_id = conversationSid;
+    conversations.virtual = "Yes";
+    conversations.abandoned = abandoned === "true" ? "Yes" : "No";
+    conversations.abandoned_phase = "BOT";
+    conversations.kind = "Bot";
+    conversations.communication_channel = "Chat";
+    conversations.conversation_label_1 = "Conversation Sid";
+    conversations.conversation_attribute_1 = conversationSid;
+    conversations.conversation_label_2 = "Flow Sid";
+    conversations.conversation_attribute_2 = flowSid;
+    conversations.conversation_label_2 = "Flow Name";
+    conversations.conversation_attribute_2 = flowName;
+    conversations.conversation_label_4 = "BOT implementation";
+    conversations.conversation_attribute_4 = implementation;
+
+    const customers: CustomersObject = {};
+    customers.customer_label_1 = "Lead or Patient";
+    customers.customer_attribute_1 = leadOrPatient;
+    customers.customer_label_2 = "URL Hubspot";
+
+    if (!hubspotAccountId) {
+        const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
+        try {
+            hubspotAccountId = await hubspotClient.oauth.accessTokensApi.get(context.HUBSPOT_TOKEN)
+                .then((response: AccessTokenInfoResponse) => response.hubId)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    customers.customer_attribute_2 = `https://app-eu1.hubspot.com/contacts/${hubspotAccountId}/record/0-1/${contactId}`;
+    
+    await client.taskrouter.v1
+        .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
+        .tasks.create({
+            attributes: JSON.stringify({ "from": from, "name": name, conversations, customers }),
+            workflowSid: context.TASK_ROUTER_NOBODY_WORKFLOW_SID,
+            timeout: 86400
+        })
 }
 
 const setUnauthorized = (response : any) => {

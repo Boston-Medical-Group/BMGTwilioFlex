@@ -37,7 +37,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = void 0;
-var twilio_flex_token_validator_1 = require("twilio-flex-token-validator");
 var api_client_1 = require("@hubspot/api-client");
 var getHtmlMessage = function (messages) { return __awaiter(void 0, void 0, void 0, function () {
     var resultHtml, bgColor_1;
@@ -57,7 +56,7 @@ var getHtmlMessage = function (messages) { return __awaiter(void 0, void 0, void
         return [2 /*return*/, resultHtml];
     });
 }); };
-var getMessages = function (context, conversationSid) { return __awaiter(void 0, void 0, void 0, function () {
+var getMessages = function (context, conversation) { return __awaiter(void 0, void 0, void 0, function () {
     var messages, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -66,7 +65,7 @@ var getMessages = function (context, conversationSid) { return __awaiter(void 0,
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, context.getTwilioClient().conversations.v1.conversations(conversationSid)
+                return [4 /*yield*/, conversation
                         .messages
                         .list({ limit: 500 })];
             case 2:
@@ -80,14 +79,13 @@ var getMessages = function (context, conversationSid) { return __awaiter(void 0,
         }
     });
 }); };
-//@ts-ignore
-exports.handler = (0, twilio_flex_token_validator_1.functionValidator)(function (context, event, callback) {
+var handler = function (context, event, callback) {
     return __awaiter(this, void 0, void 0, function () {
-        var conversationSid, hubspot_contact_id, hubspot_deal_id, hs_communication_channel_type, hs_communication_logged_from, hs_communication_body, hs_timestamp, hubspot_owner_id, response, hubspotClient, logBody, conversationMessages, _a, toHubspot, communication, err_2;
+        var conversationSid, hubspot_contact_id, hubspot_deal_id, hs_communication_channel_type, hs_communication_logged_from, hs_communication_body, hubspot_owner_id, response, hubspotClient, conversationContext, conversation, hs_timestamp, logBody, conversationMessages, _a, toHubspot, communication, err_2;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    conversationSid = event.conversationSid, hubspot_contact_id = event.hubspot_contact_id, hubspot_deal_id = event.hubspot_deal_id, hs_communication_channel_type = event.hs_communication_channel_type, hs_communication_logged_from = event.hs_communication_logged_from, hs_communication_body = event.hs_communication_body, hs_timestamp = event.hs_timestamp, hubspot_owner_id = event.hubspot_owner_id;
+                    conversationSid = event.conversationSid, hubspot_contact_id = event.hubspot_contact_id, hubspot_deal_id = event.hubspot_deal_id, hs_communication_channel_type = event.hs_communication_channel_type, hs_communication_logged_from = event.hs_communication_logged_from, hs_communication_body = event.hs_communication_body, hubspot_owner_id = event.hubspot_owner_id;
                     response = new Twilio.Response();
                     response.appendHeader("Access-Control-Allow-Origin", "*");
                     response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
@@ -96,18 +94,26 @@ exports.handler = (0, twilio_flex_token_validator_1.functionValidator)(function 
                     hubspotClient = new api_client_1.Client({ accessToken: context.HUBSPOT_TOKEN });
                     _b.label = 1;
                 case 1:
-                    _b.trys.push([1, 5, , 6]);
+                    _b.trys.push([1, 6, , 7]);
                     if (!hubspot_contact_id) {
                         throw new Error('CRMID Inválido');
                     }
+                    conversationContext = context.getTwilioClient().conversations.v1.conversations(conversationSid);
+                    return [4 /*yield*/, conversationContext.fetch()];
+                case 2:
+                    conversation = _b.sent();
+                    hs_timestamp = '';
+                    if (conversation) {
+                        hs_timestamp = conversation.dateCreated.toUTCString();
+                    }
                     logBody = hs_communication_body;
                     logBody += '<br /><br />';
-                    return [4 /*yield*/, getMessages(context, conversationSid)];
-                case 2:
+                    return [4 /*yield*/, getMessages(context, conversationContext)];
+                case 3:
                     conversationMessages = _b.sent();
                     _a = logBody;
                     return [4 /*yield*/, getHtmlMessage(conversationMessages)];
-                case 3:
+                case 4:
                     logBody = _a + _b.sent();
                     toHubspot = {
                         properties: {
@@ -145,11 +151,11 @@ exports.handler = (0, twilio_flex_token_validator_1.functionValidator)(function 
                         });
                     }
                     return [4 /*yield*/, hubspotClient.crm.objects.communications.basicApi.create(toHubspot)];
-                case 4:
+                case 5:
                     communication = _b.sent();
                     response.setBody(communication);
-                    return [3 /*break*/, 6];
-                case 5:
+                    return [3 /*break*/, 7];
+                case 6:
                     err_2 = _b.sent();
                     if (err_2 instanceof Error) {
                         response.setBody(err_2);
@@ -161,12 +167,13 @@ exports.handler = (0, twilio_flex_token_validator_1.functionValidator)(function 
                     else {
                         response.setBody({});
                     }
-                    return [3 /*break*/, 6];
-                case 6:
+                    return [3 /*break*/, 7];
+                case 7:
                     callback(null, response);
                     return [2 /*return*/];
             }
         });
     });
-});
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibG9nTWVzc2FnZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NyYy9sb2dNZXNzYWdlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUFBLDJFQUFrRjtBQUdsRixrREFBOEQ7QUFJOUQsSUFBTSxjQUFjLEdBQUcsVUFBTyxRQUE0Qjs7O1FBQ2xELFVBQVUsR0FBRyx5Q0FBeUMsQ0FBQztRQUUzRCxJQUFJO1lBRUksWUFBVSxhQUFhLENBQUM7WUFDNUIsUUFBUSxDQUFDLE9BQU8sQ0FBQyxVQUFBLE9BQU87Z0JBQ3BCLFNBQU8sR0FBRyxTQUFPLEtBQUssYUFBYSxDQUFDLENBQUMsQ0FBQyxXQUFXLENBQUMsQ0FBQyxDQUFDLGFBQWEsQ0FBQztnQkFDbEUsVUFBVSxJQUFJLHdDQUFnQyxTQUFPLCtKQUFnSixPQUFPLENBQUMsTUFBTSxzRUFBMEQsT0FBTyxDQUFDLFdBQVcsQ0FBQyxjQUFjLEVBQUUseUVBQTZELE9BQU8sQ0FBQyxJQUFJLG9CQUFpQixDQUFBO1lBQy9ZLENBQUMsQ0FBQyxDQUFBO1lBRUYsVUFBVSxJQUFJLE9BQU8sQ0FBQztTQUV6QjtRQUFDLE9BQU8sR0FBRyxFQUFFO1lBQ1YsT0FBTyxDQUFDLEtBQUssQ0FBQyxtQ0FBNEIsR0FBRyxDQUFFLENBQUMsQ0FBQztTQUNwRDtRQUVELHNCQUFPLFVBQVUsRUFBQzs7S0FDckIsQ0FBQTtBQUVELElBQU0sV0FBVyxHQUFHLFVBQU8sT0FBaUIsRUFBRSxlQUF3Qjs7Ozs7Z0JBQzlELFFBQVEsR0FBUyxFQUFFLENBQUM7Ozs7Z0JBRVQscUJBQU0sT0FBTyxDQUFDLGVBQWUsRUFBRSxDQUFDLGFBQWEsQ0FBQyxFQUFFLENBQUMsYUFBYSxDQUFDLGVBQWUsQ0FBQzt5QkFDckYsUUFBUTt5QkFDUixJQUFJLENBQUMsRUFBRSxLQUFLLEVBQUUsR0FBRyxFQUFFLENBQUMsRUFBQTs7Z0JBRnpCLFFBQVEsR0FBRyxT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
+};
+exports.handler = handler;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibG9nTWVzc2FnZS5wcm90ZWN0ZWQuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvc3R1ZGlvL2xvZ01lc3NhZ2UucHJvdGVjdGVkLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OztBQUdBLGtEQUE4RDtBQUs5RCxJQUFNLGNBQWMsR0FBRyxVQUFPLFFBQTRCOzs7UUFDbEQsVUFBVSxHQUFHLHlDQUF5QyxDQUFDO1FBRTNELElBQUk7WUFFSSxZQUFVLGFBQWEsQ0FBQztZQUM1QixRQUFRLENBQUMsT0FBTyxDQUFDLFVBQUEsT0FBTztnQkFDcEIsU0FBTyxHQUFHLFNBQU8sS0FBSyxhQUFhLENBQUMsQ0FBQyxDQUFDLFdBQVcsQ0FBQyxDQUFDLENBQUMsYUFBYSxDQUFDO2dCQUNsRSxVQUFVLElBQUksd0NBQWdDLFNBQU8sK0pBQWdKLE9BQU8sQ0FBQyxNQUFNLHNFQUEwRCxPQUFPLENBQUMsV0FBVyxDQUFDLGNBQWMsRUFBRSx5RUFBNkQsT0FBTyxDQUFDLElBQUksb0JBQWlCLENBQUE7WUFDL1ksQ0FBQyxDQUFDLENBQUE7WUFFRixVQUFVLElBQUksT0FBTyxDQUFDO1NBRXpCO1FBQUMsT0FBTyxHQUFHLEVBQUU7WUFDVixPQUFPLENBQUMsS0FBSyxDQUFDLG1DQUE0QixHQUFHLENBQUUsQ0FBQyxDQUFDO1NBQ3BEO1FBRUQsc0JBQU8sVUFBVSxFQUFDOztLQUNyQixDQUFBO0FBRUQsSUFBTSxXQUFXLEdBQUcsVUFBTyxPQUFpQixFQUFFLFlBQXdDOzs7OztnQkFDOUUsUUFBUSxHQUFTLEVBQUUsQ0FBQzs7OztnQkFFVCxxQkFBTSxZQUFZO3lCQUN4QixRQUFRO3lCQUNSLElBQUksQ0FBQyxFQUFFLEtBQUssRUFBRSxHQUFHLEVBQUUsQ0FBQyxFQUFBOztnQkFGekIsUUFBUSxHQUFHLFNBRWMsQ0FBQzs7OztnQkFFMUIsT0FBTyxDQUFDLEtBQUssQ0FBQyxtQ0FB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

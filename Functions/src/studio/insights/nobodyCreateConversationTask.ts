@@ -60,7 +60,7 @@ export const handler = (
         .tasks.create({
             attributes: JSON.stringify({ "from": from, "name": name, conversations, customers }),
             workflowSid: context.TASK_ROUTER_NOBODY_WORKFLOW_SID,
-            timeout: 1800
+            timeout: 1800 // 24 horas
         }).then(() => {
             callback(null);
         })
