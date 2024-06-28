@@ -10,7 +10,7 @@ type MyEvent = {
     conversationSid: string
 }
 
-export const handler = (
+export const handler = async (
     context: Context<MyContext>,
     event: MyEvent,
     callback: ServerlessCallback
@@ -22,10 +22,10 @@ export const handler = (
 
     const taskFilter = `conversations.conversation_id == '${conversationSid}'`
 
-    client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
+    await client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
         .tasks
         .list({ evaluateTaskAttributes: taskFilter })
-        .then(tasks => {
+        .then(async (tasks) => {
             const taskSid = tasks[0].sid;
             const attributes = { ...JSON.parse(tasks[0].attributes) };
 
@@ -39,7 +39,7 @@ export const handler = (
             }
 
             //update the task
-            client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
+            await client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
                 .tasks(taskSid)
                 .update({
                     assignmentStatus: 'canceled',
