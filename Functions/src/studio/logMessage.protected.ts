@@ -84,10 +84,6 @@ export const handler = async function (
 
         const conversationContext = context.getTwilioClient().conversations.v1.conversations(conversationSid);
         const conversation = await conversationContext.fetch()
-        let hs_timestamp : number | string = '';
-        if (conversation) {
-            hs_timestamp = conversation.dateCreated.getMilliseconds()
-        }
 
         let logBody = hs_communication_body;
         logBody += '<br /><br />';
@@ -99,7 +95,6 @@ export const handler = async function (
                 hs_communication_channel_type,
                 hs_communication_logged_from,
                 hs_communication_body: logBody,
-                hs_timestamp: `${hs_timestamp}`,
                 hubspot_owner_id: hubspot_owner_id ?? ''
             },
             associations: [
