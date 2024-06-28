@@ -50,7 +50,7 @@ type MyEvent = {
     hs_communication_channel_type: string
     hs_communication_logged_from: string
     hs_communication_body: string
-    hubspot_owner_id: string
+    hubspot_owner_id?: string
 }
 
 export const handler = async function (
@@ -100,7 +100,7 @@ export const handler = async function (
                 hs_communication_logged_from,
                 hs_communication_body: logBody,
                 hs_timestamp,
-                hubspot_owner_id
+                hubspot_owner_id: hubspot_owner_id ?? ''
             },
             associations: [
                 {
