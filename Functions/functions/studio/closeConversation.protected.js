@@ -38,7 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handler = function (context, event, callback) {
     return __awaiter(this, void 0, void 0, function () {
-        var conversationSid, client, error_1;
+        var conversationSid, client, conversationContext, conversation, error_1;
+        var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -47,9 +48,23 @@ exports.handler = function (context, event, callback) {
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, client.conversations.v1.conversations(conversationSid).update({ state: "closed" })];
+                    conversationContext = client.conversations.v1.conversations(conversationSid);
+                    return [4 /*yield*/, conversationContext.fetch()
+                            .then(function (conversation) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        if (!(conversation.state !== "closed")) return [3 /*break*/, 2];
+                                        return [4 /*yield*/, conversation.update({ state: "closed" })];
+                                    case 1:
+                                        _a.sent();
+                                        _a.label = 2;
+                                    case 2: return [2 /*return*/];
+                                }
+                            });
+                        }); })];
                 case 2:
-                    _a.sent();
+                    conversation = _a.sent();
                     return [3 /*break*/, 4];
                 case 3:
                     error_1 = _a.sent();
@@ -62,4 +77,4 @@ exports.handler = function (context, event, callback) {
         });
     });
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY2xvc2VDb252ZXJzYXRpb24ucHJvdGVjdGVkLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL3N0dWRpby9jbG9zZUNvbnZlcnNhdGlvbi5wcm90ZWN0ZWQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFRQSxPQUFPLENBQUMsT0FBTyxHQUFHLFVBQ2hCLE9BQTJCLEVBQzNCLEtBQWMsRUFDZCxRQUE0Qjs7Ozs7O29CQUd0QixlQUFlLEdBQUcsS0FBSyxDQUFDLGVBQWUsQ0FBQTtvQkFFdkMsTUFBTSxHQUFHLE9BQU8sQ0FBQyxlQUFlLEVBQUUsQ0FBQTs7OztvQkFHdEMscUJBQU0sTUFBTSxDQUFDLGFBQWEsQ0FBQyxFQUFFLENBQUMsYUFBYSxDQUFDLGVBQWUsQ0FBQyxDQUFDLE1BQU0sQ0FBQyxFQUFFLEtBQUssRUFBRSxRQUFRLEVBQUUsQ0FBQyxFQUFBOztvQkFBeEYsU0FBd0YsQ0FBQTs7OztvQkFFeEYsT0FBTyxDQUFDLEdBQUcsQ0FBQyxPQUFLLENBQUMsQ0FBQzs7O29CQUdyQixRQUFRLENBQUMsSUFBSSxFQUFFLEVBQUUsQ0FBQyxDQUFDOzs7OztDQUNwQixDQUFDIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY2xvc2VDb252ZXJzYXRpb24ucHJvdGVjdGVkLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL3N0dWRpby9jbG9zZUNvbnZlcnNhdGlvbi5wcm90ZWN0ZWQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7QUFRQSxPQUFPLENBQUMsT0FBTyxHQUFHLFVBQ2hCLE9BQTJCLEVBQzNCLEtBQWMsRUFDZCxRQUE0Qjs7Ozs7OztvQkFHdEIsZUFBZSxHQUFHLEtBQUssQ0FBQyxlQUFlLENBQUE7b0JBRXZDLE1BQU0sR0FBRyxPQUFPLENBQUMsZUFBZSxFQUFFLENBQUE7Ozs7b0JBR2hDLG1CQUFtQixHQUFHLE1BQU0sQ0FBQyxhQUFhLENBQUMsRUFBRSxDQUFDLGFBQWEsQ0FBQyxlQUFlLENBQUMsQ0FBQTtvQkFDN0QscUJBQU0sbUJBQW1CLENBQUMsS0FBSyxFQUFFOzZCQUNuRCxJQUFJLENBQUMsVUFBTyxZQUFZOzs7OzZDQUNuQixDQUFBLFlBQVksQ0FBQyxLQUFLLEtBQUssUUFBUSxDQUFBLEVBQS9CLHdCQUErQjt3Q0FDakMscUJBQU0sWUFBWSxDQUFDLE1BQU0sQ0FBQyxFQUFFLEtBQUssRUFBRSxRQUFRLEVBQUUsQ0FBQyxFQUFBOzt3Q0FBOUMsU0FBOEMsQ0FBQTs7Ozs7NkJBRWpELENBQUMsRUFBQTs7b0JBTEUsWUFBWSxHQUFHLFNBS2pCOzs7O29CQUdKLE9BQU8sQ0FBQyxHQUFHLENBQUMsT0FBSyxDQUFDLENBQUM7OztvQkFHckIsUUFBUSxDQUFDLElBQUksRUFBRSxFQUFFLENBQUMsQ0FBQzs7Ozs7Q0FDcEIsQ0FBQyJ9
