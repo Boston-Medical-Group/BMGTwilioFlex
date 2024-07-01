@@ -26,35 +26,39 @@ export const handler = async (
         .tasks
         .list({ evaluateTaskAttributes: taskFilter })
         .then(async (tasks) => {
-            console.log('ERROR CLOSING TASK');
-            console.log(tasks);
-            const taskSid = tasks[0].sid;
-            const attributes = { ...JSON.parse(tasks[0].attributes) };
+            if (tasks.length > 0) {
+                
+            
+                const taskSid = tasks[0].sid;
+                const attributes = { ...JSON.parse(tasks[0].attributes) };
 
-            //was the call abandoned?
-            if (abandoned === "true") {
-                attributes.conversations.abandoned = "Yes";
-                attributes.conversations.abandoned_phase = "BOT";
+                //was the call abandoned?
+                if (abandoned === "true") {
+                    attributes.conversations.abandoned = "Yes";
+                    attributes.conversations.abandoned_phase = "BOT";
+                } else {
+                    attributes.conversations.abandoned = "No";
+                    attributes.conversations.abandoned_phase = null;
+                }
+
+                //update the task
+                await client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
+                    .tasks(taskSid)
+                    .update({
+                        assignmentStatus: 'canceled',
+                        reason: 'Bot Task',
+                        attributes: JSON.stringify(attributes)
+                    })
+                    .then(task => {
+                        callback(null);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        callback(error);
+                    });
             } else {
-                attributes.conversations.abandoned = "No";
-                attributes.conversations.abandoned_phase = null;
+                callback(null);
             }
-
-            //update the task
-            await client.taskrouter.v1.workspaces(context.TASK_ROUTER_WORKSPACE_SID)
-                .tasks(taskSid)
-                .update({
-                    assignmentStatus: 'canceled',
-                    reason: 'Bot Task',
-                    attributes: JSON.stringify(attributes)
-                })
-                .then(task => {
-                    callback(null);
-                })
-                .catch(error => {
-                    console.log(error);
-                    callback(error);
-                });
         })
         .catch(error => {
             console.log(error)
