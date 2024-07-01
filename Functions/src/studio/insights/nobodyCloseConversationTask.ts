@@ -26,6 +26,8 @@ export const handler = async (
         .tasks
         .list({ evaluateTaskAttributes: taskFilter })
         .then(async (tasks) => {
+            console.log('ERROR CLOSING TASK');
+            console.log(tasks);
             const taskSid = tasks[0].sid;
             const attributes = { ...JSON.parse(tasks[0].attributes) };
 
