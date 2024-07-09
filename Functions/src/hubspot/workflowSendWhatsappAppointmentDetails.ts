@@ -140,7 +140,7 @@ export const handler = async (
                         hubspotAccountId: event.hubspotAccountId ?? undefined,
                         implementation: event.implementation ?? 'Transactional',
                         abandoned: event.abandoned ?? 'No',
-                        customParam: event.customParam ?? '',
+                        customParam: event.customParam ?? 'nodata',
                         templateName
                     }).then(async (task) => {
                         await client.taskrouter.v1
@@ -189,7 +189,7 @@ export const handler = async (
                 hubspotAccountId: event.hubspotAccountId ?? undefined,
                 implementation: event.implementation ?? 'Transactional',
                 abandoned: event.abandoned ?? 'No',
-                customParam: event.customParam ?? '',
+                customParam: event.customParam ?? 'nodata',
                 templateName
             }).then(async (task) => {
                 await client.taskrouter.v1
@@ -246,7 +246,7 @@ type NobodyTaskParams = {
     hubspotAccountId?: string | number
     implementation: string
     abandoned: string
-    customParam?: string
+    customParam: string
     templateName: string
 }
 
@@ -268,7 +268,34 @@ const createNobodyTask = async ({
     customParam,
     templateName
 }: NobodyTaskParams) => {
+
+    let appointmentTypes : { [ key: string | number ] : string } = {
+        1: '1era visita',
+        2: '2da visita',
+        37: 'Ondas',
+        50: 'ATM',
+        55: 'TPS',
+        61: '2da recompra',
+        63: 'Urología',
+        66: 'Tele_O',
+        68: 'Valoración CVS',
+        69: 'Valoración Psx',
+        70: 'Bloqueada',
+        72: 'Piso Pélvico',
+        73: 'Nutrición',
+        74: 'Nutrición seguimiento',
+        76: 'Administrativa',
+        77: 'F/R',
+        78: 'Viaje',
+        79: 'OOC',
+        80: 'Cardiología',
+        81: 'Endocrina',
+        82: 'Intervención quirúrgica QX',
+        83: 'PRP'
+    }
+
     const client = context.getTwilioClient()
+
     const conversations: ConversationsObject = {}
     conversations.conversation_id = conversationSid;
     conversations.virtual = "Yes";
@@ -286,7 +313,7 @@ const createNobodyTask = async ({
     conversations.conversation_label_4 = "BOT implementation";
     conversations.conversation_attribute_4 = implementation;
     conversations.conversation_label_5 = "Tipo cita";
-    conversations.conversation_attribute_5 = customParam ?? '';
+    conversations.conversation_attribute_5 = appointmentTypes.hasOwnProperty(customParam) ? appointmentTypes[customParam] : customParam;
 
     const customers: CustomersObject = {};
     customers.customer_label_1 = "Lead or Patient";
