@@ -14,7 +14,7 @@ type MyContext = {
 type MyEvent = {
     request: any,
     cookies: any,
-    template?: string
+    template: string
     messagingService: string
     phone: string
     customParam?: string
@@ -39,7 +39,7 @@ export const handler = async (
     event: MyEvent,
     callback: ServerlessCallback
 ) => {
-/*
+
     const authHeader = event.request.headers.authorization;
     const response = new Twilio.Response();
 
@@ -60,7 +60,7 @@ export const handler = async (
     // If the username or password don't match the expected values, reject
     if (username !== context.ACCOUNT_SID || password !== context.AUTH_TOKEN)
         return callback(null, setUnauthorized(response));
-*/
+
     const client = context.getTwilioClient()
 
     let parameters: Object = Object.keys(event)
@@ -117,6 +117,13 @@ export const handler = async (
                     "messagingBinding.proxyAddress": whatsappAddressFrom
                 }).then(async (participant) => {
                     let msg;
+                    let templateName: string = '';
+                    await client.content.v1.contents(event.template)
+                        .fetch()
+                        .then((content) => {
+                            templateName = content.friendlyName
+                        })
+                    
                     msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                         contentSid: event.template,
                         contentVariables: JSON.stringify(parameters)
@@ -133,7 +140,8 @@ export const handler = async (
                         hubspotAccountId: event.hubspotAccountId ?? undefined,
                         implementation: event.implementation ?? 'Transactional',
                         abandoned: event.abandoned ?? 'No',
-                        customParam: event.customParam ?? ''
+                        customParam: event.customParam ?? '',
+                        templateName
                     }).then(async (task) => {
                         await client.taskrouter.v1
                             .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
@@ -158,6 +166,13 @@ export const handler = async (
             })
         } else {
             let msg;
+            let templateName: string = '';
+            await client.content.v1.contents(event.template)
+                .fetch()
+                .then((content) => {
+                    templateName = content.friendlyName
+                })
+            
             msg = await client.conversations.v1.conversations(activeConversation).messages.create({
                 contentSid: event.template,
                 contentVariables: JSON.stringify(parameters)
@@ -174,7 +189,8 @@ export const handler = async (
                 hubspotAccountId: event.hubspotAccountId ?? undefined,
                 implementation: event.implementation ?? 'Transactional',
                 abandoned: event.abandoned ?? 'No',
-                customParam: event.customParam ?? ''
+                customParam: event.customParam ?? '',
+                templateName
             }).then(async (task) => {
                 await client.taskrouter.v1
                     .workspaces(context.TASK_ROUTER_WORKSPACE_SID)
@@ -231,6 +247,7 @@ type NobodyTaskParams = {
     implementation: string
     abandoned: string
     customParam?: string
+    templateName: string
 }
 
 type CustomersObject = {
@@ -248,7 +265,8 @@ const createNobodyTask = async ({
     hubspotAccountId,
     implementation,
     abandoned,
-    customParam
+    customParam,
+    templateName
 }: NobodyTaskParams) => {
     const client = context.getTwilioClient()
     const conversations: ConversationsObject = {}
@@ -263,15 +281,18 @@ const createNobodyTask = async ({
     conversations.conversation_attribute_1 = conversationSid;
     conversations.conversation_label_2 = "Flow Name";
     conversations.conversation_attribute_2 = flowName;
+    conversations.conversation_label_3 = "Template Friendly name";
+    conversations.conversation_attribute_3 = templateName;
     conversations.conversation_label_4 = "BOT implementation";
     conversations.conversation_attribute_4 = implementation;
+    conversations.conversation_label_5 = "Tipo cita";
+    conversations.conversation_attribute_5 = customParam ?? '';
 
     const customers: CustomersObject = {};
     customers.customer_label_1 = "Lead or Patient";
     customers.customer_attribute_1 = leadOrPatient;
     customers.customer_label_2 = "URL Hubspot";
-    customers.customer_label_3 = "Tipo cita";
-    customers.customer_attribute_3 = customParam ?? '';
+    
 
     if (!hubspotAccountId) {
         const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })

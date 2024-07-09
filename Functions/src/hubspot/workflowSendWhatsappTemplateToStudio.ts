@@ -121,11 +121,18 @@ export const handler = async (
                     "configuration.flowSid": event.flowSid
                 }).then(async (webhook) => {
                     let msg;
+                    let templateName : string = ''
                     if (event.message) {
                         msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                             body: event.message
                         })
                     } else if (event.template) {
+                        await client.content.v1.contents(event.template)
+                            .fetch()
+                            .then((content) => {
+                                templateName = content.friendlyName
+                            })
+                        
                         msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                             contentSid: event.template,
                             contentVariables: JSON.stringify(parameters)
@@ -144,7 +151,8 @@ export const handler = async (
                         hubspotAccountId: event.hubspotAccountId ?? undefined,
                         implementation: event.implementation ?? 'Transactional',
                         abandoned: event.abandoned ?? 'No',
-                        customParam: event.customParam ?? ''
+                        customParam: event.customParam ?? '',
+                        templateName
                     })
 
                     returnObject = {
@@ -181,6 +189,7 @@ type NobodyTaskParams = {
     implementation: string
     abandoned: string
     customParam?: string
+    templateName?: string
 }
 
 type CustomersObject = {
@@ -199,7 +208,8 @@ const createNobodyTask = async ({
     hubspotAccountId,
     implementation,
     abandoned,
-    customParam
+    customParam,
+    templateName
 } : NobodyTaskParams) => {
     const client = context.getTwilioClient()
     const conversations: ConversationsObject = {}
@@ -216,15 +226,17 @@ const createNobodyTask = async ({
     conversations.conversation_attribute_2 = flowSid;
     conversations.conversation_label_2 = "Flow Name";
     conversations.conversation_attribute_2 = flowName;
+    conversations.conversation_label_3 = "Template Friendly name";
+    conversations.conversation_attribute_3 = templateName;
     conversations.conversation_label_4 = "BOT implementation";
     conversations.conversation_attribute_4 = implementation;
+    conversations.conversation_label_5 = "Tipo cita";
+    conversations.conversation_attribute_5 = customParam ?? '';
 
     const customers: CustomersObject = {};
     customers.customer_label_1 = "Lead or Patient";
     customers.customer_attribute_1 = leadOrPatient;
     customers.customer_label_2 = "URL Hubspot";
-    customers.customer_label_3 = "Tipo cita";
-    customers.customer_attribute_3 = customParam ?? '';
 
     if (!hubspotAccountId) {
         const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
