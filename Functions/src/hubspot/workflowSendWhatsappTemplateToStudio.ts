@@ -1,6 +1,7 @@
 import { Context, ServerlessCallback } from "@twilio-labs/serverless-runtime-types/types"
 import { Client as HubspotClient } from "@hubspot/api-client";
 import { AccessTokenInfoResponse } from "@hubspot/api-client/lib/codegen/oauth";
+import { MessageInstance } from "twilio/lib/rest/conversations/v1/conversation/message";
 
 type MyContext = {
     ACCOUNT_SID: string
@@ -101,67 +102,114 @@ export const handler = async (
     try {
         const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
-        const timestamp = (new Date).getTime();
-        await client.conversations.v1.conversations.create({
-            friendlyName: `HubspotWorkflow -> ${event.phone} (${timestamp})`,
-            attributes: JSON.stringify(attributes),
-            timers: {
-                inactive: 'PT1H',
-                closed: 'PT24H'
-            }
-        }).then(async (conversation) => {
-            return await client.conversations.v1.conversations(conversation.sid).participants.create({
-                //@ts-ignore
-                "messagingBinding.address": whatsappAddressTo,
-                "messagingBinding.proxyAddress": whatsappAddressFrom
-            }).then(async (participant) => {
-                return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
-                    target: 'studio',
+        const activeConversation = await getActiveConversation(context, whatsappAddressTo)
+        if (activeConversation === null) {
+            const timestamp = (new Date).getTime();
+            await client.conversations.v1.conversations.create({
+                friendlyName: `HubspotWorkflow -> ${event.phone} (${timestamp})`,
+                attributes: JSON.stringify(attributes),
+                timers: {
+                    inactive: 'PT1H',
+                    closed: 'PT24H'
+                }
+            }).then(async (conversation) => {
+                return await client.conversations.v1.conversations(conversation.sid).participants.create({
                     //@ts-ignore
-                    "configuration.flowSid": event.flowSid
-                }).then(async (webhook) => {
-                    let msg;
-                    let templateName : string = ''
-                    if (event.message) {
-                        msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
-                            body: event.message
-                        })
-                    } else if (event.template) {
-                        await client.content.v1.contents(event.template)
-                            .fetch()
-                            .then((content) => {
-                                templateName = content.friendlyName
+                    "messagingBinding.address": whatsappAddressTo,
+                    "messagingBinding.proxyAddress": whatsappAddressFrom
+                }).then(async (participant) => {
+                    return await client.conversations.v1.conversations(conversation.sid).webhooks.create({
+                        target: 'studio',
+                        //@ts-ignore
+                        "configuration.flowSid": event.flowSid
+                    }).then(async (webhook) => {
+                        let msg: any;
+                        let templateName: string = ''
+                        if (event.message) {
+                            //@ts-ignore
+                            msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
+                                body: event.message
                             })
-                        
-                        msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
-                            contentSid: event.template,
-                            contentVariables: JSON.stringify(parameters)
+                        } else if (event.template) {
+                            await client.content.v1.contents(event.template)
+                                .fetch()
+                                .then((content) => {
+                                    templateName = content.friendlyName
+                                })
+                            
+                            msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
+                                contentSid: event.template,
+                                contentVariables: JSON.stringify(parameters)
+                            })
+                        }
+
+                        await createNobodyTask({
+                            context,
+                            from: whatsappAddressTo,
+                            conversationSid: conversation.sid,
+                            flowSid: event.flowSid,
+                            flowName: event.flowName ?? 'Unknown Flow',
+                            name: event.fullname,
+                            leadOrPatient: event.leadOrPatient ?? '',
+                            contactId: event.contactId,
+                            hubspotAccountId: event.hubspotAccountId ?? undefined,
+                            implementation: event.implementation ?? 'Transactional',
+                            abandoned: event.abandoned ?? 'No',
+                            customParam: event.customParam ?? 'nodata',
+                            templateName
                         })
-                    }
 
-                    await createNobodyTask({
-                        context,
-                        from: whatsappAddressTo,
-                        conversationSid: conversation.sid,
-                        flowSid: event.flowSid,
-                        flowName: event.flowName ?? 'Unknown Flow',
-                        name: event.fullname,
-                        leadOrPatient: event.leadOrPatient ?? '',
-                        contactId: event.contactId,
-                        hubspotAccountId: event.hubspotAccountId ?? undefined,
-                        implementation: event.implementation ?? 'Transactional',
-                        abandoned: event.abandoned ?? 'No',
-                        customParam: event.customParam ?? 'nodata',
-                        templateName
+                        returnObject = {
+                            ...returnObject,
+                            sid: msg.sid,
+                            body: msg.body
+                        }
                     })
-
-                    returnObject = {
-                        ...returnObject,
-                        ...msg
-                    }
                 })
             })
-        })
+        } else {
+            let msg : any;
+            let templateName: string = '';
+            if (event.message) {
+                //@ts-ignore
+                msg = await client.conversations.v1.conversations(activeConversation).messages.create({
+                    body: event.message
+                })
+            } else if (event.template) {
+                await client.content.v1.contents(event.template)
+                    .fetch()
+                    .then((content) => {
+                        templateName = content.friendlyName
+                    })
+
+                msg = await client.conversations.v1.conversations(activeConversation).messages.create({
+                    contentSid: event.template,
+                    contentVariables: JSON.stringify(parameters)
+                })
+            }
+
+            await createNobodyTask({
+                context,
+                from: whatsappAddressTo,
+                conversationSid: activeConversation,
+                flowSid: event.flowSid,
+                flowName: event.flowName ?? 'Unknown Flow',
+                name: event.fullname,
+                leadOrPatient: event.leadOrPatient ?? '',
+                contactId: event.contactId,
+                hubspotAccountId: event.hubspotAccountId ?? undefined,
+                implementation: event.implementation ?? 'Transactional',
+                abandoned: event.abandoned ?? 'No',
+                customParam: event.customParam ?? 'nodata',
+                templateName
+            })
+
+            returnObject = {
+                ...returnObject,
+                sid: msg.sid,
+                body: msg.body
+            }
+        }
     } catch (error) {
         console.log(error)
         returnObject.result = 'ERROR'
@@ -170,6 +218,21 @@ export const handler = async (
 
     callback(null, returnObject)
 
+}
+
+const getActiveConversation = async (context: Context<MyContext>, whatsappAddressTo: string) => {
+    const client = context.getTwilioClient()
+    const conversations = await client.conversations.v1.participantConversations.list({
+        address: whatsappAddressTo,
+        limit: 50,
+    });
+
+    const activeConversation = conversations.find((conversation) => conversation.conversationState === 'active')
+    if (activeConversation != undefined) {
+        return activeConversation.conversationSid;
+    }
+
+    return null;
 }
 
 type ConversationsObject = {
