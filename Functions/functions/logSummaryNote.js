@@ -3,7 +3,7 @@ const fetch = require("node-fetch");
 const OpenAI = require("openai");
 const { getGPTSummary } = require(Runtime.getFunctions()['helpers/crmHelper'].path);
 
-const createSummary = async (historyDelivered, context) => {
+const createSummary = async (historyDelivered, context, accountCountry) => {
   if (historyDelivered.length <= 3) {
     return false
   }
@@ -15,7 +15,7 @@ const createSummary = async (historyDelivered, context) => {
     apiKey: API_KEY,
   });
 
-  return await getGPTSummary(openai, historyDelivered, apiModel)
+  return await getGPTSummary(openai, historyDelivered, apiModel, accountCountry)
 }
 
 /**
@@ -74,6 +74,8 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
     hubspot_owner_id
   } = event
 
+  const accountCountry = event.accountCountry ?? 'esp'
+
   const response = new Twilio.Response();
   response.appendHeader("Access-Control-Allow-Origin", "*");
   response.appendHeader("Access-Control-Allow-Methods", "OPTIONS POST GET");
@@ -99,14 +101,14 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
     let clientMessages = historyDelivered.filter((m) => m.author.startsWith('whatsapp:'))
     let agentMessages = historyDelivered.filter((m) => !m.author.startsWith('whatsapp:'))
     if (clientMessages.length === 0 && agentMessages.length > 0) {
-      summaryContent = 'Se ha contactado al paciente, pero aún no se obtuvo una respuesta'
+      summaryContent = accountCountry === 'bra' ? 'O paciente foi contatado, mas ainda não recebeu resposta.' : 'Se ha contactado al paciente, pero aún no se obtuvo una respuesta'
     } else if (historyDelivered.length < 4) {
       response.setBody({ result: 'TOO_SHORT' });
       return callback(null, response);
       //summaryContent = 'Aún no se ha generado resumen ya que la conversación es muy breve'
 
     } else {
-      summaryContent = await createSummary(historyDelivered, context)
+      summaryContent = await createSummary(historyDelivered, context, accountCountry)
     }
   } catch (err) {
     console.log(err)
@@ -114,7 +116,7 @@ exports.handler = FunctionTokenValidator(async function (  context,  event,  cal
     return callback(null, response);
   }
 
-  let hs_note_body = 'Resumen AI: ' + summaryContent;
+  let hs_note_body = accountCountry === 'bra' ? 'Resumo da AI: ' + summaryContent : 'Resumen AI: ' + summaryContent;
 
   let toHubspot = {
     properties: {

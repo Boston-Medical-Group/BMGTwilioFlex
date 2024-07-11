@@ -184,6 +184,7 @@ const LogHubspotSummaryNote = async (task: ITask, manager: Flex.Manager) => {
   }
 
   const ownerId = manager.workerClient?.attributes?.hubspot_owner_id ?? null;
+  const accountCountry = manager.serviceConfiguration.attributes.account_country;
 
   const params = {
     conversationSid: task.attributes.conversationSid,
@@ -191,6 +192,7 @@ const LogHubspotSummaryNote = async (task: ITask, manager: Flex.Manager) => {
     hubspot_deal_id: task.attributes.hubspot_deal_id ?? null,
     hs_timestamp: Date.parse(task.dateCreated.toUTCString()),
     hubspot_owner_id: ownerId,
+    accountCountry
   }
 
   const token = manager.store.getState().flex.session.ssoTokenPayload.token;

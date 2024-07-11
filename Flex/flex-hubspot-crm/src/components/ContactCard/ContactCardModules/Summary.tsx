@@ -14,6 +14,8 @@ type Props = {
  */
 const Summary = ({ manager, task } : Props) => {
     
+    const [accountCountry, setAccountCountry] = useState(manager.serviceConfiguration.attributes.account_country);
+
     //const [conversationSid, setConversationSid] = useState();
     //const [channelSid] = useState(task.attributes?.taskChannelSid)
     const [summary, setSummary] = useState<any>({});
@@ -47,6 +49,7 @@ const Summary = ({ manager, task } : Props) => {
 
     const reloadSummary = useCallback(async (conversationSid, force) => {
         setLoading(true)
+
         const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversationSummary`, {
             method: "POST",
             headers: {
@@ -54,6 +57,7 @@ const Summary = ({ manager, task } : Props) => {
             },
             body: JSON.stringify({
                 conversationSid,
+                country: accountCountry,
                 force,
                 Token: manager.store.getState().flex.session.ssoTokenPayload.token
             })
