@@ -1,4 +1,4 @@
-exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
+exports.getGPTSummary = async (openai, historyDelivered, apiModel, accountCountry) => {
     let messages = []
 
     // System messages
@@ -18,6 +18,13 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel) => {
         role: 'system',
         content: 'Debes incluir la ciudad del paciente solo en caso de que el paciente la haya proporcionado en algún momento de la conversación.'
     })
+
+    if (accountCountry === 'bra') {
+        messages.push({
+            role: 'system',
+            content: 'SIEMPRE debes responder en portugues de brasil.'
+        })
+    }
 
     historyDelivered.forEach((h) => {
         let author = 'assistant'

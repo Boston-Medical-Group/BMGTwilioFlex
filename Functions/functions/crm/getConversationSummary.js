@@ -5,7 +5,7 @@ const { getGPTSummary } = require(Runtime.getFunctions()['helpers/crmHelper'].pa
 const TokenValidator = require('twilio-flex-token-validator').functionValidator;
 
 
-const createSummary = async (historyDelivered, context) => {
+const createSummary = async (historyDelivered, context, accountCountry) => {
     if (historyDelivered.length <= 3) {
         return false
     }
@@ -17,7 +17,7 @@ const createSummary = async (historyDelivered, context) => {
         apiKey: API_KEY,
     });
 
-    return await getGPTSummary(openai, historyDelivered, apiModel)
+    return await getGPTSummary(openai, historyDelivered, apiModel, accountCountry)
 }
 
 exports.handler = TokenValidator(async (context, event, callback) => {
@@ -29,7 +29,8 @@ exports.handler = TokenValidator(async (context, event, callback) => {
     response.appendHeader('Content-Type', 'application/json');
 
     const conversationSid = event.conversationSid
-    let forceSummary      = event.force ?? false
+    let forceSummary = event.force ?? false
+    const accountCountry = event.accountCountry ?? 'esp'
 
     const conversationContext = context.getTwilioClient().conversations.v1.conversations(conversationSid)
     const conversation = await conversationContext.fetch()
@@ -44,9 +45,9 @@ exports.handler = TokenValidator(async (context, event, callback) => {
         let clientMessages = historyDelivered.filter((m) => m.author.startsWith('whatsapp:'))
         let agentMessages = historyDelivered.filter((m) => !m.author.startsWith('whatsapp:'))
         if (clientMessages.length === 0 && agentMessages.length > 0) {
-            summaryContent = 'Se ha contactado al paciente, pero aún no se obtuvo una respuesta'
+            summaryContent = accountCountry === 'bra' ? 'O paciente foi contatado, mas ainda não recebeu resposta.' : 'Se ha contactado al paciente, pero aún no se obtuvo una respuesta'
         } else if (historyDelivered.length < 4) {
-            summaryContent = 'Aún no se ha generado resumen ya que la conversación es muy breve'
+            summaryContent = accountCountry === 'bra' ? 'Nenhum resumo foi gerado ainda, pois a conversa foi muito breve.' : 'Aún no se ha generado resumen ya que la conversación es muy breve'
         } else {
             // Si la conversación se ha actualizado o ha pasado mucho tiempo, forzamos un nuevo resument
             const oldCounter = conversationAttributes.chatgpt_summary_messages_counter ?? historyDelivered.length
@@ -62,7 +63,7 @@ exports.handler = TokenValidator(async (context, event, callback) => {
             }
 
             if (!conversationAttributes.chatgpt_summary_content || forceSummary) {
-                summaryContent = await createSummary(historyDelivered, context)
+                summaryContent = await createSummary(historyDelivered, context, accountCountry)
                 if (summaryContent) {
                     summaryTimestamp = new Date().toISOString()
                     conversationAttributes.chatgpt_summary_content = summaryContent
