@@ -37,10 +37,17 @@ exports.getGPTSummary = async (openai, historyDelivered, apiModel, accountCountr
         })
     })
 
-    messages.push({
-        role: 'assistant',
-        content: 'Crea un resumen de la conversación en máximo 500 caracteres ahora.'
-    })
+    if (accountCountry === 'bra') {
+        messages.push({
+            role: 'system',
+            content: 'Crea un resumen de la conversación en máximo 500 caracteres ahora y responde en Portugues de Brasil.'
+        })
+    } else {
+        messages.push({
+            role: 'assistant',
+            content: 'Crea un resumen de la conversación en máximo 500 caracteres ahora.'
+        })
+    }
 
     let summary = ''
     if (!apiModel) {

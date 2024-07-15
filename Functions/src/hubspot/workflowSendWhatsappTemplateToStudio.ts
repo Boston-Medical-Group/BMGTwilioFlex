@@ -97,8 +97,8 @@ export const handler = async (
         }
     })
 
-    let returnObject : any = {'result': 'OK'};
-
+    let returnObject: any = { 'result': 'OK' };
+    let nestedError : Array<string> = [];
     try {
         const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
@@ -129,6 +129,10 @@ export const handler = async (
                             //@ts-ignore
                             msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                                 body: event.message
+                            }).catch((err) => {
+                                nestedError.push(err.message ?? 'NESTED ERROR: 133')
+                                console.log('ERROR workflowSendWhatsappTemplateToStudio@134');
+                                console.log(err);
                             })
                         } else if (event.template) {
                             await client.content.v1.contents(event.template)
@@ -136,10 +140,19 @@ export const handler = async (
                                 .then((content) => {
                                     templateName = content.friendlyName
                                 })
+                                .catch((err) => {
+                                    nestedError.push(err.message ?? 'NESTED ERROR: 144')
+                                    console.log('ERROR workflowSendWhatsappTemplateToStudio@145');
+                                    console.log(err);
+                                })
                             
                             msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                                 contentSid: event.template,
                                 contentVariables: JSON.stringify(parameters)
+                            }).catch((err) => {
+                                nestedError.push(err.message ?? 'NESTED ERROR: 153')
+                                console.log('ERROR workflowSendWhatsappTemplateToStudio@154');
+                                console.log(err);
                             })
                         }
 
@@ -164,8 +177,16 @@ export const handler = async (
                             sid: msg.sid,
                             body: msg.body
                         }
+                    }).catch((err) => {
+                        nestedError.push(err.message ?? 'NESTED ERROR: 181')
+                        console.log('ERROR workflowSendWhatsappTemplateToStudio@182');
+                        console.log(err);
                     })
                 })
+            }).catch((err) => {
+                nestedError.push(err.message ?? 'NESTED ERROR: 187')
+                console.log('ERROR workflowSendWhatsappTemplateToStudio@188');
+                console.log(err);
             })
         } else {
             let msg : any;
@@ -174,17 +195,29 @@ export const handler = async (
                 //@ts-ignore
                 msg = await client.conversations.v1.conversations(activeConversation).messages.create({
                     body: event.message
+                }).catch((err) => {
+                    nestedError.push(err.message ?? 'NESTED ERROR: 199')
+                    console.log('ERROR workflowSendWhatsappTemplateToStudio@200');
+                    console.log(err);
                 })
             } else if (event.template) {
                 await client.content.v1.contents(event.template)
                     .fetch()
                     .then((content) => {
                         templateName = content.friendlyName
+                    }).catch((err) => {
+                        nestedError.push(err.message ?? 'NESTED ERROR: 209')
+                        console.log('ERROR workflowSendWhatsappTemplateToStudio@210');
+                        console.log(err);
                     })
 
                 msg = await client.conversations.v1.conversations(activeConversation).messages.create({
                     contentSid: event.template,
                     contentVariables: JSON.stringify(parameters)
+                }).catch((err) => {
+                    nestedError.push(err.message ?? 'NESTED ERROR: 218')
+                    console.log('ERROR workflowSendWhatsappTemplateToStudio@219');
+                    console.log(err);
                 })
             }
 
@@ -214,6 +247,7 @@ export const handler = async (
         console.log(error)
         returnObject.result = 'ERROR'
         returnObject.error = error
+        returnObject.nestedError = nestedError
     }
 
     callback(null, returnObject)
