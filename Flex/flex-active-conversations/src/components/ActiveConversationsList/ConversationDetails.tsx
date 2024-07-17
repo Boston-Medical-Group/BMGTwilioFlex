@@ -68,10 +68,10 @@ const ConversationDetails = ({ conversationSid, manager, closeCallback }: Props)
         }
     }, [conversationSid])
 
-    const formatConversationHeading = (participants: any) => {
-        if (participants !== undefined && participants.length > 0) {
-            let firstParticipant = participants[0].messagingBinding.address ?? conversation.sid
-            return firstParticipant
+    const formatConversationHeading = (participants: Array<any>) => {
+        const userParticipant = participants.find((participant: any) => participant.messagingBinding !== undefined && participant.messagingBinding !== null)
+        if (userParticipant !== undefined) {
+            return userParticipant.messagingBinding.address ?? conversation.sid
         }
 
         if (conversation !== undefined) {
