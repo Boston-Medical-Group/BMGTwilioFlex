@@ -88,7 +88,7 @@ const ConversationDetails = ({ conversationSid, manager, closeCallback }: Props)
                     <SideModalHeading>
                         {isLoading
                             ? <SkeletonLoader width={'50%'} />
-                            : formatConversationHeading(conversation?.participants)
+                            : formatConversationHeading(conversation?.participants ?? [])
                         }
                     </SideModalHeading>
                 </SideModalHeader>
