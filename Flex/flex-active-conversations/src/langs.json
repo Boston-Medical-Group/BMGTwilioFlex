@@ -1,0 +1,53 @@
+{
+    "en": {
+        "Address": "Address",
+        "Start Date": "Start Date",
+        "Actions": "Actions",
+        "Active Conversations": "Active Conversations",
+        "Refresh": "Refresh",
+        "Conversation details": "Conversation details",
+        "Close conversation": "Close conversation",
+        "Participants": "Participants",
+        "1 participant points to an orphan or a transactional conversation, 2 participants could be an active conversation": "1 participant points to an orphan or a transactional conversation, 2 participants could be an active conversation",
+        "Participant": "Participant",
+        "Create Date": "Create Date",
+        "Conversation start": "Conversation start",
+        "Conversation end": "Conversation end",
+        "Loading conversation": "Loading conversation...",
+        "No messages in the conversation": "No messages in the conversation"
+    },
+    "es": {
+        "Address": "Dirección",
+        "Start Date": "Fecha de inicio",
+        "Actions": "Acciones",
+        "Active Conversations": "Conversaciones activas",
+        "Refresh": "Refrescar",
+        "Conversation details": "Detalles de la conversación",
+        "Close conversation": "Cerrar conversación",
+        "Participants": "Participantes",
+        "1 participant points to an orphan or a transactional conversation, 2 participants could be an active conversation": "1 participante indica una conversación huerfana, 2 participantes podría indicar una conversación activa",
+        "Participant": "Participante",
+        "Create Date": "Fecha de creación",
+        "Conversation start": "Inicio de la conversación",
+        "Conversation end": "Fin de la conversación",
+        "Loading conversation": "Cargando conversación...",
+        "No messages in the conversation": "No hay mensajes en la conversación"
+    },
+    "pt": {
+        "Address": "Endereço",
+        "Start Date": "Data de inição",
+        "Actions": "Ações",
+        "Active Conversations": "Conversações ativas",
+        "Refresh": "Atualizar",
+        "Conversation details": "Detalhes da conversação",
+        "Close conversation": "Fechar conversação",
+        "Participants": "Participantes",
+        "1 participant points to an orphan or a transactional conversation, 2 participants could be an active conversation": "1 participante indica uma conversa órfã, 2 participantes podem indicar uma conversa ativa.",
+        "Participant": "Participante",
+        "Create Date": "Data de criação",
+        "Conversation start": "Começo da conversação",
+        "Conversation end": "Fim da conversação",
+        "Loading conversation": "Carregando conversação...",
+        "No messages in the conversation": "Nenhuma mensagem na conversação"
+    }
+}
