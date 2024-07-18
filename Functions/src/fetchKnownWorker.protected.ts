@@ -43,6 +43,10 @@ const fetchOwner = async (context: Context<EnvVars>, phone: string): Promise<Own
                                 propertyName: "associations.contact",
                                 operator: "EQ",
                                 value: `${contacts.results[0].properties.hs_object_id}`
+                            }, {
+                                propertyName: "hs_is_open_count",
+                                operator: "EQ",
+                                value: "1"
                             }
                         ]
                     }],
