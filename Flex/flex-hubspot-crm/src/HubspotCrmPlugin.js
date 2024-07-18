@@ -9,23 +9,29 @@ const PLUGIN_NAME = 'HubspotCrmPlugin';
 
 
 const registerNotifications = () => {
-  Notifications.registerNotification({
-    id: "errorLoadingConversations",
-    content: "Error al cargar las conversaciones",
-    type: NotificationType.error
-  });
+  if (!Notifications.registeredNotifications.has('errorLoadingConversations')) {
+    Notifications.registerNotification({
+      id: "errorLoadingConversations",
+      content: "Error al cargar las conversaciones",
+      type: NotificationType.error
+    });
+  }
+  
+  if (!Notifications.registeredNotifications.has('errorNotEnoughMessages')) {
+    Notifications.registerNotification({
+      id: "errorNotEnoughMessages",
+      content: "No hay suficiente contexto para generar una sugerencia",
+      type: NotificationType.error
+    });
+  }
 
-  Notifications.registerNotification({
-    id: "errorNotEnoughMessages",
-    content: "No hay suficiente contexto para generar una sugerencia",
-    type: NotificationType.error
-  });
-
-  Notifications.registerNotification({
-    id: "errorLoadingConversationMessages",
-    content: "Error al cargar la conversación",
-    type: NotificationType.error
-  });
+  if (!Notifications.registeredNotifications.has('errorLoadingConversationMessages')) {
+    Notifications.registerNotification({
+      id: "errorLoadingConversationMessages",
+      content: "Error al cargar la conversación",
+      type: NotificationType.error
+    });
+  }
 }
 
 export default class HubspotCrmPlugin extends FlexPlugin {
