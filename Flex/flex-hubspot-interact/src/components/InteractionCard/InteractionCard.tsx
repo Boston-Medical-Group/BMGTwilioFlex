@@ -85,15 +85,15 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
     }
   }, [afterSetActivityListener])
 
-  const sendSmsHandler = useCallback((contact: HubspotContact, deal?: HubspotDeal) => {
-    setSelectedSmsContact(contact);
-    interactionHandler()
+  const sendSmsHandler = useCallback(async (contact: HubspotContact, deal?: HubspotDeal) => {
+    await sendHandler('sms', contact, deal)
   }, []);
 
   type CountryMap = {
     [key: string]: string
   }
-  const sendWAHandler = useCallback(async (contact: HubspotContact, deal?: HubspotDeal) => {
+
+  const sendHandler = useCallback(async (channel: string,contact: HubspotContact, deal?: HubspotDeal) => {
     if (contact.country) {
       const countryMap: CountryMap = {
         CO: '+57',
@@ -113,21 +113,20 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
         }
       }
     }
-    
 
     // @todo Enviar mensajes de hubspot con interaction 
     // @todo corregir telefono e164
     const result = await startOutboundConversation({
-        To: `whatsapp:${ contact.phone }`,
-        customerName: `${contact.firstname || ''} ${contact.lastname || ''}`.trim(),
-        WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
-        KnownAgentRoutingFlag: false,
-        OpenChatFlag: true,
-        hubspotContact: contact,
-        hubspot_contact_id: contact.hs_object_id,
-        hubspot_deal_id: deal?.hs_object_id ?? null
+      To: channel === 'whatsapp' ? `whatsapp:${contact.phone}` : contact.phone,
+      customerName: `${contact.firstname || ''} ${contact.lastname || ''}`.trim(),
+      WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
+      KnownAgentRoutingFlag: false,
+      OpenChatFlag: true,
+      hubspotContact: contact,
+      hubspot_contact_id: contact.hs_object_id,
+      hubspot_deal_id: deal?.hs_object_id ?? null
     })
-    
+
     interactionHandler()
 
     const isSuccess = result.success
@@ -135,6 +134,10 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
       const errorCode = result.errorMessage
       Notifications.showNotification(errorCode);
     }
+  }, [])
+
+  const sendWAHandler = useCallback(async (contact: HubspotContact, deal?: HubspotDeal) => {
+    await sendHandler('whatsapp', contact, deal)
   }, []);
 
   const handleCloseModel = React.useCallback(() => {
