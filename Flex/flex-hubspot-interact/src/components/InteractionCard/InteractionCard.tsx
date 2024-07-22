@@ -132,7 +132,7 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
     const isSuccess = result.success
     if (!isSuccess) {
       const errorCode = result.errorMessage
-      Notifications.showNotification(errorCode);
+      Notifications.showNotification(errorCode, { conversationSid: result.conversationSid});
     }
   }, [])
 

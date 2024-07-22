@@ -13,22 +13,25 @@ import InteractionContainer from './components/InteractionContainer';
 
 const PLUGIN_NAME = 'HubspotInteractPlugin';
 
-const registerNotifications = () => {
+const registerNotifications = (manager) => {
+  manager.strings.alreadyActiveConversationWithAnotherAgent = "Al parecer el contacto con el que desea interactuar ya es encuentra en interacción con otro agente. ID Conversación: {{conversationSid}}";
+  manager.strings.alreadyActiveConversationWithAgent = "Ya está interactuando con este contacto. Si esto es un error póngase en contacto con un Administrador. ID Conversación: {{conversationSid}}";
+  manager.strings.alreadyActiveConversationWithoutAgent = "Al parecer este contacto se encuentra en una interacción activa. Si esto es un error póngase en contacto con un Administrador. ID Conversación: {{conversationSid}}";
   Notifications.registerNotification({
     id: "ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT",
-    content: "Al parecer el contacto con el que desea interactuar ya es encuentra en interacción con otro agente",
+    content: "alreadyActiveConversationWithAnotherAgent",
     type: NotificationType.error
   });
 
   Notifications.registerNotification({
     id: "ALREADY_ACTIVE_CONVERSATION_WITH_AGENT",
-    content: "Ya está interactuando con este contacto. Si esto es un error póngase en contacto con un Administrador",
+    content: "alreadyActiveConversationWithAgent",
     type: NotificationType.error
   });
 
   Notifications.registerNotification({
     id: "ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT",
-    content: "Al parecer este contacto se encuentra en una interacción activa. Si esto es un error póngase en contacto con un Administrador",
+    content: "alreadyActiveConversationWithoutAgent",
     type: NotificationType.error
   });
 }
@@ -47,7 +50,7 @@ export default class HubspotInteractPlugin extends FlexPlugin {
   async init(flex, manager) {
     manager.store.addReducer(namespace, reducers);
 
-    registerNotifications();
+    registerNotifications(manager);
     
     const options = { sortOrder: 1000 };
 

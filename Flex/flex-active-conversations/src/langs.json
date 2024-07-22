@@ -14,7 +14,12 @@
         "Conversation start": "Conversation start",
         "Conversation end": "Conversation end",
         "Loading conversation": "Loading conversation...",
-        "No messages in the conversation": "No messages in the conversation"
+        "No messages in the conversation": "No messages in the conversation",
+        "Conversation ID": "Conversation ID",
+        "Conversation ID or SID provided by an agent": "Conversation ID or SID provided by an agent",
+        "Search": "Search",
+        "Phone Number (e164 format)": "Phone Number (e164 format)",
+        "Clear all": "Clear all"
     },
     "es": {
         "Address": "Dirección",
@@ -31,7 +36,12 @@
         "Conversation start": "Inicio de la conversación",
         "Conversation end": "Fin de la conversación",
         "Loading conversation": "Cargando conversación...",
-        "No messages in the conversation": "No hay mensajes en la conversación"
+        "No messages in the conversation": "No hay mensajes en la conversación",
+        "Conversation ID": "ID de la conversación",
+        "Conversation ID or SID provided by an agent": "ID de la conversación o SID proporcionado por un agente",
+        "Search": "Buscar",
+        "Phone Number (e164 format)": "Número de teléfono (formato e164)",
+        "Clear all": "Limpiar todos"
     },
     "pt": {
         "Address": "Endereço",
@@ -48,6 +58,11 @@
         "Conversation start": "Começo da conversação",
         "Conversation end": "Fim da conversação",
         "Loading conversation": "Carregando conversação...",
-        "No messages in the conversation": "Nenhuma mensagem na conversação"
+        "No messages in the conversation": "Nenhuma mensagem na conversação",
+        "Conversation ID": "ID da conversação",
+        "Conversation ID or SID provided by an agent": "ID da conversação ou SID fornecido pelo agente",
+        "Search": "Pesquisar",
+        "Phone Number (e164 format)": "Número de telefone (formato e164)",
+        "Clear all": "Limpar tudo"
     }
 }

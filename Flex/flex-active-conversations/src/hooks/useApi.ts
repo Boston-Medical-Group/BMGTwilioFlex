@@ -2,14 +2,16 @@ import { useCallback } from "react";
 
 const useApi = ({ token } : { token: string }) => {
 
-  const getActiveConversations = useCallback(async (page: null | string) => {
-    let params = {};
+  const getActiveConversations = useCallback(async (page: null | string, phone : undefined | string) => {
+    let params : any = {};
     if (page !== undefined && page !== '') {
-      console.log('SETTING PAGE: ' + page)
-      params = {
-        page
-      }
+      params.page = page
     }
+
+    if (phone !== undefined && phone !== '') {
+      params.phone = phone
+    }
+
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/getActiveConversations`, {
       method: "POST",
       headers: {

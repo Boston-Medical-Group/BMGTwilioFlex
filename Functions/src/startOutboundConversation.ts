@@ -59,11 +59,13 @@ const openAChatTask = async (
             const agent = participants.find((participant) => participant.identity === WorkerConversationIdentity)
             if (!agent) { // Not the current agent
                 return {
+                    conversationSid: conversation.sid,
                     success: false,
                     errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT'
                 };
             } else { // Conversation is linked to current agent, cant start a new one
                 return {
+                    conversationSid: conversation.sid,
                     success: false,
                     errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITH_AGENT'
                 };
@@ -71,6 +73,7 @@ const openAChatTask = async (
         } else {
             // Orphan conversation. ...notify
             return {
+                conversationSid: conversation.sid,
                 success: false,
                 errorMessage: 'ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT'
             };

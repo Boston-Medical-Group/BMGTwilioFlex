@@ -47,6 +47,7 @@ const ConversationDetails = ({ conversationSid, manager, closeCallback }: Props)
 
     const [conversation, setConversation] = useState<any>()
     const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState(false)
 
     useEffect(() => {
         if (conversationSid !== undefined) {
@@ -54,10 +55,16 @@ const ConversationDetails = ({ conversationSid, manager, closeCallback }: Props)
             dialog.show();
                 
             (async () => {
-                const conv = await getConversation(conversationSid)
-                setConversation(conv)
-                console.log(conv)
-                setIsLoading(false)
+                await getConversation(conversationSid)
+                    .then((conv) => {
+                        if (conv.hasOwnProperty('sid')) {
+                            setConversation(conv)
+                            setError(false)
+                        } else {
+                            setError(true)
+                        }
+                    }).finally(() => setIsLoading(false))
+                
             })();
         } else {
             dialog.hide()
@@ -95,7 +102,7 @@ const ConversationDetails = ({ conversationSid, manager, closeCallback }: Props)
                 <SideModalBody>
                     {isLoading && <SkeletonLoader height={'150px'} />}
                     
-                    {!isLoading && conversation && (
+                    {!isLoading && !error && conversation && (
                         <Box>
                             <DescriptionList>
                                 <DescriptionListSet>
@@ -129,6 +136,12 @@ const ConversationDetails = ({ conversationSid, manager, closeCallback }: Props)
                             <ConversationTranscription conversationSid={conversationSid} manager={manager} />
 
                             <CloseActiveConversationButton manager={manager} conversationSid={conversation.sid} closedCallback={closeCallback} />
+                        </Box>
+                    )}
+
+                    {!isLoading && error && (
+                        <Box alignContent={"center"} margin={"space100"}>
+                            <Paragraph>{_l('Conversation not found')}</Paragraph>
                         </Box>
                     )}
                 </SideModalBody>
