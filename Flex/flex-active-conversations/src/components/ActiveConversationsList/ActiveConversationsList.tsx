@@ -3,6 +3,7 @@ import * as Flex from '@twilio/flex-ui';
 import { Icon } from '@twilio/flex-ui';
 import { Anchor, ButtonGroup, Form, Input, Label, Pagination, PaginationArrow, PaginationItems, PaginationLabel, Separator, Tooltip } from '@twilio-paste/core';
 import {
+  useSideModalState,
   Box, Table, THead, Tr, Th, TBody, Td, TFoot, Heading, SkeletonLoader, Text, Button
 } from '@twilio-paste/core';
 import useLang from '../../hooks/useLang'
@@ -39,6 +40,8 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
   const [query, setQuery] = useState('');
   const [tmpPhone, setTmpPhone] = useState('');
   const [phone, setPhone] = useState<undefined|string>(undefined);
+
+  const dialog = useSideModalState({});
 
   useEffect(() => {
     loadPage()
@@ -104,8 +107,10 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
     setQuery(event.target.value);
   }
 
-  const handleSubmitQuery = (event: FormEvent<HTMLFormElement>) : void => {
+  const handleSubmitQuery = (event: FormEvent<HTMLFormElement>): void => {
     setSelectedConversation(query)
+    dialog.show()
+
     //@ts-ignore
     event.preventDefault();
   }
@@ -150,6 +155,7 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
                 <Input aria-describedby="query_text" id="query" name="query" type="search" placeholder="CHXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                   onChange={handleChangeQuery}
                   onBlur={handleChangeQuery}
+                  value={query}
                   required />
               </Box>
               <Box display="flex" columnGap="space50" paddingLeft="space40">
@@ -234,6 +240,7 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
                   <ButtonGroup>
                     <Button variant="primary" onClick={() => {
                       setSelectedConversation(conversation.sid)
+                      dialog.show()
                     }}>{_l('Conversation details')}</Button>
 
                     <CloseActiveConversationButton manager={manager} conversationSid={conversation.sid} closedCallback={() => {
@@ -290,10 +297,10 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
         )}
         
       </Table>
-      <ConversationDetails manager={manager} conversationSid={selectedConversation} closeCallback={() => { 
+      <ConversationDetails manager={manager} conversationSid={selectedConversation} closeCallback={() => {
         setActiveConversations(activeConversations.filter((a: any) => a.sid !== selectedConversation))
         setSelectedConversation(undefined)
-      }} />
+      }} dialog={dialog}  />
     </Box>
   );
 };

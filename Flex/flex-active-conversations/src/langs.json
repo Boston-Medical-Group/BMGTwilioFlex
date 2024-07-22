@@ -19,7 +19,10 @@
         "Conversation ID or SID provided by an agent": "Conversation ID or SID provided by an agent",
         "Search": "Search",
         "Phone Number (e164 format)": "Phone Number (e164 format)",
-        "Clear all": "Clear all"
+        "Clear all": "Clear all",
+        "Are you sure you want to close this conversation?": "Are you sure you want to close this conversation?",
+        "Confirm": "Confirm",
+        "Cancel": "Cancel"
     },
     "es": {
         "Address": "Dirección",
@@ -41,7 +44,10 @@
         "Conversation ID or SID provided by an agent": "ID de la conversación o SID proporcionado por un agente",
         "Search": "Buscar",
         "Phone Number (e164 format)": "Número de teléfono (formato e164)",
-        "Clear all": "Limpiar todos"
+        "Clear all": "Limpiar todos",
+        "Are you sure you want to close this conversation?": "¿Seguro que quieres cerrar esta conversación?",
+        "Confirm": "Confirmar",
+        "Cancel": "Cancelar"
     },
     "pt": {
         "Address": "Endereço",
@@ -63,6 +69,9 @@
         "Conversation ID or SID provided by an agent": "ID da conversação ou SID fornecido pelo agente",
         "Search": "Pesquisar",
         "Phone Number (e164 format)": "Número de telefone (formato e164)",
-        "Clear all": "Limpar tudo"
+        "Clear all": "Limpar tudo",
+        "Are you sure you want to close this conversation?": "Tem certeza que deseja fechar esta conversação?",
+        "Confirm": "Confirmar",
+        "Cancel": "Cancelar"
     }
 }
