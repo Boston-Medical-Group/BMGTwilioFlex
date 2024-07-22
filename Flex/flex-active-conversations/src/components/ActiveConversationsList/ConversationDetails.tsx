@@ -21,6 +21,7 @@ type Props = {
     manager: Flex.Manager
     conversationSid: string
     closeCallback?: () => void
+    dialog: any
 }
 
 const closeConversation = async (manager: Flex.Manager, conversationSid: string) => {
@@ -37,13 +38,11 @@ const closeConversation = async (manager: Flex.Manager, conversationSid: string)
         .then((resp) => resp.json());
 }
 
-const ConversationDetails = ({ conversationSid, manager, closeCallback }: Props) => {
+const ConversationDetails = ({ conversationSid, manager, closeCallback, dialog }: Props) => {
 
     const [isClosing, setIsClosing] = useState(false)
     const { getConversation } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
     const { _l } = useLang();
-
-    const dialog = useSideModalState({});
 
     const [conversation, setConversation] = useState<any>()
     const [isLoading, setIsLoading] = useState(false)
