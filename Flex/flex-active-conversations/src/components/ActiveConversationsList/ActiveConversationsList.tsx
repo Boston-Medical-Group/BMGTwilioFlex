@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, FormEventHandler, useCallback, useEffect, useState } from 'react';
 import * as Flex from '@twilio/flex-ui';
 import { Icon } from '@twilio/flex-ui';
-import { ButtonGroup, Pagination, PaginationArrow, PaginationItems, PaginationLabel, useSideModalState } from '@twilio-paste/core';
+import { ButtonGroup, Form, Input, Label, Pagination, PaginationArrow, PaginationItems, PaginationLabel, Tooltip } from '@twilio-paste/core';
 import {
   Box, Table, THead, Tr, Th, TBody, Td, TFoot, Heading, SkeletonLoader, Text, Button
 } from '@twilio-paste/core';
@@ -13,6 +13,7 @@ import { ErrorIcon } from "@twilio-paste/icons/esm/ErrorIcon";
 import { TimeIcon } from "@twilio-paste/icons/esm/TimeIcon";
 import ConversationDetails from './ConversationDetails';
 import CloseActiveConversationButton from './CloseActiveConversationButton';
+import { InformationIcon } from '@twilio-paste/icons/esm/InformationIcon';
 
 type Props = {
   manager: Flex.Manager
@@ -34,6 +35,7 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedConversation, setSelectedConversation] = useState<any>()
   const [currentPage, setCurrentPage] = useState(1);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     loadPage()
@@ -87,13 +89,49 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
     event.preventDefault();
   };
 
+  const handleChangeQuery = (event : ChangeEvent<HTMLInputElement>) => {
+    setQuery(event.target.value);
+  }
+
+  const handleSubmitQuery = (event: FormEvent<HTMLFormElement>) : void => {
+    setSelectedConversation(query)
+    //@ts-ignore
+    event.preventDefault();
+  }
+
   return (
     <Box overflowY="auto" minHeight="100%" width={"100%"} padding={"space60"} verticalAlign={"top"}>
-      <Box marginBottom={"space30"} display="flex" columnGap={"space30"} alignItems={"center"} verticalAlign={"middle"}>
-        <Heading as="h3" variant="heading30" marginBottom='space0'>{_l('Active Conversations')}</Heading>
-        <Button variant="primary" onClick={() => reloadPage()} size='small'>
-          <Icon icon="Loading"  /> {_l('Refresh')}
-        </Button>
+      <Box display={"flex"} justifyContent={"space-between"} marginBottom={"space30"}>
+        <Box marginBottom={"space0"} display="flex" columnGap={"space30"} alignItems={"center"} verticalAlign={"middle"}>
+          <Heading as="h3" variant="heading30" marginBottom='space0'>{_l('Active Conversations')}</Heading>
+          <Button variant="primary" onClick={() => reloadPage()} size='small'>
+            <Icon icon="Loading"  /> {_l('Refresh')}
+          </Button>
+        </Box>
+
+        <Box>
+          <Form onSubmit={handleSubmitQuery}>
+            <Box display="flex" alignItems="flex-end" columnGap="space50">
+              <Box>
+                <Label htmlFor="query" required>
+                  <Box display="flex" alignItems="center">
+                    <Text as="span">{_l('Conversation ID')}</Text>
+                    <Tooltip text={_l('Conversation ID or SID provided by an agent')}>
+                        <InformationIcon decorative={false} title="Open Tooltip" display="block" />
+                    </Tooltip>
+                  </Box>
+                </Label>
+                <Input aria-describedby="query_text" id="query" name="query" type="search" placeholder="CHXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                  onChange={handleChangeQuery}
+                  onBlur={handleChangeQuery}
+                  required />
+              </Box>
+              <Box display="flex" columnGap="space50" paddingLeft="space40">
+                <Button variant='primary' type="submit">{_l('Search')}</Button>
+              </Box>
+            </Box>
+          </Form>
+        </Box>
       </Box>
       
       <Table>
