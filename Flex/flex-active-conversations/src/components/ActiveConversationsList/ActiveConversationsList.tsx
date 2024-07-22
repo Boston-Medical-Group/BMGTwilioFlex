@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FormEvent, FormEventHandler, useCallback, useEffect, useState } from 'react';
 import * as Flex from '@twilio/flex-ui';
 import { Icon } from '@twilio/flex-ui';
-import { ButtonGroup, Form, Input, Label, Pagination, PaginationArrow, PaginationItems, PaginationLabel, Tooltip } from '@twilio-paste/core';
+import { ButtonGroup, Form, Input, Label, Pagination, PaginationArrow, PaginationItems, PaginationLabel, Separator, Tooltip } from '@twilio-paste/core';
 import {
   Box, Table, THead, Tr, Th, TBody, Td, TFoot, Heading, SkeletonLoader, Text, Button
 } from '@twilio-paste/core';
@@ -14,6 +14,7 @@ import { TimeIcon } from "@twilio-paste/icons/esm/TimeIcon";
 import ConversationDetails from './ConversationDetails';
 import CloseActiveConversationButton from './CloseActiveConversationButton';
 import { InformationIcon } from '@twilio-paste/icons/esm/InformationIcon';
+import { SearchIcon } from "@twilio-paste/icons/esm/SearchIcon";
 
 type Props = {
   manager: Flex.Manager
@@ -36,16 +37,22 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
   const [selectedConversation, setSelectedConversation] = useState<any>()
   const [currentPage, setCurrentPage] = useState(1);
   const [query, setQuery] = useState('');
+  const [tmpPhone, setTmpPhone] = useState('');
+  const [phone, setPhone] = useState<undefined|string>(undefined);
 
   useEffect(() => {
     loadPage()
   }, [page])
 
-  const loadPage = async () => {
+  const loadPage = useCallback(async () => {
     setIsLoading(true)
-    await getActiveConversations(page).then((conversations) => {
-      //console.log(conversations)
-      setActiveConversations(conversations.instances)
+    await getActiveConversations(page, phone).then((conversations) => {
+      if (conversations.hasOwnProperty('instances')) {
+        setActiveConversations(conversations.instances)  
+      } else if (conversations !== undefined) {
+        setActiveConversations(conversations)
+      }
+      
       let pages: PageUrls = {
         nextPageUrl: null,
         previousPageUrl: null
@@ -59,13 +66,17 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
       setMeta(pages)
 
     }).then(() => setIsLoading(false))
-  }
+  },[page,phone])
 
-  const reloadPage = () => {
+  useEffect(() => {
+    reloadPage()
+  }, [phone])
+
+  const reloadPage = useCallback(() => {
     setPage('')
     loadPage()
     setCurrentPage(1);
-  }
+  }, [phone])
 
   const goToNextPage = (event : any) => {
     setPage(meta.nextPageUrl);
@@ -97,6 +108,19 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
     setSelectedConversation(query)
     //@ts-ignore
     event.preventDefault();
+  }
+
+  const handleChangeSearchPhone = (event : ChangeEvent<HTMLInputElement>) => {
+    setTmpPhone(event.target.value);
+  }
+
+  const handleApplySearchPhone = () => {
+    setPhone(tmpPhone)
+  }
+
+  const handleClearAllSearchPhone = () => {
+    setTmpPhone('')
+    setPhone(undefined)
   }
 
   return (
@@ -131,6 +155,37 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
               </Box>
             </Box>
           </Form>
+        </Box>
+      </Box>
+
+      <Separator orientation='horizontal' horizontalSpacing={'space40'} />
+
+      <Box marginBottom={'space60'}>
+        <Box display="flex" alignItems="flex-end" columnGap="space50">
+          <Box>
+            <Label htmlFor="phone" required>
+              <Box display="flex" alignItems="center">
+                <Text as="span">{_l('Phone Number (e164 format)')}</Text>
+              </Box>
+            </Label>
+            <Input aria-describedby="phone_text" id="phone" name="phone" type="text" placeholder="+XXXXXXXXXXX"
+              onChange={handleChangeSearchPhone}
+              required
+              value={tmpPhone}
+              insertAfter={
+                <Button variant="link" onClick={handleApplySearchPhone}>
+                  <SearchIcon decorative={false} title="Search" />
+                </Button>
+              }/>
+          </Box>
+          <Box display="flex" columnGap="space50" paddingLeft="space40">
+            <Button
+              variant="link"
+              onClick={handleClearAllSearchPhone}
+            >
+              {_l('Clear all')}
+            </Button>
+          </Box>
         </Box>
       </Box>
       

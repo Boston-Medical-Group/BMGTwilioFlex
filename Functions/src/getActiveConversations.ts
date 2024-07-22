@@ -8,6 +8,7 @@ import { ConversationInstance } from 'twilio/lib/rest/conversations/v1/conversat
 
 type MyEvent = {
     page: string
+    phone?: string
 }
 
 type MyContext = {
@@ -36,20 +37,69 @@ exports.handler = FunctionTokenValidator(async function (
     response.appendHeader("Content-Type", "application/json");
 
     try {
-        let sendResponse = {};
-        if (event.page) {
-            await context.getTwilioClient().conversations.v1.conversations.getPage(event.page).then((data) => {
-                sendResponse = data
-            })
-        } else {
-            await context.getTwilioClient().conversations.v1.conversations.page({
-                //@ts-ignore
-                state: "active",
-                pageSize: 20,
-                pageToken: event.page
+        let sendResponse : any = [];
+        if (event.phone) {
+            const whatsappConversations = await context.getTwilioClient().conversations.v1.participantConversations.list({
+                limit: 100,
+                address: event.phone.startsWith('whatsapp:') ? event.phone : `whatsapp:${event.phone}`
             }).then((data) => {
-                sendResponse = data
+                return data.filter((item) => item.conversationState === "active")
             })
+            const smsConversations = await context.getTwilioClient().conversations.v1.participantConversations.list({
+                limit: 100,
+                address: event.phone
+            }).then((data) => {
+                return data.filter((item) => item.conversationState === "active")
+            })
+
+            for (const wc of whatsappConversations) {
+                sendResponse.push({
+                    account_sid: wc.accountSid,
+                    attributes: wc.conversationAttributes,
+                    bindings: wc.participantMessagingBinding,
+                    chat_service_sid: wc.chatServiceSid,
+                    dateCreated: wc.conversationDateCreated,
+                    dateUpdated: wc.conversationDateUpdated,
+                    friendly_name: wc.conversationFriendlyName,
+                    links: wc.links,
+                    sid: wc.conversationSid,
+                    state: wc.conversationState,
+                    timers: wc.conversationTimers,
+                    unique_name: wc.conversationUniqueName
+                })
+            }
+
+            for (const sc of smsConversations) {
+                sendResponse.push({
+                    account_sid: sc.accountSid,
+                    attributes: sc.conversationAttributes,
+                    bindings: sc.participantMessagingBinding,
+                    chat_service_sid: sc.chatServiceSid,
+                    dateCreated: sc.conversationDateCreated,
+                    dateUpdated: sc.conversationDateUpdated,
+                    friendly_name: sc.conversationFriendlyName,
+                    links: sc.links,
+                    sid: sc.conversationSid,
+                    state: sc.conversationState,
+                    timers: sc.conversationTimers,
+                    unique_name: sc.conversationUniqueName
+                })
+            }
+        } else {
+            if (event.page) {
+                await context.getTwilioClient().conversations.v1.conversations.getPage(event.page).then((data) => {
+                    sendResponse = data
+                })
+            } else {
+                await context.getTwilioClient().conversations.v1.conversations.page({
+                    //@ts-ignore
+                    state: "active",
+                    pageSize: 20,
+                    pageToken: event.page
+                }).then((data) => {
+                    sendResponse = data
+                })
+            }
         }
 
         response.setBody(sendResponse);
