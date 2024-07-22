@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FormEvent, FormEventHandler, useCallback, useEffect, useState } from 'react';
 import * as Flex from '@twilio/flex-ui';
 import { Icon } from '@twilio/flex-ui';
-import { ButtonGroup, Form, Input, Label, Pagination, PaginationArrow, PaginationItems, PaginationLabel, Separator, Tooltip } from '@twilio-paste/core';
+import { Anchor, ButtonGroup, Form, Input, Label, Pagination, PaginationArrow, PaginationItems, PaginationLabel, Separator, Tooltip } from '@twilio-paste/core';
 import {
   Box, Table, THead, Tr, Th, TBody, Td, TFoot, Heading, SkeletonLoader, Text, Button
 } from '@twilio-paste/core';
@@ -141,7 +141,9 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
                   <Box display="flex" alignItems="center">
                     <Text as="span">{_l('Conversation ID')}</Text>
                     <Tooltip text={_l('Conversation ID or SID provided by an agent')}>
+                      <Anchor href="#">
                         <InformationIcon decorative={false} title="Open Tooltip" display="block" />
+                      </Anchor>
                     </Tooltip>
                   </Box>
                 </Label>
@@ -158,7 +160,7 @@ const ActiveConversationsList = ({ manager }: Props) : JSX.Element | null => {
         </Box>
       </Box>
 
-      <Separator orientation='horizontal' horizontalSpacing={'space40'} />
+      <Separator orientation='horizontal' verticalSpacing={'space40'} />
 
       <Box marginBottom={'space60'}>
         <Box display="flex" alignItems="flex-end" columnGap="space50">
