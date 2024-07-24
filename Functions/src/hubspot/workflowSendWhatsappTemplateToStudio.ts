@@ -45,7 +45,7 @@ export const handler = async (
     event: MyEvent,
     callback: ServerlessCallback
 ) => {
-
+/*
     const authHeader = event.request.headers.authorization;
     const response = new Twilio.Response();
 
@@ -66,7 +66,7 @@ export const handler = async (
     // If the username or password don't match the expected values, reject
     if (username !== context.ACCOUNT_SID || password !== context.AUTH_TOKEN)
         return callback(null, setUnauthorized(response));
-
+*/
     const client = context.getTwilioClient()
 
     let parameters: Object = Object.keys(event)
@@ -98,7 +98,8 @@ export const handler = async (
     })
 
     let returnObject: any = { 'result': 'OK' };
-    let nestedError : Array<string> = [];
+    let nestedError: Array<string> = [];
+    let hasError = false
     try {
         const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
@@ -125,13 +126,16 @@ export const handler = async (
                     }).then(async (webhook) => {
                         let msg: any;
                         let templateName: string = ''
+                        let isOk = true
                         if (event.message) {
                             //@ts-ignore
                             msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                                 body: event.message
-                            }).catch((err) => {
-                                nestedError.push(err.message ?? 'NESTED ERROR: 133')
-                                console.log('ERROR workflowSendWhatsappTemplateToStudio@134');
+                            }).catch(async (err) => {
+                                hasError = true
+                                isOk = false
+                                nestedError.push(err.message ?? 'NESTED ERROR: 135')
+                                console.log('ERROR workflowSendWhatsappTemplateToStudio@136');
                                 console.log(err);
                             })
                         } else if (event.template) {
@@ -140,52 +144,65 @@ export const handler = async (
                                 .then((content) => {
                                     templateName = content.friendlyName
                                 })
-                                .catch((err) => {
-                                    nestedError.push(err.message ?? 'NESTED ERROR: 144')
-                                    console.log('ERROR workflowSendWhatsappTemplateToStudio@145');
-                                    console.log(err);
-                                })
                             
                             msg = await client.conversations.v1.conversations(conversation.sid).messages.create({
                                 contentSid: event.template,
                                 contentVariables: JSON.stringify(parameters)
-                            }).catch((err) => {
-                                nestedError.push(err.message ?? 'NESTED ERROR: 153')
-                                console.log('ERROR workflowSendWhatsappTemplateToStudio@154');
+                            }).catch(async (err) => {
+                                hasError = true
+                                isOk = false
+                                nestedError.push(err.message ?? 'NESTED ERROR: 151')
+                                console.log('ERROR workflowSendWhatsappTemplateToStudio@152');
                                 console.log(err);
                             })
                         }
 
-                        await createNobodyTask({
-                            context,
-                            from: whatsappAddressTo,
-                            conversationSid: conversation.sid,
-                            flowSid: event.flowSid,
-                            flowName: event.flowName ?? 'Unknown Flow',
-                            name: event.fullname,
-                            leadOrPatient: event.leadOrPatient ?? '',
-                            contactId: event.contactId,
-                            hubspotAccountId: event.hubspotAccountId ?? undefined,
-                            implementation: event.implementation ?? 'Transactional',
-                            abandoned: event.abandoned ?? 'No',
-                            customParam: event.customParam ?? 'nodata',
-                            templateName
-                        })
+                        if (isOk) {
+                            await createNobodyTask({
+                                context,
+                                from: whatsappAddressTo,
+                                conversationSid: conversation.sid,
+                                flowSid: event.flowSid,
+                                flowName: event.flowName ?? 'Unknown Flow',
+                                name: event.fullname,
+                                leadOrPatient: event.leadOrPatient ?? '',
+                                contactId: event.contactId,
+                                hubspotAccountId: event.hubspotAccountId ?? undefined,
+                                implementation: event.implementation ?? 'Transactional',
+                                abandoned: event.abandoned ?? 'No',
+                                customParam: event.customParam ?? 'nodata',
+                                templateName
+                            })
 
-                        returnObject = {
-                            ...returnObject,
-                            sid: msg.sid,
-                            body: msg.body
+                            returnObject = {
+                                ...returnObject,
+                                sid: msg.sid,
+                                body: msg.body
+                            }
+                        } else {
+                            await conversation.update({ state: "closed" })
+                            hasError = true
                         }
-                    }).catch((err) => {
-                        nestedError.push(err.message ?? 'NESTED ERROR: 181')
-                        console.log('ERROR workflowSendWhatsappTemplateToStudio@182');
+                    }).catch(async (err) => {
+                        await conversation.update({ state: "closed" })
+                        hasError = true
+                        nestedError.push(err.message ?? 'NESTED ERROR: 182')
+                        console.log('ERROR workflowSendWhatsappTemplateToStudio@183');
                         console.log(err);
+                        
                     })
+                }).catch(async (err) => {
+                    // Si no se pudo agregar el participante a la conversación, se cierra la conversación
+                    hasError = true
+                    await conversation.update({ state: "closed" })
+                    nestedError.push(err.message ?? 'NESTED ERROR: 191')
+                    console.log('ERROR workflowSendWhatsappTemplateToStudio@192');
+                    console.log(err);
                 })
             }).catch((err) => {
-                nestedError.push(err.message ?? 'NESTED ERROR: 187')
-                console.log('ERROR workflowSendWhatsappTemplateToStudio@188');
+                hasError = true
+                nestedError.push(err.message ?? 'NESTED ERROR: 197')
+                console.log('ERROR workflowSendWhatsappTemplateToStudio@198');
                 console.log(err);
             })
         } else {
@@ -196,27 +213,26 @@ export const handler = async (
                 msg = await client.conversations.v1.conversations(activeConversation).messages.create({
                     body: event.message
                 }).catch((err) => {
-                    nestedError.push(err.message ?? 'NESTED ERROR: 199')
-                    console.log('ERROR workflowSendWhatsappTemplateToStudio@200');
+                    hasError = true
+                    nestedError.push(err.message ?? 'NESTED ERROR: 210')
+                    console.log('ERROR workflowSendWhatsappTemplateToStudio@211');
                     console.log(err);
                 })
             } else if (event.template) {
+                // Sólo analitica
                 await client.content.v1.contents(event.template)
                     .fetch()
                     .then((content) => {
                         templateName = content.friendlyName
-                    }).catch((err) => {
-                        nestedError.push(err.message ?? 'NESTED ERROR: 209')
-                        console.log('ERROR workflowSendWhatsappTemplateToStudio@210');
-                        console.log(err);
                     })
 
                 msg = await client.conversations.v1.conversations(activeConversation).messages.create({
                     contentSid: event.template,
                     contentVariables: JSON.stringify(parameters)
                 }).catch((err) => {
-                    nestedError.push(err.message ?? 'NESTED ERROR: 218')
-                    console.log('ERROR workflowSendWhatsappTemplateToStudio@219');
+                    hasError = true
+                    nestedError.push(err.message ?? 'NESTED ERROR: 227')
+                    console.log('ERROR workflowSendWhatsappTemplateToStudio@228');
                     console.log(err);
                 })
             }
@@ -250,6 +266,12 @@ export const handler = async (
         returnObject.nestedError = nestedError
     }
 
+    if (hasError) {
+        returnObject.result = 'ERROR'
+        returnObject.error = 'Internal logic error'
+        returnObject.nestedError = nestedError
+    }
+
     callback(null, returnObject)
 
 }
@@ -264,6 +286,15 @@ const getActiveConversation = async (context: Context<MyContext>, whatsappAddres
     const activeConversation = conversations.find((conversation) => conversation.conversationState === 'active')
     if (activeConversation != undefined) {
         return activeConversation.conversationSid;
+        /*
+// NO PUEDO HACER ESTO AÚN PORQUE UNA CONVERSACION CON 1 SOLO PARTICIPANTE PUEDE SER UNA CONFIRMACION DE CITA PREVIA
+
+        const participants = await client.conversations.v1.conversations(activeConversation.conversationSid).participants.list({})
+        if (participants.length < 2) {
+            await client.conversations.v1.conversations(activeConversation.conversationSid).update({ state: "closed" })
+        } else {
+            return activeConversation.conversationSid;
+        }*/
     }
 
     return null;

@@ -199,6 +199,13 @@ export const handler = async (
                     .update({
                         assignmentStatus: 'canceled'
                     })
+                
+                const participants = await client.conversations.v1.conversations(activeConversation).participants.list()
+                if (participants.length < 2) {
+                    await client.conversations.v1.conversations(activeConversation).update({
+                        state: 'closed'
+                    })
+                }
             })
 
             returnObject = {
