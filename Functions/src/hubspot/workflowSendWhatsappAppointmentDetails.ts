@@ -103,14 +103,15 @@ export const handler = async (
         const activeConversation = await getActiveConversation(context, whatsappAddressTo)
         if (activeConversation === null) {
             const timestamp = (new Date).getTime();
-            await client.conversations.v1.conversations.create({
+            let conversationAttributes = {
                 friendlyName: `HubspotWorkflow -> ${event.phone} (${timestamp})`,
                 attributes: JSON.stringify(attributes),
-                timers: {
-                    inactive: 'PT30M',
-                    closed: 'PT1H'
-                }
-            }).then(async (conversation) => {
+                //@ts-ignore
+                "timers.inactive": 'PT30M',
+                //@ts-ignore
+                "timers.closed": 'PT1H'
+            }
+            await client.conversations.v1.conversations.create(conversationAttributes).then(async (conversation) => {
                 return await client.conversations.v1.conversations(conversation.sid).participants.create({
                     //@ts-ignore
                     "messagingBinding.address": whatsappAddressTo,
@@ -230,7 +231,7 @@ const getActiveConversation = async (context: Context<MyContext>, whatsappAddres
         limit: 50,
     });
 
-    const activeConversation = conversations.find((conversation) => conversation.conversationState === 'active')
+    const activeConversation = conversations.find((conversation) => conversation.conversationState !== 'closed')
     if (activeConversation != undefined) {
         return activeConversation.conversationSid;
     }

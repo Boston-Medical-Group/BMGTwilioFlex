@@ -17,23 +17,29 @@ const registerNotifications = (manager) => {
   manager.strings.alreadyActiveConversationWithAnotherAgent = "Al parecer el contacto con el que desea interactuar ya es encuentra en interacción con otro agente. ID Conversación: {{conversationSid}}";
   manager.strings.alreadyActiveConversationWithAgent = "Ya está interactuando con este contacto. Si esto es un error póngase en contacto con un Administrador. ID Conversación: {{conversationSid}}";
   manager.strings.alreadyActiveConversationWithoutAgent = "Al parecer este contacto se encuentra en una interacción activa. Si esto es un error póngase en contacto con un Administrador. ID Conversación: {{conversationSid}}";
-  Notifications.registerNotification({
-    id: "ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT",
-    content: "alreadyActiveConversationWithAnotherAgent",
-    type: NotificationType.error
-  });
+  if (!Notifications.registeredNotifications.has('ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT')) {
+    Notifications.registerNotification({
+      id: "ALREADY_ACTIVE_CONVERSATION_WITH_ANOTHER_AGENT",
+      content: "alreadyActiveConversationWithAnotherAgent",
+      type: NotificationType.error
+    });
+  }
 
-  Notifications.registerNotification({
-    id: "ALREADY_ACTIVE_CONVERSATION_WITH_AGENT",
-    content: "alreadyActiveConversationWithAgent",
-    type: NotificationType.error
-  });
+  if (!Notifications.registeredNotifications.has('ALREADY_ACTIVE_CONVERSATION_WITH_AGENT')) {
+    Notifications.registerNotification({
+      id: "ALREADY_ACTIVE_CONVERSATION_WITH_AGENT",
+      content: "alreadyActiveConversationWithAgent",
+      type: NotificationType.error
+    });
+  }
 
-  Notifications.registerNotification({
-    id: "ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT",
-    content: "alreadyActiveConversationWithoutAgent",
-    type: NotificationType.error
-  });
+  if (!Notifications.registeredNotifications.has('ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT')) {
+    Notifications.registerNotification({
+      id: "ALREADY_ACTIVE_CONVERSATION_WITHOUT_AGENT",
+      content: "alreadyActiveConversationWithoutAgent",
+      type: NotificationType.error
+    });
+  }
 }
 
 export default class HubspotInteractPlugin extends FlexPlugin {
