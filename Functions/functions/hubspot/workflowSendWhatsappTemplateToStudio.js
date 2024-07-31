@@ -64,26 +64,11 @@ var api_client_1 = require("@hubspot/api-client");
  *
  */
 var handler = function (context, event, callback) { return __awaiter(void 0, void 0, void 0, function () {
-    var authHeader, response, _a, authType, credentials, _b, username, password, client, parameters, attributes, currentlyRequiredAttributes, returnObject, nestedError, whatsappAddressTo_1, whatsappAddressFrom_1, activeConversation, timestamp, msg, templateName_1, error_1;
-    var _c, _d, _e, _f, _g, _h;
-    return __generator(this, function (_j) {
-        switch (_j.label) {
+    var client, parameters, attributes, currentlyRequiredAttributes, returnObject, nestedError, hasError, whatsappAddressTo_1, whatsappAddressFrom_1, activeConversation, timestamp, msg, templateName_1, error_1;
+    var _a, _b, _c, _d, _e, _f;
+    return __generator(this, function (_g) {
+        switch (_g.label) {
             case 0:
-                authHeader = event.request.headers.authorization;
-                response = new Twilio.Response();
-                // Reject requests that don't have an Authorization header
-                if (!authHeader)
-                    return [2 /*return*/, callback(null, setUnauthorized(response))];
-                _a = authHeader.split(' '), authType = _a[0], credentials = _a[1];
-                // If the auth type doesn't match Basic, reject the request
-                if (authType.toLowerCase() !== 'basic')
-                    return [2 /*return*/, callback(null, setUnauthorized(response))];
-                _b = Buffer.from(credentials, 'base64')
-                    .toString()
-                    .split(':'), username = _b[0], password = _b[1];
-                // If the username or password don't match the expected values, reject
-                if (username !== context.ACCOUNT_SID || password !== context.AUTH_TOKEN)
-                    return [2 /*return*/, callback(null, setUnauthorized(response))];
                 client = context.getTwilioClient();
                 parameters = Object.keys(event)
                     .filter(function (k) { return k.indexOf('param_') == 0; })
@@ -114,14 +99,15 @@ var handler = function (context, event, callback) { return __awaiter(void 0, voi
                 });
                 returnObject = { 'result': 'OK' };
                 nestedError = [];
-                _j.label = 1;
+                hasError = false;
+                _g.label = 1;
             case 1:
-                _j.trys.push([1, 12, , 13]);
+                _g.trys.push([1, 12, , 13]);
                 whatsappAddressTo_1 = event.phone.indexOf('whatsapp:') === -1 ? "whatsapp:".concat(event.phone) : "".concat(event.phone);
                 whatsappAddressFrom_1 = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? "whatsapp:".concat(context.TWILIO_WA_PHONE_NUMBER) : "".concat(context.TWILIO_WA_PHONE_NUMBER);
                 return [4 /*yield*/, getActiveConversation(context, whatsappAddressTo_1)];
             case 2:
-                activeConversation = _j.sent();
+                activeConversation = _g.sent();
                 if (!(activeConversation === null)) return [3 /*break*/, 4];
                 timestamp = (new Date).getTime();
                 return [4 /*yield*/, client.conversations.v1.conversations.create({
@@ -146,21 +132,27 @@ var handler = function (context, event, callback) { return __awaiter(void 0, voi
                                                         //@ts-ignore
                                                         "configuration.flowSid": event.flowSid
                                                     }).then(function (webhook) { return __awaiter(void 0, void 0, void 0, function () {
-                                                        var msg, templateName;
+                                                        var msg, templateName, isOk;
                                                         var _a, _b, _c, _d, _e, _f;
                                                         return __generator(this, function (_g) {
                                                             switch (_g.label) {
                                                                 case 0:
                                                                     templateName = '';
+                                                                    isOk = true;
                                                                     if (!event.message) return [3 /*break*/, 2];
                                                                     return [4 /*yield*/, client.conversations.v1.conversations(conversation.sid).messages.create({
                                                                             body: event.message
-                                                                        }).catch(function (err) {
+                                                                        }).catch(function (err) { return __awaiter(void 0, void 0, void 0, function () {
                                                                             var _a;
-                                                                            nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 133');
-                                                                            console.log('ERROR workflowSendWhatsappTemplateToStudio@134');
-                                                                            console.log(err);
-                                                                        })];
+                                                                            return __generator(this, function (_b) {
+                                                                                hasError = true;
+                                                                                isOk = false;
+                                                                                nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 135');
+                                                                                console.log('ERROR workflowSendWhatsappTemplateToStudio@136');
+                                                                                console.log(err);
+                                                                                return [2 /*return*/];
+                                                                            });
+                                                                        }); })];
                                                                 case 1:
                                                                     //@ts-ignore
                                                                     msg = _g.sent();
@@ -171,55 +163,87 @@ var handler = function (context, event, callback) { return __awaiter(void 0, voi
                                                                             .fetch()
                                                                             .then(function (content) {
                                                                             templateName = content.friendlyName;
-                                                                        })
-                                                                            .catch(function (err) {
-                                                                            var _a;
-                                                                            nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 144');
-                                                                            console.log('ERROR workflowSendWhatsappTemplateToStudio@145');
-                                                                            console.log(err);
                                                                         })];
                                                                 case 3:
                                                                     _g.sent();
                                                                     return [4 /*yield*/, client.conversations.v1.conversations(conversation.sid).messages.create({
                                                                             contentSid: event.template,
                                                                             contentVariables: JSON.stringify(parameters)
-                                                                        }).catch(function (err) {
+                                                                        }).catch(function (err) { return __awaiter(void 0, void 0, void 0, function () {
                                                                             var _a;
-                                                                            nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 153');
-                                                                            console.log('ERROR workflowSendWhatsappTemplateToStudio@154');
-                                                                            console.log(err);
-                                                                        })];
+                                                                            return __generator(this, function (_b) {
+                                                                                hasError = true;
+                                                                                isOk = false;
+                                                                                nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 151');
+                                                                                console.log('ERROR workflowSendWhatsappTemplateToStudio@152');
+                                                                                console.log(err);
+                                                                                return [2 /*return*/];
+                                                                            });
+                                                                        }); })];
                                                                 case 4:
                                                                     msg = _g.sent();
                                                                     _g.label = 5;
-                                                                case 5: return [4 /*yield*/, createNobodyTask({
-                                                                        context: context,
-                                                                        from: whatsappAddressTo_1,
-                                                                        conversationSid: conversation.sid,
-                                                                        flowSid: event.flowSid,
-                                                                        flowName: (_a = event.flowName) !== null && _a !== void 0 ? _a : 'Unknown Flow',
-                                                                        name: event.fullname,
-                                                                        leadOrPatient: (_b = event.leadOrPatient) !== null && _b !== void 0 ? _b : '',
-                                                                        contactId: event.contactId,
-                                                                        hubspotAccountId: (_c = event.hubspotAccountId) !== null && _c !== void 0 ? _c : undefined,
-                                                                        implementation: (_d = event.implementation) !== null && _d !== void 0 ? _d : 'Transactional',
-                                                                        abandoned: (_e = event.abandoned) !== null && _e !== void 0 ? _e : 'No',
-                                                                        customParam: (_f = event.customParam) !== null && _f !== void 0 ? _f : 'nodata',
-                                                                        templateName: templateName
-                                                                    })];
+                                                                case 5:
+                                                                    if (!isOk) return [3 /*break*/, 7];
+                                                                    return [4 /*yield*/, createNobodyTask({
+                                                                            context: context,
+                                                                            from: whatsappAddressTo_1,
+                                                                            conversationSid: conversation.sid,
+                                                                            flowSid: event.flowSid,
+                                                                            flowName: (_a = event.flowName) !== null && _a !== void 0 ? _a : 'Unknown Flow',
+                                                                            name: event.fullname,
+                                                                            leadOrPatient: (_b = event.leadOrPatient) !== null && _b !== void 0 ? _b : '',
+                                                                            contactId: event.contactId,
+                                                                            hubspotAccountId: (_c = event.hubspotAccountId) !== null && _c !== void 0 ? _c : undefined,
+                                                                            implementation: (_d = event.implementation) !== null && _d !== void 0 ? _d : 'Transactional',
+                                                                            abandoned: (_e = event.abandoned) !== null && _e !== void 0 ? _e : 'No',
+                                                                            customParam: (_f = event.customParam) !== null && _f !== void 0 ? _f : 'nodata',
+                                                                            templateName: templateName
+                                                                        })];
                                                                 case 6:
                                                                     _g.sent();
                                                                     returnObject = __assign(__assign({}, returnObject), { sid: msg.sid, body: msg.body });
+                                                                    return [3 /*break*/, 9];
+                                                                case 7: return [4 /*yield*/, conversation.update({ state: "closed" })];
+                                                                case 8:
+                                                                    _g.sent();
+                                                                    hasError = true;
+                                                                    _g.label = 9;
+                                                                case 9: return [2 /*return*/];
+                                                            }
+                                                        });
+                                                    }); }).catch(function (err) { return __awaiter(void 0, void 0, void 0, function () {
+                                                        var _a;
+                                                        return __generator(this, function (_b) {
+                                                            switch (_b.label) {
+                                                                case 0: return [4 /*yield*/, conversation.update({ state: "closed" })];
+                                                                case 1:
+                                                                    _b.sent();
+                                                                    hasError = true;
+                                                                    nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 182');
+                                                                    console.log('ERROR workflowSendWhatsappTemplateToStudio@183');
+                                                                    console.log(err);
                                                                     return [2 /*return*/];
                                                             }
                                                         });
-                                                    }); }).catch(function (err) {
-                                                        var _a;
-                                                        nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 181');
-                                                        console.log('ERROR workflowSendWhatsappTemplateToStudio@182');
-                                                        console.log(err);
-                                                    })];
+                                                    }); })];
                                                 case 1: return [2 /*return*/, _a.sent()];
+                                            }
+                                        });
+                                    }); }).catch(function (err) { return __awaiter(void 0, void 0, void 0, function () {
+                                        var _a;
+                                        return __generator(this, function (_b) {
+                                            switch (_b.label) {
+                                                case 0:
+                                                    // Si no se pudo agregar el participante a la conversación, se cierra la conversación
+                                                    hasError = true;
+                                                    return [4 /*yield*/, conversation.update({ state: "closed" })];
+                                                case 1:
+                                                    _b.sent();
+                                                    nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 191');
+                                                    console.log('ERROR workflowSendWhatsappTemplateToStudio@192');
+                                                    console.log(err);
+                                                    return [2 /*return*/];
                                             }
                                         });
                                     }); })];
@@ -228,12 +252,13 @@ var handler = function (context, event, callback) { return __awaiter(void 0, voi
                         });
                     }); }).catch(function (err) {
                         var _a;
-                        nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 187');
-                        console.log('ERROR workflowSendWhatsappTemplateToStudio@188');
+                        hasError = true;
+                        nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 197');
+                        console.log('ERROR workflowSendWhatsappTemplateToStudio@198');
                         console.log(err);
                     })];
             case 3:
-                _j.sent();
+                _g.sent();
                 return [3 /*break*/, 11];
             case 4:
                 msg = void 0;
@@ -243,68 +268,72 @@ var handler = function (context, event, callback) { return __awaiter(void 0, voi
                         body: event.message
                     }).catch(function (err) {
                         var _a;
-                        nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 199');
-                        console.log('ERROR workflowSendWhatsappTemplateToStudio@200');
+                        hasError = true;
+                        nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 210');
+                        console.log('ERROR workflowSendWhatsappTemplateToStudio@211');
                         console.log(err);
                     })];
             case 5:
                 //@ts-ignore
-                msg = _j.sent();
+                msg = _g.sent();
                 return [3 /*break*/, 9];
             case 6:
                 if (!event.template) return [3 /*break*/, 9];
+                // Sólo analitica
                 return [4 /*yield*/, client.content.v1.contents(event.template)
                         .fetch()
                         .then(function (content) {
                         templateName_1 = content.friendlyName;
-                    }).catch(function (err) {
-                        var _a;
-                        nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 209');
-                        console.log('ERROR workflowSendWhatsappTemplateToStudio@210');
-                        console.log(err);
                     })];
             case 7:
-                _j.sent();
+                // Sólo analitica
+                _g.sent();
                 return [4 /*yield*/, client.conversations.v1.conversations(activeConversation).messages.create({
                         contentSid: event.template,
                         contentVariables: JSON.stringify(parameters)
                     }).catch(function (err) {
                         var _a;
-                        nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 218');
-                        console.log('ERROR workflowSendWhatsappTemplateToStudio@219');
+                        hasError = true;
+                        nestedError.push((_a = err.message) !== null && _a !== void 0 ? _a : 'NESTED ERROR: 227');
+                        console.log('ERROR workflowSendWhatsappTemplateToStudio@228');
                         console.log(err);
                     })];
             case 8:
-                msg = _j.sent();
-                _j.label = 9;
+                msg = _g.sent();
+                _g.label = 9;
             case 9: return [4 /*yield*/, createNobodyTask({
                     context: context,
                     from: whatsappAddressTo_1,
                     conversationSid: activeConversation,
                     flowSid: event.flowSid,
-                    flowName: (_c = event.flowName) !== null && _c !== void 0 ? _c : 'Unknown Flow',
+                    flowName: (_a = event.flowName) !== null && _a !== void 0 ? _a : 'Unknown Flow',
                     name: event.fullname,
-                    leadOrPatient: (_d = event.leadOrPatient) !== null && _d !== void 0 ? _d : '',
+                    leadOrPatient: (_b = event.leadOrPatient) !== null && _b !== void 0 ? _b : '',
                     contactId: event.contactId,
-                    hubspotAccountId: (_e = event.hubspotAccountId) !== null && _e !== void 0 ? _e : undefined,
-                    implementation: (_f = event.implementation) !== null && _f !== void 0 ? _f : 'Transactional',
-                    abandoned: (_g = event.abandoned) !== null && _g !== void 0 ? _g : 'No',
-                    customParam: (_h = event.customParam) !== null && _h !== void 0 ? _h : 'nodata',
+                    hubspotAccountId: (_c = event.hubspotAccountId) !== null && _c !== void 0 ? _c : undefined,
+                    implementation: (_d = event.implementation) !== null && _d !== void 0 ? _d : 'Transactional',
+                    abandoned: (_e = event.abandoned) !== null && _e !== void 0 ? _e : 'No',
+                    customParam: (_f = event.customParam) !== null && _f !== void 0 ? _f : 'nodata',
                     templateName: templateName_1
                 })];
             case 10:
-                _j.sent();
+                _g.sent();
                 returnObject = __assign(__assign({}, returnObject), { sid: msg.sid, body: msg.body });
-                _j.label = 11;
+                _g.label = 11;
             case 11: return [3 /*break*/, 13];
             case 12:
-                error_1 = _j.sent();
+                error_1 = _g.sent();
                 console.log(error_1);
                 returnObject.result = 'ERROR';
                 returnObject.error = error_1;
                 returnObject.nestedError = nestedError;
                 return [3 /*break*/, 13];
             case 13:
+                if (hasError) {
+                    returnObject.result = 'ERROR';
+                    returnObject.error = 'Internal logic error';
+                    returnObject.nestedError = nestedError;
+                }
                 callback(null, returnObject);
                 return [2 /*return*/];
         }
@@ -326,6 +355,15 @@ var getActiveConversation = function (context, whatsappAddressTo) { return __awa
                 activeConversation = conversations.find(function (conversation) { return conversation.conversationState === 'active'; });
                 if (activeConversation != undefined) {
                     return [2 /*return*/, activeConversation.conversationSid];
+                    /*
+            // NO PUEDO HACER ESTO AÚN PORQUE UNA CONVERSACION CON 1 SOLO PARTICIPANTE PUEDE SER UNA CONFIRMACION DE CITA PREVIA
+            
+                    const participants = await client.conversations.v1.conversations(activeConversation.conversationSid).participants.list({})
+                    if (participants.length < 2) {
+                        await client.conversations.v1.conversations(activeConversation.conversationSid).update({ state: "closed" })
+                    } else {
+                        return activeConversation.conversationSid;
+                    }*/
                 }
                 return [2 /*return*/, null];
         }
@@ -424,4 +462,4 @@ var setUnauthorized = function (response) {
         .appendHeader('WWW-Authenticate', 'Basic realm="Authentication Required"');
     return response;
 };
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoid29ya2Zsb3dTZW5kV2hhdHNhcHBUZW1wbGF0ZVRvU3R1ZGlvLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2h1YnNwb3Qvd29ya2Zsb3dTZW5kV2hhdHNhcHBUZW1wbGF0ZVRvU3R1ZGlvLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQ0Esa0RBQThEO0FBMEI5RDs7Ozs7Ozs7Ozs7OztHQWFHO0FBRUksSUFBTSxPQUFPLEdBQUcsVUFDbkIsT0FBMkIsRUFDM0IsS0FBYyxFQUNkLFFBQTRCOzs7Ozs7Z0JBR3RCLFVBQVUsR0FBRyxLQUFLLENBQUMsT0FBTyxDQUFDLE9BQU8sQ0FBQyxhQUFhLENBQUM7Z0JBQ2pELFFBQVEsR0FBRyxJQUFJLE1BQU0sQ0FBQyxRQUFRLEVBQUUsQ0FBQztnQkFFdkMsMERBQTBEO2dCQUMxRCxJQUFJLENBQUMsVUFBVTtvQkFBRSxzQkFBTyxRQUFRLENBQUMsSUFBSSxFQUFFLGVBQWUsQ0FBQyxRQUFRLENBQUMsQ0FBQyxFQUFDO2dCQUc1RCxLQUEwQixVQUFVLENBQUMsS0FBSyxDQUFDLEdBQUcsQ0FBQyxFQUE5QyxRQUFRLFFBQUEsRUFBRSxXQUFXLFFBQUEsQ0FBMEI7Z0JBQ3RELDJEQUEyRDtnQkFDM0QsSUFBSSxRQUFRLENBQUMsV0FBVyxFQUFFLEtBQUssT0FBTztvQkFDbEMsc0JBQU8sUUFBUSxDQUFDLElBQUksRUFBRSxlQUFlLENBQUMsUUFBUSxDQUFDLENBQUMsRUFBQztnQkFJL0MsS0FBdUIsTUFBTSxDQUFDLElBQUksQ0FBQyxXQUFXLEVBQUUsUUFBUSxDQUFDO3FCQUMxRCxRQUFRLEVBQUU7cUJBQ1YsS0FBSyxDQUFDLEdBQUcsQ0FBQyxFQUZSLFFBQVEsUUFBQSxFQUFFLFFBQVEsUUFBQSxDQUVUO2dCQUNoQixzRUFBc0U7Z0JBQ3RFLElBQUksUUFBUSxLQUFLLE9BQU8sQ0FBQyxXQUFX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
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoid29ya2Zsb3dTZW5kV2hhdHNhcHBUZW1wbGF0ZVRvU3R1ZGlvLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2h1YnNwb3Qvd29ya2Zsb3dTZW5kV2hhdHNhcHBUZW1wbGF0ZVRvU3R1ZGlvLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0FBQ0Esa0RBQThEO0FBMEI5RDs7Ozs7Ozs7Ozs7OztHQWFHO0FBRUksSUFBTSxPQUFPLEdBQUcsVUFDbkIsT0FBMkIsRUFDM0IsS0FBYyxFQUNkLFFBQTRCOzs7Ozs7Z0JBd0J0QixNQUFNLEdBQUcsT0FBTyxDQUFDLGVBQWUsRUFBRSxDQUFBO2dCQUVwQyxVQUFVLEdBQVcsTUFBTSxDQUFDLElBQUksQ0FBQyxLQUFLLENBQUM7cUJBQ3RDLE1BQU0sQ0FBQyxVQUFDLENBQUMsSUFBSyxPQUFBLENBQUMsQ0FBQyxPQUFPLENBQUMsUUFBUSxDQUFDLElBQUksQ0FBQyxFQUF4QixDQUF3QixDQUFDO3FCQUN2QyxNQUFNLENBQUMsVUFBQyxNQUFNLEVBQUUsQ0FBQztvQkFDZCxJQUFJLFFBQVEsR0FBRyxDQUFDLENBQUMsT0FBTyxDQUFDLFFBQVEsRUFBRSxFQUFFLENBQUMsQ0FBQztvQkFDdkMsWUFBWTtvQkFDWixNQUFNLENBQUMsUUFBUSxDQUFDLFFBQVEsQ0FBQyxDQUFDLEdBQUcsS0FBSyxDQUFDLENBQUMsQ0FBQyxDQUFDO29CQUN0QyxPQUFPLE1BQU0sQ0FBQztnQkFDbEIsQ0FBQyxFQUFFLEVBQUUsQ0FBQyxDQUFBO2dCQUVOLFVBQVUsR0FBK0IsTUFBTSxDQUFDLElBQUksQ0FBQyxLQUFLLENBQUM7cUJBQzFELE1BQU0sQ0FBQyxVQUFDLENBQUMsSUFBSyxPQUFBLENBQUMsQ0FBQyxPQUFPLENBQUMsUUFBUSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsSUFBSSxTQUFTLEVBQTFDLENBQTBDLENB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
