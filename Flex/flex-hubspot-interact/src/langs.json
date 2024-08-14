@@ -36,7 +36,12 @@
         "Select": "Select",
         "Latest errors": "Latest errors",
         "No recent errors": "No recent errors",
-        "Error fetching templates": "Error fetching templates"
+        "Error fetching templates": "Error fetching templates",
+        "Start conversation with %": "Start conversation with",
+        "Select Whatsapp address to start a conversation": "Select Whatsapp address to start a conversation",
+        "Do no whatsapp": "Do no whatsapp",
+        "To start a whatsapp conversation, please change your status different from 'Offline'": "To start a whatsapp conversation, please change your status different from 'Offline'",
+        "Start conversation": "Start conversation"
     },
     "es": {
         "Call %": "Llamar a",
@@ -75,7 +80,12 @@
         "Select": "Seleccionar",
         "Latest errors": "Últimos errores",
         "No recent errors": "No hay errores recientes",
-        "Error fetching templates": "Error al obtener las plantillas"
+        "Error fetching templates": "Error al obtener las plantillas",
+        "Start conversation with %": "Iniciar conversación con",
+        "Select Whatsapp address to start a conversation": "Seleccionar la dirección de WhatsApp para iniciar una conversación",
+        "Do no whatsapp": "No enviar whatsapp",
+        "To start a whatsapp conversation, please change your status different from 'Offline'": "Para iniciar una conversación de whatsapp, cambie su estado distinto a 'Offline'",
+        "Start conversation": "Iniciar conversación"
     },
     "pt": {
         "Call %": "Ligar",
@@ -114,6 +124,11 @@
         "Select": "Selecionar",
         "Latest errors": "Últimos erros",
         "No recent errors": "Nenhum erro recente",
-        "Error fetching templates": "Erro ao buscar modelos"
+        "Error fetching templates": "Erro ao buscar modelos",
+        "Start conversation with %": "Iniciar conversação com",
+        "Select Whatsapp address to start a conversation": "Selecionar o endereço de WhatsApp para iniciar uma conversação",
+        "Do no whatsapp": "Não enviar whatsapp",
+        "To start a whatsapp conversation, please change your status different from 'Offline'": "Para iniciar uma conversação de whatsapp, altere seu estado diferente de 'Offline'",
+        "Start conversation": "Iniciar conversação"
     }
 }

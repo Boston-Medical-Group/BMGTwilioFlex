@@ -10,7 +10,7 @@ type MyContext = {
 
 const fetchByContact = async (contact_id: string, context: Context<MyContext>, deal?: DealSimplePublicObjectWithAssociations) => {
   const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
-  const contact: ContactSimplePublicObjectWithAssociations = await hubspotClient.crm.contacts.basicApi.getById(
+  const contact: ContactSimplePublicObjectWithAssociations | null = await hubspotClient.crm.contacts.basicApi.getById(
     contact_id,
     [
       'email',
@@ -23,14 +23,23 @@ const fetchByContact = async (contact_id: string, context: Context<MyContext>, d
       'donotcall',
       'numero_de_telefono_adicional',
       'numero_de_telefono_adicional_',
-      'whatsappoptout'
+      'whatsappoptout',
+      'hs_whatsapp_phone_number'
     ],
   )
     .then((hubpostContact: ContactSimplePublicObjectWithAssociations) => hubpostContact)
     .catch((error) => {
+      if (error.status === 404) {
+        return null
+      }
+
       throw new Error('Error while retrieving data from hubspot (CONTACT)');
     })
   
+  if (contact === null && (deal === undefined || deal === null)) {
+    return null
+  }
+
   return {
     ...contact,
     deal: deal ?? null
@@ -91,7 +100,12 @@ exports.handler = FunctionTokenValidator(async function (
     }
     
     response.appendHeader("Content-Type", "application/json");
-    response.setBody(data);
+    if (data === null) {
+      //response.setStatusCode(404);
+      response.setBody({});
+    } else {
+      response.setBody(data);
+    }
     // Return a success response using the callback function.
     callback(null, response);
 

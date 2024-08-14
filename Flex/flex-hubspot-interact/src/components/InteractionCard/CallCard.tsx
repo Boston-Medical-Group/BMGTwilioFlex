@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from 'react';
+import { useSelector } from 'react-redux';
 import * as Flex from "@twilio/flex-ui";
 import { Box, Heading, Select, Option, Stack, Label, Button } from '@twilio-paste/core';
 import { FaPhoneAlt } from 'react-icons/fa';
@@ -10,8 +11,6 @@ import useLang from '../../hooks/useLang';
 const { FLEX_APP_OUTBOUND_WORKFLOW_SID, FLEX_APP_OUTBOUND_QUEUE_SID } = process.env;
 
 type Props = {
-  contact: HubspotContact
-  deal?: HubspotDeal
   manager: Flex.Manager 
   interactionHandler: () => void
 }
@@ -24,7 +23,7 @@ type PhonesList = Array<{
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
-const CallCard = ({ manager, contact, deal, interactionHandler }: Props) => {
+const CallCard = ({ manager, interactionHandler }: Props) => {
   const { _l } = useLang()
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [queues, setQueues] = useState<Array<TaskQueue>>([]);
@@ -34,6 +33,13 @@ const CallCard = ({ manager, contact, deal, interactionHandler }: Props) => {
   const [isLoading, setIsLoading] = useState(false)
   const [doNotCall, setDoNotCall] = useState(true);
   const [phonesList, setPhonesList] = useState<PhonesList>([]);
+
+  const { contact, deal } = useSelector(
+    (state: any) => ({
+      contact: state.hubspotInteraction.interaction.contact,
+      deal: state.hubspotInteraction.interaction.deal
+    })
+  );
 
   const afterSetActivityListener = useCallback((payload) => {
     if (payload.activityAvailable) {
