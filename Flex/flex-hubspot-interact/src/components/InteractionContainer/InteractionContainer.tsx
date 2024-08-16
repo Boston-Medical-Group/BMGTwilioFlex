@@ -5,8 +5,14 @@ import { Box, Heading, Flex, Paragraph, SkeletonLoader, Modal, ModalBody, ModalH
 import { useEffect, useState, useCallback } from 'react';
 import useApi from '../../hooks/useApi';
 import CallCard from '../InteractionCard/CallCard';
+import WhatsappCard from '../InteractionCard/WhatsappCard';
 import { actions } from '../../states';
 import useLang from '../../hooks/useLang';
+import { Notifications } from "@twilio/flex-ui";
+
+type CountryMap = {
+    [key: string]: string
+}
 
 type MyProps = {
     flex: typeof FlexInstance
@@ -26,9 +32,10 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
 
     const dispatch = useDispatch();
 
-    const [ isLoading, setIsLoading ] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [ showCallCard, setShowCallCard ] = useState(false)
-    const [ showInteractionCard, setShowInteractionCard ] = useState(false)
+    const [ showInteractionCard, setShowInteractionCard] = useState(false)
+    const [ showWhatsappCard, setShowWhatsappCard] = useState(false)
     //const [ contact, setContact ] = useState({})
 //    const [deal, setDeal] = useState({})
     const [isOpen, setIsOpen] = useState(false)
@@ -37,6 +44,84 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
         setIsOpen(true)
         setInteraction('call')
     }, [])
+
+
+    const whatsappHandlerCallback = useCallback(async (event) => {
+        console.log('HASCONTACT', contact)
+        if (contact) {
+            const phone1 = contact?.hs_whatsapp_phone_number && contact?.hs_whatsapp_phone_number !== '' ? contact?.hs_whatsapp_phone_number : contact?.phone
+            const phone2 = contact?.phone
+
+            if (phone1 === phone2 || (phone1 !== undefined && phone1 !== '' && phone2 === undefined || phone2 === '')) { 
+                console.log('SINGLE PHONE', phone1, phone2)
+                await sendWAHandler(phone1)
+            } else {
+                console.log('MULTIPLE PHONES', phone1, phone2)
+                setIsOpen(true)
+                setInteraction('whatsapp')
+            }
+        }
+    }, [contact])
+
+    const smsHandlerCallback = useCallback((event) => {
+        sendSmsHandler(contact?.hs_whatsapp_phone_number)
+     }, [])
+    
+    const sendWAHandler = useCallback(async (phone : string) => {
+        await sendHandler('whatsapp', phone)
+    }, []);
+
+    const sendSmsHandler = useCallback(async (phone : string) => {
+        await sendHandler('sms', phone)
+    }, []);
+
+    const sendHandler = async (channel: string, address: string) => {
+        //@ts-ignore
+        const reloadContact = manager.store.getState().hubspotInteraction.interaction.contact
+        //@ts-ignore
+        const reloadDeal = manager.store.getState().hubspotInteraction.interaction.deal
+        console.log('FETCHED CONTACT', reloadContact)
+        if (reloadContact.country) {
+            const countryMap: CountryMap = {
+                CO: '+57',
+                PE: '+51',
+                AR: '+54',
+                ES: '+34',
+                MX: '+52',
+                EC: '+593',
+                BR: '+55',
+            }
+
+            if (!address.startsWith('+') && countryMap.hasOwnProperty(reloadContact.country)) {
+                const currentCode: string = countryMap[reloadContact.country];
+                // if contact.phone doesn't have country code, add it
+                if (!address.startsWith(currentCode)) {
+                    address = `${currentCode}${address}`;
+                }
+            }
+        }
+
+        // @todo Enviar mensajes de hubspot con interaction 
+        // @todo corregir telefono e164
+        const result = await startOutboundConversation({
+            To: channel === 'whatsapp' ? `whatsapp:${address}` : address,
+            customerName: `${reloadContact.firstname || ''} ${reloadContact.lastname || ''}`.trim(),
+            WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
+            KnownAgentRoutingFlag: false,
+            OpenChatFlag: true,
+            hubspotContact: reloadContact,
+            hubspot_contact_id: reloadContact.hs_object_id,
+            hubspot_deal_id: reloadDeal?.hs_object_id ?? null
+        })
+
+        setIsOpen(false)
+
+        const isSuccess = result.success
+        if (!isSuccess) {
+            const errorCode = result.errorMessage
+            Notifications.showNotification(errorCode, { conversationSid: result.conversationSid });
+        }
+    }
 
     useEffect(() => {
         const handleReceiveMessage = (event: any) => {
@@ -90,7 +175,10 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
                     dispatch(actions.interaction.setContact(data.properties))
                 })
                 .catch(() => console.log("Error while fetching data from Hubspot"))
-                .finally(() => (setIsLoading(false)))
+                .finally(() => {
+                    //resetContactOrDeal()
+                    setIsLoading(false)
+                })
         } else if (dealId) {
             getDataByDealId({ deal_id: dealId, newToken: manager.store.getState().flex.session.ssoTokenPayload.token })
                 .then((data) => {
@@ -101,19 +189,28 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
                     }
                 })
                 .catch(() => console.log("Error while fetching data from Hubspot"))
-                .finally(() => (setIsLoading(false)));
+                .finally(() => {
+                    //resetContactOrDeal()
+                    setIsLoading(false)
+                });
         }
-    }, [])
+    }, [contact, deal])
 
-    const setInteraction = (type: string) => {
+    const setInteraction = useCallback((type: string) => {
         if (type === 'call') {
             setShowCallCard(true)
             setShowInteractionCard(false)
+            setShowWhatsappCard(false)
         } else if (type === 'interaction') {
             setShowCallCard(false)
             setShowInteractionCard(true)
+            setShowWhatsappCard(false)
+        } else if (type === 'whatsapp') {
+            setShowCallCard(false)
+            setShowInteractionCard(false)
+            setShowWhatsappCard(true)
         }
-    }
+    }, [])
 
     return (
         <>
@@ -130,11 +227,19 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
                         )}
 
                         {!isLoading && showCallCard && (
-                            <CallCard manager={manager} contact={contact} deal={deal} interactionHandler={() => setIsOpen(false)} />
+                            <CallCard manager={manager} interactionHandler={() => setIsOpen(false)} />
+                        )}
+
+                        {!isLoading && showWhatsappCard && (
+                            <WhatsappCard manager={manager} sendHandler={sendWAHandler} interactionHandler={() => setIsOpen(false)} />
                         )}
 
                         {!isLoading && showInteractionCard && (
-                            <InteractionCard manager={manager} contact={contact} deal={deal} callHandler={callHandlerCallback} interactionHandler={() => setIsOpen(false)} />
+                            <InteractionCard manager={manager}
+                                callHandler={callHandlerCallback}
+                                smsHandler={smsHandlerCallback}
+                                whatsappHandler={whatsappHandlerCallback}
+                                interactionHandler={() => setIsOpen(false)} />
                         )}
                     </Stack>
                 </ModalBody>

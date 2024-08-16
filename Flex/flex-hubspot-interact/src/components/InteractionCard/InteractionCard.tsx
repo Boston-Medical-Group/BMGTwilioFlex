@@ -17,9 +17,9 @@ import useLang from '../../hooks/useLang';
 
 type Props = {
   manager: Flex.Manager
-  contact: HubspotContact
-  deal?: HubspotDeal
   callHandler: (event: any) => void
+  smsHandler: (event: any) => void
+  whatsappHandler: (event: any) => void
   interactionHandler: any
 }
 
@@ -46,9 +46,8 @@ Flex.Notifications.registerNotification({
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */
-const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandler }: Props) => {
+const InteractionCard = ({ manager, callHandler, smsHandler, whatsappHandler, interactionHandler }: Props) => {
   const { _l } = useLang()
-  const { startOutboundConversation } = useApi({ token: manager.store.getState().flex.session.ssoTokenPayload.token });
 
   const [actionDisabled, setActionDisabled] = useState(manager.workerClient ? !manager.workerClient.activity.available : true);
   const [selectedSmsContact, setSelectedSmsContact] = useState<HubspotContact>();
@@ -56,6 +55,13 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
   const [doNotCall, setDoNotCall] = useState(true);
   const [doNotWhatsapp, setDoNotWhatsapp] = useState(true);
 
+  const { contact, deal } = useSelector(
+    (state: any) => ({
+      contact: state.hubspotInteraction.interaction.contact,
+      deal: state.hubspotInteraction.interaction.deal
+    })
+  );
+  
   const afterSetActivityListener = useCallback((payload) => {
     if (payload.activityAvailable) {
       setActionDisabled(false)
@@ -84,61 +90,6 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
       Flex.Actions.removeListener("afterSetActivity", afterSetActivityListener)
     }
   }, [afterSetActivityListener])
-
-  const sendSmsHandler = useCallback(async (contact: HubspotContact, deal?: HubspotDeal) => {
-    await sendHandler('sms', contact, deal)
-  }, []);
-
-  type CountryMap = {
-    [key: string]: string
-  }
-
-  const sendHandler = useCallback(async (channel: string,contact: HubspotContact, deal?: HubspotDeal) => {
-    if (contact.country) {
-      const countryMap: CountryMap = {
-        CO: '+57',
-        PE: '+51',
-        AR: '+54',
-        ES: '+34',
-        MX: '+52',
-        EC: '+593',
-        BR: '+55',
-      }
-
-      if (contact.phone && !contact.phone.startsWith('+') && countryMap.hasOwnProperty(contact.country)) {
-        const currentCode: string = countryMap[contact.country];
-        // if contact.phone doesn't have country code, add it
-        if (contact.phone && !contact.phone.startsWith(currentCode)) {
-          contact.phone = `${currentCode}${contact.phone}`;
-        }
-      }
-    }
-
-    // @todo Enviar mensajes de hubspot con interaction 
-    // @todo corregir telefono e164
-    const result = await startOutboundConversation({
-      To: channel === 'whatsapp' ? `whatsapp:${contact.phone}` : contact.phone,
-      customerName: `${contact.firstname || ''} ${contact.lastname || ''}`.trim(),
-      WorkerFriendlyName: manager.workerClient ? manager.workerClient.name : '',
-      KnownAgentRoutingFlag: false,
-      OpenChatFlag: true,
-      hubspotContact: contact,
-      hubspot_contact_id: contact.hs_object_id,
-      hubspot_deal_id: deal?.hs_object_id ?? null
-    })
-
-    interactionHandler()
-
-    const isSuccess = result.success
-    if (!isSuccess) {
-      const errorCode = result.errorMessage
-      Notifications.showNotification(errorCode, { conversationSid: result.conversationSid});
-    }
-  }, [])
-
-  const sendWAHandler = useCallback(async (contact: HubspotContact, deal?: HubspotDeal) => {
-    await sendHandler('whatsapp', contact, deal)
-  }, []);
 
   const handleCloseModel = React.useCallback(() => {
     setSelectedSmsContact(undefined);
@@ -197,7 +148,11 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
               flexDirection="column"
               margin="auto"
               maxWidth="300px">
-            <Button variant="primary" title={doNotCall ? _l('Do not call') : (actionDisabled ? _l('To make a call, please change your status different from \'Offline\'') : _l('Make a call'))} disabled={actionDisabled || doNotCall} onClick={callHandler}><FaPhoneAlt /> {_l('Start call')}</Button>
+              <Button variant="primary"
+              title={doNotCall ? _l('Do not call') : (actionDisabled ? _l('To make a call, please change your status different from \'Offline\'') : _l('Make a call'))}
+              disabled={actionDisabled || doNotCall}
+              onClick={callHandler}><FaPhoneAlt /> {_l('Start call')}</Button>
+              
               <CustomizationProvider
                 elements={{
                   BUTTON: {
@@ -213,8 +168,9 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
                   },
                 }}
               >
-                <Button variant="primary" disabled={actionDisabled} fullWidth onClick={() => sendSmsHandler(contact, deal)}><FaSms /> {_l('SMS')}</Button>
+                <Button variant="primary" disabled={actionDisabled} fullWidth onClick={() => smsHandler}><FaSms /> {_l('SMS')}</Button>
               </CustomizationProvider>
+            
               <CustomizationProvider
                 elements={{
                   BUTTON: {
@@ -229,14 +185,14 @@ const InteractionCard = ({ manager, contact, deal, callHandler, interactionHandl
                     }
                   },
                 }}
-              >
-                <Button variant="primary"
-                  fullWidth
-                title={doNotWhatsapp ? _l('Do not WhatsApp') : (actionDisabled ? _l('To start a WhatsApp conversation, please change your status different from \'Offline\'') : _l('Start WhatsApp conversation'))}
-                  disabled={actionDisabled || doNotWhatsapp}
-                  onClick={() => sendWAHandler(contact, deal)}
-              ><FaWhatsapp /> {_l('WhatsApp')}</Button>
-              </CustomizationProvider>
+                >
+                  <Button variant="primary"
+                    fullWidth
+                    title={doNotWhatsapp ? _l('Do not WhatsApp') : (actionDisabled ? _l('To start a WhatsApp conversation, please change your status different from \'Offline\'') : _l('Start WhatsApp conversation'))}
+                    disabled={actionDisabled || doNotWhatsapp}
+                    onClick={whatsappHandler}
+                  ><FaWhatsapp /> {_l('WhatsApp')}</Button>
+                </CustomizationProvider>
 
               {calendar() !== '' && (
                 <CustomizationProvider
