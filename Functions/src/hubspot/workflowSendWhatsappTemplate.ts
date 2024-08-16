@@ -14,6 +14,7 @@ type MyEvent = {
     message?: string
     messagingService: string
     phone: string
+    altphone?: string
     [key: string] : string | undefined
 }
 
@@ -74,7 +75,14 @@ export const handler = async (
     }
 
     try {
-        const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
+        let { phone, altphone } = event
+        phone = phone == '' ? altphone as string : phone
+        if (!phone || phone == undefined || phone == '') {
+            console.log('Invalid phone provided')
+            return callback('Invalid phone provided')
+        }
+
+        const whatsappAddressTo = phone.indexOf('whatsapp:') === -1 ? `whatsapp:${phone}` : `${phone}`
         const messagingService = event.messagingService
 
         const messageOptions : MessageListInstanceCreateOptions = {
@@ -98,7 +106,7 @@ export const handler = async (
         callback(null, 'OK')
     } catch (error) {
         console.log(error)
-        callback(null, 'ERROR')
+        callback('ERROR')
     }
 
 }

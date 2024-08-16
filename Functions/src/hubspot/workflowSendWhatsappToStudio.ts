@@ -12,6 +12,7 @@ type MyEvent = {
     request: any,
     cookies: any,
     phone: string
+    altphone?: string
     firstname: string
     lastname: string
     fullname: string
@@ -54,11 +55,18 @@ export const handler = async (
     const client = context.getTwilioClient()
 
     try {
-        const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
+        let { phone, altphone } = event
+        phone = phone == '' ? altphone as string : phone
+        if (!phone || phone == undefined || phone == '') {
+            console.log('Invalid phone provided')
+            return callback('Invalid phone provided')
+        }
+
+        const whatsappAddressTo = phone.indexOf('whatsapp:') === -1 ? `whatsapp:${phone}` : `${phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
         const timestamp = (new Date).getTime();
         await client.conversations.v1.conversations.create({
-            friendlyName: `IATrainer -> ${event.phone} (${timestamp})`,
+            friendlyName: `IATrainer -> ${phone} (${timestamp})`,
             attributes: JSON.stringify({
                 customerName: event.fullname,
                 name: event.fullname,
@@ -102,7 +110,7 @@ export const handler = async (
         callback(null, 'OK')
     } catch (error) {
         console.log(error)
-        callback(null, 'ERROR')
+        callback('ERROR')
     }
 
 }

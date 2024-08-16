@@ -17,6 +17,7 @@ type MyEvent = {
     template: string
     messagingService: string
     phone: string
+    altphone?: string
     customParam?: string
     [key: string] : string | undefined
 }
@@ -98,13 +99,22 @@ export const handler = async (
     let returnObject: any = { 'result': 'OK' };
 
     try {
-        const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
+        let { phone, altphone } = event
+        phone = phone == '' ? altphone as string : phone
+        if (!phone || phone == undefined || phone == '') {
+            console.log('Invalid phone provided')
+            returnObject.result = 'ERROR'
+            returnObject.error = 'Invalid phone provided'
+            return callback(returnObject)
+        }
+
+        const whatsappAddressTo = phone.indexOf('whatsapp:') === -1 ? `whatsapp:${phone}` : `${phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
         const activeConversation = await getActiveConversation(context, whatsappAddressTo)
         if (activeConversation === null) {
             const timestamp = (new Date).getTime();
             let conversationAttributes = {
-                friendlyName: `HubspotWorkflow -> ${event.phone} (${timestamp})`,
+                friendlyName: `HubspotWorkflow -> ${phone} (${timestamp})`,
                 attributes: JSON.stringify(attributes),
                 //@ts-ignore
                 "timers.inactive": 'PT30M',
@@ -219,6 +229,7 @@ export const handler = async (
         console.log(error)
         returnObject.result = 'ERROR'
         returnObject.error = error
+        return callback(returnObject)
     }
 
     callback(null, returnObject)
