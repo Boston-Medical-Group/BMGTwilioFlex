@@ -21,6 +21,7 @@ type MyEvent = {
     flowName?: string
     contactId?: string
     phone: string
+    altphone?: string
     customParam?: string
     [key: string] : string | undefined
 }
@@ -101,13 +102,22 @@ export const handler = async (
     let nestedError: Array<string> = [];
     let hasError = false
     try {
-        const whatsappAddressTo = event.phone.indexOf('whatsapp:') === -1 ? `whatsapp:${event.phone}` : `${event.phone}`
+        let { phone, altphone } = event
+        phone = phone == '' ? altphone as string : phone
+        if (!phone || phone == undefined || phone == '') {
+            console.log('Invalid phone provided')
+            returnObject.result = 'ERROR'
+            returnObject.error = 'Invalid phone provided'
+            return callback(returnObject)
+        }
+
+        const whatsappAddressTo = phone.indexOf('whatsapp:') === -1 ? `whatsapp:${phone}` : `${phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
         const activeConversation = await getActiveConversation(context, whatsappAddressTo)
         if (activeConversation === null) {
             const timestamp = (new Date).getTime();
             await client.conversations.v1.conversations.create({
-                friendlyName: `HubspotWorkflow -> ${event.phone} (${timestamp})`,
+                friendlyName: `HubspotWorkflow -> ${phone} (${timestamp})`,
                 attributes: JSON.stringify(attributes),
                 timers: {
                     inactive: 'PT1H',
@@ -260,6 +270,7 @@ export const handler = async (
             }
         }
     } catch (error) {
+        hasError = true
         console.log(error)
         returnObject.result = 'ERROR'
         returnObject.error = error
@@ -270,6 +281,7 @@ export const handler = async (
         returnObject.result = 'ERROR'
         returnObject.error = 'Internal logic error'
         returnObject.nestedError = nestedError
+        return callback(returnObject)
     }
 
     callback(null, returnObject)
