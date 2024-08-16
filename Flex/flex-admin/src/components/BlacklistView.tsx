@@ -18,7 +18,7 @@ const BlacklistView = ({ manager }: Props) => {
     const [items, setItems] = useState < Array < { id: string } >> ([])
 
     const reloadHandler = () => {
-        axios.get(`inbound-blacklists?filter[country]=${accountCountry}&page[limit]=100`)
+        axios.get(`inbound-blacklists?filter[country]=${accountCountry}&page[size]=100`)
             .then(result => {
                 setIsLoaded(true)
                 setItems(result.data.data)

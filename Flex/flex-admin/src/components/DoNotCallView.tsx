@@ -19,7 +19,7 @@ const DoNotCallView = ({ manager }: Props) => {
     const [items, setItems] = useState<Array<{ id: string }>>([])
 
     const reloadHandler = () => {
-        axios.get(`do-not-calls?filter[country]=${accountCountry}&page[limit]=100`)
+        axios.get(`do-not-calls?filter[country]=${accountCountry}&page[size]=100`)
             .then(result => {
                 setIsLoaded(true)
                 setItems(result.data.data)
