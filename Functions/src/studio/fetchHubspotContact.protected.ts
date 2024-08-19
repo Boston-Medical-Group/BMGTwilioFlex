@@ -23,7 +23,8 @@ exports.handler = async function (
         lastname: '',
         fullname: '',
         lifecyclestage: 'lead',
-        leadorpatient: 'lead'
+        leadorpatient: 'lead',
+        tf_default_queue: ''
     };
     let from = event.from;
 
@@ -36,11 +37,24 @@ exports.handler = async function (
     from = from.replace(' ', '+');
     let fromWithoutPrefix = removePrefix(from, ['+593', '+52', '+521', '+34', '+1', '+51', '+54', '+56', '+57', '+55'])
 
-    let additionalFilters : any = [
+    let filterGroups: any = [
         {
-            propertyName: 'phone',
-            operator: 'CONTAINS_TOKEN',
-            value: `*${fromWithoutPrefix}`
+            filters: [
+                {
+                    propertyName: 'phone',
+                    operator: 'EQ',
+                    value: from
+                }
+            ]
+        },
+        {
+            filters: [
+                {
+                    propertyName: 'phone',
+                    operator: 'CONTAINS_TOKEN',
+                    value: `*${fromWithoutPrefix}`
+                }
+            ]
         }
     ]
 
@@ -56,16 +70,24 @@ exports.handler = async function (
             let tmpPhoneWithoutPrefix = tmpPhone.slice(2);
             if (tmpPhoneWithoutPrefix.length === 8) {
                 from = `+55${prefix}9${tmpPhoneWithoutPrefix}`
-                additionalFilters.push({
-                    propertyName: 'phone',
-                    operator: 'CONTAINS_TOKEN',
-                    value: `*${prefix}9${tmpPhoneWithoutPrefix}`
+                filterGroups.push({
+                    filters: [
+                        {
+                            propertyName: 'phone',
+                            operator: 'CONTAINS_TOKEN',
+                            value: `*${prefix}9${tmpPhoneWithoutPrefix}`
+                        }
+                    ]
                 })
             } else {
-                additionalFilters.push({
-                    propertyName: 'phone',
-                    operator: 'CONTAINS_TOKEN',
-                    value: `*${prefix}${tmpPhoneWithoutPrefix.slice(1)}`
+                filterGroups.push({
+                    filters: [
+                        {
+                            propertyName: 'phone',
+                            operator: 'CONTAINS_TOKEN',
+                            value: `*${prefix}${tmpPhoneWithoutPrefix.slice(1)}`
+                        }
+                    ]
                 })
             }
         }
@@ -74,19 +96,7 @@ exports.handler = async function (
     const hubspotClient = new HubspotClient({ accessToken: context.HUBSPOT_TOKEN })
     await hubspotClient.crm.contacts.searchApi.doSearch({
         //query: from,
-        filterGroups: [
-            {
-                filters: [
-                    {
-                        propertyName: 'phone',
-                        operator: 'EQ',
-                        value: from
-                    }
-                ]
-            }, {
-                filters: additionalFilters
-            }
-        ],
+        filterGroups,
         //@ts-ignore
         sorts: [{
             propertyName: 'phone',
@@ -104,6 +114,7 @@ exports.handler = async function (
             result.lastname = `${contact.properties.lastname}`;
             result.fullname = `${contact.properties.firstname ?? ''} ${contact.properties.lastname ?? ''}`;
             result.lifecyclestage = `${contact.properties?.lifecyclestage ?? 'lead'}`;
+            result.tf_default_queue = contact.properties?.tf_default_queue ?? ''
             if ((result.lifecyclestage != 'lead') && (result.lifecyclestage != 'marketingqualifiedlead') && (result.lifecyclestage != 'opportunity' && (result.lifecyclestage !== 'subscriber'))) {
                 result.leadorpatient = 'patient';
             }

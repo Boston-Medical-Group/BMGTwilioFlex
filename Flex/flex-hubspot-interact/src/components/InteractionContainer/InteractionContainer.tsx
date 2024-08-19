@@ -47,16 +47,13 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
 
 
     const whatsappHandlerCallback = useCallback(async (event) => {
-        console.log('HASCONTACT', contact)
         if (contact) {
             const phone1 = contact?.hs_whatsapp_phone_number && contact?.hs_whatsapp_phone_number !== '' ? contact?.hs_whatsapp_phone_number : contact?.phone
             const phone2 = contact?.phone
 
             if (phone1 === phone2 || (phone1 !== undefined && phone1 !== '' && phone2 === undefined || phone2 === '')) { 
-                console.log('SINGLE PHONE', phone1, phone2)
                 await sendWAHandler(phone1)
             } else {
-                console.log('MULTIPLE PHONES', phone1, phone2)
                 setIsOpen(true)
                 setInteraction('whatsapp')
             }
@@ -80,7 +77,6 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
         const reloadContact = manager.store.getState().hubspotInteraction.interaction.contact
         //@ts-ignore
         const reloadDeal = manager.store.getState().hubspotInteraction.interaction.deal
-        console.log('FETCHED CONTACT', reloadContact)
         if (reloadContact.country) {
             const countryMap: CountryMap = {
                 CO: '+57',
@@ -112,7 +108,7 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
             hubspotContact: reloadContact,
             hubspot_contact_id: reloadContact.hs_object_id,
             hubspot_deal_id: reloadDeal?.hs_object_id ?? null
-        })
+        }, manager.store.getState().flex.session.ssoTokenPayload.token)
 
         setIsOpen(false)
 
@@ -171,7 +167,6 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
         if (contactId) {
             getDataByContactId({ contact_id: contactId, newToken: manager.store.getState().flex.session.ssoTokenPayload.token })
                 .then(data => {
-                    console.log('LOADED DATA FOR CONTACT ID', contactId, data)
                     dispatch(actions.interaction.setContact(data.properties))
                 })
                 .catch(() => console.log("Error while fetching data from Hubspot"))
@@ -182,7 +177,6 @@ const InteractionContainer = ({ flex, manager }: MyProps) => {
         } else if (dealId) {
             getDataByDealId({ deal_id: dealId, newToken: manager.store.getState().flex.session.ssoTokenPayload.token })
                 .then((data) => {
-                    console.log('LOADED DATA FOR DEAL ID', dealId, data)
                     dispatch(actions.interaction.setContact(data.properties))
                     if (data.deal !== undefined && data.deal !== null) {
                         dispatch(actions.interaction.setDeal(data.deal.properties))
