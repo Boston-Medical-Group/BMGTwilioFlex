@@ -103,7 +103,7 @@ exports.handler = async function (
             propertyName: 'phone',
             direction: 'ASCENDING'
         }],
-        properties: ['firstname', 'lastname', 'lifecyclestage', 'phone'],
+        properties: ['firstname', 'lastname', 'lifecyclestage', 'phone', 'tf_default_workflow', 'tf_default_queue'],
         limit: 1,
         after: 0
     }).then((contacts: CollectionResponseWithTotalSimplePublicObjectForwardPaging) => {
