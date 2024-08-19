@@ -136,7 +136,7 @@ const useApi = ({ token }) => {
 
   }, [token]);
 
-  const startOutboundConversation = useCallback(async ({ To, customerName, WorkerFriendlyName, KnownAgentRoutingFlag, OpenChatFlag, hubspotContact, hubspot_contact_id, hubspot_deal_id }) => {
+  const startOutboundConversation = useCallback(async ({ To, customerName, WorkerFriendlyName, KnownAgentRoutingFlag, OpenChatFlag, hubspotContact, hubspot_contact_id, hubspot_deal_id }, newToken) => {
 
     const request = await fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/startOutboundConversation`, {
       method: "POST",
@@ -152,7 +152,7 @@ const useApi = ({ token }) => {
         hubspotContact,
         hubspot_contact_id,
         hubspot_deal_id,
-        Token: token
+        Token: newToken ?? token
       })
     });
 
