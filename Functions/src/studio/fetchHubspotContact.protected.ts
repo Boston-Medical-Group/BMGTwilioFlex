@@ -24,7 +24,8 @@ exports.handler = async function (
         fullname: '',
         lifecyclestage: 'lead',
         leadorpatient: 'lead',
-        tf_default_queue: ''
+        tf_default_queue: '',
+        tf_default_workflow: ''
     };
     let from = event.from;
 
@@ -114,7 +115,8 @@ exports.handler = async function (
             result.lastname = `${contact.properties.lastname}`;
             result.fullname = `${contact.properties.firstname ?? ''} ${contact.properties.lastname ?? ''}`;
             result.lifecyclestage = `${contact.properties?.lifecyclestage ?? 'lead'}`;
-            result.tf_default_queue = contact.properties?.tf_default_queue ?? ''
+            result.tf_default_queue = contact.properties?.tf_default_queue ?? '';
+            result.tf_default_workflow = contact.properties?.tf_default_workflow ?? '';
             if ((result.lifecyclestage != 'lead') && (result.lifecyclestage != 'marketingqualifiedlead') && (result.lifecyclestage != 'opportunity' && (result.lifecyclestage !== 'subscriber'))) {
                 result.leadorpatient = 'patient';
             }
