@@ -2,8 +2,8 @@ exports.default = {
     // TaskRouter -> Workspace -> TaskQueues
 
     // Manual
-    defaultQueue: 'WQ686410a71588d101fd581949e1033aa4',
-    
+    defaultQueue: 'WQ7e3c199f2ddb15c14c32db22de01fe16',
+
     // Manual
-    'WQ686410a71588d101fd581949e1033aa4': [    ]
+    'WQ7e3c199f2ddb15c14c32db22de01fe16': []
 }
