@@ -193,6 +193,40 @@ exports.areaCodeQueue = (country, areaCode) => {
                     "areaCodes": ["983", "984", "997", "998"],
                     "queue": "Cancun"
                 }
+            },
+            "BR": {
+                "31": {
+                    "areaCodes": ["31"],
+                    "queue": "Belo_Horizonte"
+                },
+                "61": {
+                    "areaCodes": ["61"],
+                    "queue": "Brasilia"
+                },
+                "41": {
+                    "areaCodes": ["41"],
+                    "queue": "Curitiba"
+                },
+                "85": {
+                    "areaCodes": ["85"],
+                    "queue": "Fortaleza"
+                },
+                "51": {
+                    "areaCodes": ["51"],
+                    "queue": "Porto_Alegre"
+                },
+                "81": {
+                    "areaCodes": ["81"],
+                    "queue": "Recife"
+                },
+                "71": {
+                    "areaCodes": ["71"],
+                    "queue": "Salvador"
+                },
+                "21": {
+                    "areaCodes": ["21"],
+                    "queue": "Rio_Janeiro"
+                }
             }
         }
 
