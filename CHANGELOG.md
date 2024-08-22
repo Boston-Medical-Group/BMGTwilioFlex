@@ -1,5 +1,8 @@
 # Changelog
 
+## 22/08/2024
+* Actualiza version twilio cli para despligues
+
 ## 27/06/2024
 * Agrega tarea para nobody
 
