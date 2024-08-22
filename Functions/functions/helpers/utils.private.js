@@ -196,7 +196,7 @@ exports.areaCodeQueue = (country, areaCode) => {
             },
             "BR": {
                 "31": {
-                    "areaCodes": ["31"],
+                    "areaCodes": ["31", "32", "33", "34", "35", "37", "38"],
                     "queue": "Belo_Horizonte"
                 },
                 "61": {
@@ -204,15 +204,15 @@ exports.areaCodeQueue = (country, areaCode) => {
                     "queue": "Brasilia"
                 },
                 "41": {
-                    "areaCodes": ["41"],
+                    "areaCodes": ["41", "42", "43", "44", "45", "46"],
                     "queue": "Curitiba"
                 },
                 "85": {
-                    "areaCodes": ["85"],
+                    "areaCodes": ["85", "88"],
                     "queue": "Fortaleza"
                 },
                 "51": {
-                    "areaCodes": ["51"],
+                    "areaCodes": ["51", "53", "54", "55"],
                     "queue": "Porto_Alegre"
                 },
                 "81": {
@@ -220,11 +220,11 @@ exports.areaCodeQueue = (country, areaCode) => {
                     "queue": "Recife"
                 },
                 "71": {
-                    "areaCodes": ["71"],
+                    "areaCodes": ["71", "73", "74", "75", "77"],
                     "queue": "Salvador"
                 },
                 "21": {
-                    "areaCodes": ["21"],
+                    "areaCodes": ["21", "22", "24"],
                     "queue": "Rio_Janeiro"
                 }
             }
