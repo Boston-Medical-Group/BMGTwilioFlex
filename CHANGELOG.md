@@ -2,6 +2,7 @@
 
 ## 27/08/2024
 * Corrige bug en telefonos cuando vienen como enteros y no string
+* Implementa Assistants para PE, MX, EC
 
 ## 22/08/2024
 * Actualiza version twilio cli para despligues
