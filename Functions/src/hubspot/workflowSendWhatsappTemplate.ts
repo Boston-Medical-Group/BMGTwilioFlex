@@ -81,6 +81,7 @@ export const handler = async (
             console.log('Invalid phone provided')
             return callback('Invalid phone provided')
         }
+        phone = phone.toString()
 
         const whatsappAddressTo = phone.indexOf('whatsapp:') === -1 ? `whatsapp:${phone}` : `${phone}`
         const messagingService = event.messagingService
