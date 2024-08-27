@@ -107,6 +107,7 @@ export const handler = async (
             returnObject.error = 'Invalid phone provided'
             return callback(returnObject)
         }
+        phone = phone.toString()
 
         const whatsappAddressTo = phone.indexOf('whatsapp:') === -1 ? `whatsapp:${phone}` : `${phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
