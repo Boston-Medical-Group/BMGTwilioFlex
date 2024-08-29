@@ -2,6 +2,7 @@
 
 ## 29/08/2024
 * Agrega log a fetchHubspotContact
+* Actualiza SDK OpenAI para assistant v2
 
 ## 27/08/2024
 * Corrige bug en telefonos cuando vienen como enteros y no string
