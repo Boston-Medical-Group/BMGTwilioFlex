@@ -1,5 +1,8 @@
 # Changelog
 
+## 29/08/2024
+* Agrega log a fetchHubspotContact
+
 ## 27/08/2024
 * Corrige bug en telefonos cuando vienen como enteros y no string
 * Implementa Assistants para PE, MX, EC

@@ -33,6 +33,7 @@ const fetchByContact = async (contact_id: string, context: Context<MyContext>, d
         return null
       }
 
+      console.error(error)
       throw new Error('Error while retrieving data from hubspot (CONTACT)');
     })
   
