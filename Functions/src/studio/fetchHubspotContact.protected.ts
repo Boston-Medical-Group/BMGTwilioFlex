@@ -36,7 +36,7 @@ exports.handler = async function (
     //if the string from contains a whatsapp prefix we need to remove it
     from = from.replace('whatsapp:', '');
     from = from.replace(' ', '+');
-    let fromWithoutPrefix = removePrefix(from, ['+593', '+52', '+521', '+34', '+1', '+51', '+54', '+56', '+57', '+55'])
+    let fromWithoutPrefix = removePrefix(from, ['+593', '+521', '+52', '+34', '+1', '+51', '+54', '+56', '+57', '+55'])
 
     let filterGroups: any = [
         {
@@ -138,6 +138,11 @@ exports.handler = async function (
 const removePrefix = (phone: string , prefixes: string[]) => {
     for (let prefix of prefixes) {
         if (phone.startsWith(prefix)) {
+            // HACK para MX. No quitamos 521 si 1 es parte de los 10 digitos del telefono
+            if (prefix == '+521' && phone.length < 14) {
+                continue;
+            }
+            
             phone = phone.slice(prefix.length);
             break;
         }
