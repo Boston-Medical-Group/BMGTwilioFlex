@@ -9,11 +9,7 @@ type Props = {
     conversationSid: string
 }
 
-Flex.Notifications.registerNotification({
-    id: "errorLoadingConversations",
-    content: "Error al cargar las conversaciones",
-    type: Flex.NotificationType.error
-});
+
 
 const getConversationLog = async (sid: string, manager: Flex.Manager) => {
     return fetch(`${process.env.FLEX_APP_TWILIO_SERVERLESS_DOMAIN}/crm/getConversationMessages`, {
