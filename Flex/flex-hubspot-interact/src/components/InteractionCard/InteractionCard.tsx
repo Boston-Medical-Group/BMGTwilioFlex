@@ -37,12 +37,6 @@ const disabledButtonStyles = {
   }
 }
 
-Flex.Notifications.registerNotification({
-  id: "contact_not_found_on_hubpost",
-  content: 'Error',
-  type: Flex.NotificationType.error
-});
-
 /**
  * Generates a function comment for the given function body in a markdown code block with the correct language syntax.
  */

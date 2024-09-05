@@ -1,5 +1,8 @@
 # Changelog
 
+## 04/09/2024
+* Optimiza carga de notificaciones
+
 ## 29/08/2024
 * Agrega log a fetchHubspotContact
 * Actualiza SDK OpenAI para assistant v2

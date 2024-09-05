@@ -2,12 +2,22 @@ import React from 'react';
 import * as Flex from '@twilio/flex-ui';
 import { FlexPlugin } from '@twilio/flex-plugin';
 import { CustomizationProvider } from '@twilio-paste/core/customization';
-
+import { Notifications, NotificationType } from '@twilio/flex-ui'
 
 import ActiveConversationsList from './components/ActiveConversationsList/ActiveConversationsList';
 import ActiveConversationsLink from './components/ActiveConversationsLink';
 
 const PLUGIN_NAME = 'FlexActiveConversationsPlugin';
+
+const registerNotifications = () => {
+  if (!Notifications.registeredNotifications.has('errorLoadingConversations')) {
+    Flex.Notifications.registerNotification({
+      id: "errorLoadingConversations",
+      content: "Error al cargar las conversaciones",
+      type: Flex.NotificationType.error
+    });
+  }
+}
 
 export default class FlexActiveConversations2Plugin extends FlexPlugin {
   constructor() {
@@ -22,6 +32,8 @@ export default class FlexActiveConversations2Plugin extends FlexPlugin {
    */
   async init(flex: typeof Flex, manager: Flex.Manager): Promise<void> {
     const userRoles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles || [];
+
+    registerNotifications();
 
     Flex.setProviders({
       PasteThemeProvider: CustomizationProvider

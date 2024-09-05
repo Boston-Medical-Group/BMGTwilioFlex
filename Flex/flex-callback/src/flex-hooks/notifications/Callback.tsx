@@ -12,20 +12,3 @@ export default (flex: typeof Flex, manager: Flex.Manager) => {
   //errorNotification(flex, manager);
   //outboundDialingNotEnabled(flex, manager);
 };
-/*
-function errorNotification(flex: typeof Flex, manager: Flex.Manager) {
-  flex.Notifications.registerNotification({
-    id: CallbackNotification.ErrorCallBackAndVoicemail,
-    type: Flex.NotificationType.error,
-    content: StringTemplates.ErrorCallBackAndVoicemail,
-  });
-}
-
-function outboundDialingNotEnabled(flex: typeof Flex, manager: Flex.Manager) {
-  flex.Notifications.registerNotification({
-    id: CallbackNotification.OutboundDialingNotEnabled,
-    type: Flex.NotificationType.error,
-    content: StringTemplates.OutboundDialingNotEnabled,
-  });
-}
-*/

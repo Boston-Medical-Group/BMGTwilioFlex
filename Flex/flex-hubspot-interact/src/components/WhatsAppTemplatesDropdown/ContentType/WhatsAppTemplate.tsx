@@ -22,12 +22,6 @@ type Parameters = {
     [ key: string] : string | null
 }
 
-Flex.Notifications.registerNotification({
-    id: "whatsapptemplate_sendmessage",
-    content: 'Error',
-    type: Flex.NotificationType.error
-});
-
 /**
  * Available replazable parameters:
  * 

@@ -40,6 +40,22 @@ const registerNotifications = (manager) => {
       type: NotificationType.error
     });
   }
+
+  if (!Notifications.registeredNotifications.has('contact_not_found_on_hubpost')) {
+    Flex.Notifications.registerNotification({
+      id: "contact_not_found_on_hubpost",
+      content: 'Error',
+      type: Flex.NotificationType.error
+    });
+  }
+
+  if (!Notifications.registeredNotifications.has('whatsapptemplate_sendmessage')) {
+    Flex.Notifications.registerNotification({
+      id: "whatsapptemplate_sendmessage",
+      content: 'Error',
+      type: Flex.NotificationType.error
+    });
+  }
 }
 
 export default class HubspotInteractPlugin extends FlexPlugin {
