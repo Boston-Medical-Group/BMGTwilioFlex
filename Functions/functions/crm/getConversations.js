@@ -18,7 +18,7 @@ async function getAllConversationsList(client, skipSid, fromAddress) {
     }
 
     //fetch conversations with filters
-    const conversationsListNumber = await client.conversations.v1.participantConversations.list({
+    let conversationsListNumber = await client.conversations.v1.participantConversations.list({
         address: fromAddress,
         limit: MAX_CONVERSATIONS_TO_FETCH
     })
@@ -28,13 +28,32 @@ async function getAllConversationsList(client, skipSid, fromAddress) {
         address: fromAddressWA,
         limit: MAX_CONVERSATIONS_TO_FETCH
     })
+    conversationsListNumber = conversationsListNumber.concat(conversationsListWA);
+
+    // FIX Para MX
+    if (fromAddressWA.startsWith('whatsapp:+521')) {
+        //fetch conversations with prefix 52
+        const conversationsListWA1 = await client.conversations.v1.participantConversations.list({
+            address: fromAddressWA.replace('whatsapp:+521', 'whatsapp:+52'),
+            limit: MAX_CONVERSATIONS_TO_FETCH
+        })
+        conversationsListNumber = conversationsListNumber.concat(conversationsListWA1);
+    } else if (fromAddressWA.startsWith('whatsapp:+52')) {
+        //fetch conversations with prefix 521
+        const conversationsListWA2 = await client.conversations.v1.participantConversations.list({
+            address: fromAddressWA.replace('whatsapp:+52', 'whatsapp:+521'),
+            limit: MAX_CONVERSATIONS_TO_FETCH
+        })
+        conversationsListNumber = conversationsListNumber.concat(conversationsListWA2);
+    }
+
 
     //sort by date created 
-    var conversationsList = conversationsListNumber.concat(conversationsListWA);
-    conversationsList.sort((a, b) => new Date(b.conversationDateCreated) - new Date(a.conversationDateCreated));
+    //var conversationsList = conversationsListNumber.concat(conversationsListWA);
+    conversationsListNumber.sort((a, b) => new Date(b.conversationDateCreated) - new Date(a.conversationDateCreated));
 
     //create a result object with the information we want to supply
-    for await (const conversation of conversationsList) {
+    for await (const conversation of conversationsListNumber) {
         if (conversation.conversationSid === skipSid) {
             continue;
         }
