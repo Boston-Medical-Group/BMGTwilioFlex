@@ -1,5 +1,8 @@
 # Changelog
 
+## 09/09/2024
+* Fix para obtener las conversaciones de MX con prefijos 521 y 52
+
 ## 04/09/2024
 * Optimiza carga de notificaciones
 
