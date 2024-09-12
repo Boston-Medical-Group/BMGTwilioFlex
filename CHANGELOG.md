@@ -1,5 +1,8 @@
 # Changelog
 
+## 12/09/2024
+* Fix para formatear un telefono correctamente
+
 ## 09/09/2024
 * Fix para obtener las conversaciones de MX con prefijos 521 y 52
 
