@@ -109,7 +109,10 @@ export const handler = async (
         }
         phone = phone.toString()
 
-        const whatsappAddressTo = phone.indexOf('whatsapp:') === -1 ? `whatsapp:${phone}` : `${phone}`
+        phone = phone.replace('whatsapp:', '');
+        phone = phone.startsWith('+') ? phone : `+${phone}`
+
+        const whatsappAddressTo = `whatsapp:${phone}`
         const whatsappAddressFrom = context.TWILIO_WA_PHONE_NUMBER.indexOf('whatsapp:') === -1 ? `whatsapp:${context.TWILIO_WA_PHONE_NUMBER}` : `${context.TWILIO_WA_PHONE_NUMBER}`
         const activeConversation = await getActiveConversation(context, whatsappAddressTo)
         if (activeConversation === null) {

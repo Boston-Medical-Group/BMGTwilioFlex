@@ -83,7 +83,10 @@ export const handler = async (
         }
         phone = phone.toString()
 
-        const whatsappAddressTo = phone.indexOf('whatsapp:') === -1 ? `whatsapp:${phone}` : `${phone}`
+        phone = phone.replace('whatsapp:', '');
+        phone = phone.startsWith('+') ? phone : `+${phone}`
+
+        const whatsappAddressTo = `whatsapp:${phone}`
         const messagingService = event.messagingService
 
         const messageOptions : MessageListInstanceCreateOptions = {
