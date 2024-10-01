@@ -34,10 +34,14 @@ const Summary = ({ manager, task } : Props) => {
         if (csid) {
             reloadSummary(csid, false).finally(() => {
 
+                const workerAttr: Flex.WorkerAttributes & { ia_enabled: string } | Record<string, any> | undefined = manager?.workerClient?.attributes
                 const roles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles ?? []
-                const skills = manager?.workerClient?.attributes?.routing?.skills ?? []
+                const skills = workerAttr?.routing?.skills ?? []
 
-                setShowButtons(roles.indexOf('admin') >= 0 || skills?.indexOf('IA_Assistant') >= 0)
+                if (workerAttr !== undefined && workerAttr.ia_enabled === 'true') {
+                    console.log('Loading IA Features as workers is IA_ENABLED');
+                }
+                setShowButtons(roles.indexOf('admin') >= 0 || skills?.indexOf('IA_Assistant') >= 0 || (workerAttr !== undefined && workerAttr.ia_enabled === 'true'))
                 setLoaded(true)
             })
         }
