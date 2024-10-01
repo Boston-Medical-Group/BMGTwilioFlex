@@ -1,5 +1,8 @@
 # Changelog
 
+## 01/10/2024
+* Modifica carga de IA en Flex.
+
 ## 12/09/2024
 * Fix para formatear un telefono correctamente
 
