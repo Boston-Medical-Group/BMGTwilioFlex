@@ -38,6 +38,9 @@ const Summary = ({ manager, task } : Props) => {
                 const roles = manager?.store?.getState()?.flex?.session?.ssoTokenPayload?.roles ?? []
                 const skills = workerAttr?.routing?.skills ?? []
 
+                if (workerAttr !== undefined && workerAttr.ia_enabled === 'true') {
+                    console.log('Loading IA Features as workers is IA_ENABLED');
+                }
                 setShowButtons(roles.indexOf('admin') >= 0 || skills?.indexOf('IA_Assistant') >= 0 || (workerAttr !== undefined && workerAttr.ia_enabled === 'true'))
                 setLoaded(true)
             })
